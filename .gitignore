@@ -1,0 +1,6 @@
+.env
+/target
+/.idea
+/config
+nabi.conf
+postgres.env

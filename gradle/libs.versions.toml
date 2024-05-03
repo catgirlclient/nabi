@@ -1,0 +1,72 @@
+[versions]
+exposed = "0.49.0"
+hikari = "5.1.0"
+interaktions = "e92c2a407b"
+icu4j = "75.1"
+jda = "5.0.0-beta.23"
+kotlin = "1.9.21"
+slf4j = "1.4.5"
+kord = "0.14.0-SNAPSHOT"
+kotlin-serialization = "1.6.3"
+ktoml = "0.5.1"
+postgresql = "42.7.3"
+prometheus = "0.16.0"
+
+
+[libraries]
+# Discord libraries/frameworks
+jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
+
+kord-common = { module = "dev.kord:kord-core", version.ref = "kord" }
+kord-core = { module = "dev.kord:kord-core", version.ref = "kord" }
+kord-gateway = { module = "dev.kord:kord-gateway", version.ref = "kord" }
+kord-rest = { module = "dev.kord:kord-rest", version.ref = "kord" }
+interaktions-gateway = { module = "com.github.catgirlclient.DiscordInteraKTions:gateway-kord", version.ref = "interaktions" }
+interaktions-webserver = { module = "com.github.catgirlclient.DiscordInteraKTions:webserver-ktor-kord", version.ref = "interaktions" }
+
+# Database
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
+
+# Config/Locale Purposes
+kotlin-hocon = { module = "org.jetbrains.kotlinx:kotlinx-serialization-hocon", version.ref = "kotlin-serialization" }
+ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
+ktoml-file = { module = "com.akuleshov7:ktoml-file", version.ref = "ktoml" }
+icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
+
+# Logger
+slf4j = { module = "ch.qos.logback:logback-classic", version.ref = "slf4j" }
+prometheus-httpserver = { module = "io.prometheus:simpleclient_httpserver", version.ref = "prometheus" }
+
+[bundles]
+discord = [
+    "jda",
+    "kord-common",
+    "kord-core",
+    "kord-gateway",
+    "kord-rest",
+    "interaktions-gateway",
+    "interaktions-webserver"
+]
+database = [
+    "postgresql",
+    "hikaricp",
+    "exposed-core",
+    "exposed-dao",
+    "exposed-jdbc",
+    "exposed-kotlin-datetime"
+]
+parsers = [
+    "kotlin-hocon",
+    "ktoml-core",
+    "ktoml-file",
+    "icu4j"
+]
+logger = [
+    "slf4j",
+    "prometheus-httpserver"
+]
