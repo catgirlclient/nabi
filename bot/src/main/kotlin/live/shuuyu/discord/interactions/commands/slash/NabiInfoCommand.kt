@@ -6,7 +6,6 @@ import dev.kord.rest.route.Route
 import kotlinx.datetime.Clock
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
-import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.formatBytes
 import net.perfectdreams.discordinteraktions.common.builder.message.embed
@@ -18,7 +17,7 @@ import java.lang.management.ManagementFactory
 class NabiInfoCommand(nabi: NabiCore): NabiSlashCommandExecutor(nabi), SlashCommandDeclarationWrapper {
     @OptIn(KordUnsafe::class, KordExperimental::class)
     override suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments) {
-        val gatewayInfo = rest.unsafe(Route.GatewayBotGet) {}
+        val gatewayInfo = nabi.rest.unsafe(Route.GatewayBotGet) {}
         val os = ManagementFactory.getOperatingSystemMXBean()
 
         // memory stuff
@@ -27,27 +26,34 @@ class NabiInfoCommand(nabi: NabiCore): NabiSlashCommandExecutor(nabi), SlashComm
         val totalMemoryUsage = runtime.totalMemory().formatBytes()
         val memoryAllocated = runtime.maxMemory().formatBytes()
 
-        context.interaction.sendMessage {
+        context.respond {
             embed {
                 title = "Nabi"
                 field {
                     name = "» System Information"
                     value = buildString {
                         append("**Operating System:** ${os.name} (${os.arch}; ${os.version})")
-                        append("**RAM Usage:** $memoryUsage/$totalMemoryUsage $memoryAllocated")
+                        append("\n")
+                        append("**RAM Usage:** $memoryUsage/$totalMemoryUsage [$memoryAllocated]")
+                        append("\n")
                         append("**Java Version:** ${System.getProperty("java.version")}")
+                        append("\n")
                         append("**Java Distributor:** ${System.getProperty("java.vendor")}")
+                        append("\n")
                         append("**Kotlin Version:** ${KotlinVersion.CURRENT}")
                     }
                 }
                 field {
                     name = "» Sharding Information"
                     value = buildString {
-                        append("**Ping:** ${kord.gateway.averagePing!!.absoluteValue.inWholeMilliseconds}ms ")
+                        append("**Gateway Ping:** ${kord.gateway.averagePing?.inWholeMilliseconds}}ms")
+                        append("\n")
                         append("**Shards Launched This Session:** ${gatewayInfo.shards}")
+                        append("\n")
                         append("**Session Limit:** ${gatewayInfo.sessionStartLimit.remaining}/${gatewayInfo.sessionStartLimit.total}")
                     }
                 }
+                image = kord.getSelf().defaultAvatar.cdnUrl.toUrl()
                 timestamp = Clock.System.now()
             }
         }

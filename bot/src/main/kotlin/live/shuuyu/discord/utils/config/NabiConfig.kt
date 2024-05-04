@@ -1,4 +1,4 @@
-package live.shuuyu.discord.utils
+package live.shuuyu.discord.utils.config
 
 import dev.kord.common.entity.Snowflake
 import kotlinx.serialization.Serializable
@@ -11,7 +11,5 @@ data class NabiConfig (
     val shards: Int,
     val publicKey: String,
     val port: Int,
-    val jdbcUsername: String,
-    val jdbcPassword: String,
-    val jdbcUrl: String
+    val database: DatabaseConfig
 )

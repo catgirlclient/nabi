@@ -16,6 +16,7 @@ open class NabiApplicationCommandContext(
     discordInteraction: DiscordInteraction,
     override val interaction: ApplicationCommandContext
 ): NabiInteractionContext(nabi, sender, channelId, interactionData, discordInteraction, interaction) {
-    val applicationCommandDeclaration: ApplicationCommandDeclaration = interaction.applicationCommandDeclaration
+    val applicationCommandDeclaration: ApplicationCommandDeclaration
+        get() = interaction.applicationCommandDeclaration
 }
 

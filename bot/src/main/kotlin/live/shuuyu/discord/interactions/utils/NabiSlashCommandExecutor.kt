@@ -5,13 +5,12 @@ import live.shuuyu.discord.NabiCore
 import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
-import kotlin.coroutines.CoroutineContext
 
 abstract class NabiSlashCommandExecutor(val nabi: NabiCore): SlashCommandExecutor(), NabiCommandHandler {
     val kord = nabi.kord
     val rest = nabi.rest
     val scope = object: CoroutineScope {
-        override val coroutineContext = Dispatchers.IO + SupervisorJob() + CoroutineName("NabiSlashCommand")
+        override val coroutineContext = Dispatchers.IO + SupervisorJob()
     }
 
     abstract suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments)
@@ -24,10 +23,12 @@ abstract class NabiSlashCommandExecutor(val nabi: NabiCore): SlashCommandExecuto
         context: ApplicationCommandContext,
         args: SlashCommandArguments
     ) {
+        val ctx = handleCommandContext(nabi, context)
+
         try {
-            execute(handleCommandContext(nabi, context), args)
+            execute(ctx, args)
         } catch (e: Throwable) {
-            createCommandExceptionMessage(context, e)
+            return createCommandExceptionMessage(context, e)
         }
     }
 }

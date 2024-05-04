@@ -16,7 +16,7 @@ open class NabiBarebonesInteractionContext(open val interaction: BarebonesIntera
 
 
     suspend inline fun ephemeralRespond(builder: InteractionOrFollowupMessageCreateBuilder.() -> (Unit)) =
-        interaction.sendEphemeralMessage(builder)
+        interaction.sendEphemeralMessage { apply(builder)}
 
     suspend inline fun embed(builder: EmbedBuilder.() -> (Unit)) {
         respond {

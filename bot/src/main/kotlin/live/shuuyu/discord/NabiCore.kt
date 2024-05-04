@@ -1,6 +1,7 @@
 package live.shuuyu.discord
 
 import dev.kord.common.annotation.KordExperimental
+import dev.kord.common.entity.DiscordShard
 import dev.kord.core.Kord
 import dev.kord.gateway.*
 import dev.kord.rest.request.KtorRequestHandler
@@ -11,12 +12,10 @@ import live.shuuyu.discord.database.NabiDatabaseCore
 import live.shuuyu.discord.events.EventContext
 import live.shuuyu.discord.events.impl.PhishingBlocker
 import live.shuuyu.discord.interactions.InteractionsManager
-import live.shuuyu.discord.utils.NabiConfig
+import live.shuuyu.discord.utils.config.NabiConfig
 import net.dv8tion.jda.api.JDABuilder
 import net.perfectdreams.discordinteraktions.common.DiscordInteraKTions
 import net.perfectdreams.discordinteraktions.platforms.kord.installDiscordInteraKTions
-import net.perfectdreams.discordinteraktions.webserver.InteractionsServer
-import kotlin.time.measureTimedValue
 
 class NabiCore(
     private val gatewayManager: NabiGatewayManager,
@@ -28,8 +27,6 @@ class NabiCore(
 
     @OptIn(KordExperimental::class)
     val kord = Kord.restOnly(config.token) {
-        defaultDispatcher = Dispatchers.Default
-
         requestHandler {
             StackTraceRecoveringKtorRequestHandler(KtorRequestHandler(it.token))
         }
@@ -48,26 +45,35 @@ class NabiCore(
     private val database = NabiDatabaseCore(this)
     private val manager = InteractionsManager(this)
 
+    val modules = listOf(PhishingBlocker(this))
+
     @OptIn(PrivilegedIntent::class)
     fun initialize() {
-        val gateway = DefaultGateway {}
-
         runBlocking {
-            gateway.installDiscordInteraKTions(interaktions)
-            manager.registerGlobalApplicationCommands()
-            manager.registerGuildApplicationCommands(config.defaultGuild)
+            gatewayManager.gateways.forEach { (shardId, gateway) ->
+                gateway.installDiscordInteraKTions(interaktions)
+                manager.registerGlobalApplicationCommands()
+                manager.registerGuildApplicationCommands(config.defaultGuild)
 
-            scope.launch {
-                gateway.start(config.token) {
-                    intents = Intents {
-                        +Intent.Guilds
-                        +Intent.GuildMessages
-                        +Intent.MessageContent
-                        +Intent.GuildMembers
+                scope.launch {
+                    gateway.start(config.token) {
+                        intents = Intents {
+                            +Intent.Guilds
+                            +Intent.GuildMessages
+                            +Intent.MessageContent
+                            +Intent.GuildMembers
+                        }
+
+                        presence {
+                            playing("with something idk")
+                        }
+
+                        shard = DiscordShard(shardId, config.shards)
                     }
-
-                    presence {
-                        playing("with something idk")
+                    gateway.events.collect {
+                        for (module in modules) {
+                            module.process(EventContext(it, shardId))
+                        }
                     }
                 }
             }

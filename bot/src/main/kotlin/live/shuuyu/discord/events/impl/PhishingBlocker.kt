@@ -1,18 +1,14 @@
 package live.shuuyu.discord.events.impl
 
-import dev.kord.common.entity.DiscordUser
 import dev.kord.common.entity.Snowflake
 import dev.kord.gateway.*
 import dev.kord.rest.request.KtorRequestException
-import dev.kord.rest.request.KtorRequestHandler
-import dev.kord.rest.route.Route
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.events.AbstractEventModule
 import live.shuuyu.discord.events.EventContext
-import live.shuuyu.discord.events.EventResult
 
 class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
-    override suspend fun process(context: EventContext): EventResult {
+    override suspend fun process(context: EventContext) {
         when(val event = context.event) {
             is MessageCreate -> {
                 val author = event.message.author
@@ -31,7 +27,6 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
 
             else -> {}
         }
-        return EventResult.Cancel
     }
 
     private suspend fun detectInvokePunishment(
