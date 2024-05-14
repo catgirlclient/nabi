@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DatabaseConfig(
-    val databaseUsername: String,
-    val databasePassword: String,
-    val databaseUrl: String
+    val username: String,
+    val password: String,
+    val url: String
 )

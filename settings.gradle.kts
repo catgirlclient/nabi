@@ -3,12 +3,13 @@
 pluginManagement {
     repositories {
         mavenCentral()
+        gradlePluginPortal()
         maven("https://jitpack.io")
     }
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    // repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         mavenCentral()
         maven("https://jitpack.io")
@@ -16,4 +17,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":bot", ":common")
+include(":bot", ":common", ":dashboard")

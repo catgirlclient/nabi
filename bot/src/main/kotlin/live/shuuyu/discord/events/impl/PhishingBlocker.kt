@@ -1,6 +1,9 @@
 package live.shuuyu.discord.events.impl
 
+import dev.kord.common.entity.DiscordUser
 import dev.kord.common.entity.Snowflake
+import dev.kord.core.cache.data.GuildData
+import dev.kord.core.entity.Guild
 import dev.kord.gateway.*
 import dev.kord.rest.request.KtorRequestException
 import live.shuuyu.discord.NabiCore
@@ -30,16 +33,12 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
     }
 
     private suspend fun detectInvokePunishment(
-        authorId: Snowflake,
+        authorId: DiscordUser,
         guildId: Snowflake,
         channelId: Snowflake,
         messageId: Snowflake
     ) {
-        try {
-            nabi.rest.channel.deleteMessage(channelId, messageId)
-        } catch (e: KtorRequestException) {
-
-        }
+        val guild = Guild(GuildData.from(nabi.rest.guild.getGuild(guildId)), nabi.kord)
     }
 
     enum class PunishmentType() {

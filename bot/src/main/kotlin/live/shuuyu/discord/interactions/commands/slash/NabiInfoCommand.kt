@@ -8,6 +8,7 @@ import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.formatBytes
+import net.perfectdreams.discordinteraktions.common.builder.message.actionRow
 import net.perfectdreams.discordinteraktions.common.builder.message.embed
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
@@ -46,7 +47,7 @@ class NabiInfoCommand(nabi: NabiCore): NabiSlashCommandExecutor(nabi), SlashComm
                 field {
                     name = "» Sharding Information"
                     value = buildString {
-                        append("**Gateway Ping:** ${kord.gateway.averagePing?.inWholeMilliseconds}}ms")
+                        append("**Gateway Ping:** ${kord.gateway.averagePing?.inWholeMilliseconds} ms")
                         append("\n")
                         append("**Shards Launched This Session:** ${gatewayInfo.shards}")
                         append("\n")

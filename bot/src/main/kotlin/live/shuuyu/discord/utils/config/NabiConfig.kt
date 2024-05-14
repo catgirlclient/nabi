@@ -11,5 +11,6 @@ data class NabiConfig (
     val shards: Int,
     val publicKey: String,
     val port: Int,
+    val prefix: String,
     val database: DatabaseConfig
 )
