@@ -1,4 +1,4 @@
-package live.shuuyu.discord.interactions.commands.slash
+package live.shuuyu.discord.interactions.commands.slash.general
 
 import dev.kord.common.annotation.KordExperimental
 import dev.kord.common.annotation.KordUnsafe
@@ -8,14 +8,13 @@ import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.formatBytes
-import net.perfectdreams.discordinteraktions.common.builder.message.actionRow
 import net.perfectdreams.discordinteraktions.common.builder.message.embed
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 import net.perfectdreams.discordinteraktions.common.commands.slashCommand
 import java.lang.management.ManagementFactory
 
-class NabiInfoCommand(nabi: NabiCore): NabiSlashCommandExecutor(nabi), SlashCommandDeclarationWrapper {
+class NabiInfo(nabi: NabiCore): NabiSlashCommandExecutor(nabi), SlashCommandDeclarationWrapper {
     @OptIn(KordUnsafe::class, KordExperimental::class)
     override suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments) {
         val gatewayInfo = nabi.rest.unsafe(Route.GatewayBotGet) {}
@@ -61,6 +60,6 @@ class NabiInfoCommand(nabi: NabiCore): NabiSlashCommandExecutor(nabi), SlashComm
     }
 
     override fun declaration() = slashCommand("info", "Sends useless information about Nabi.") {
-        executor = this@NabiInfoCommand
+        executor = this@NabiInfo
     }
 }

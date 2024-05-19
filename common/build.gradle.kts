@@ -5,4 +5,5 @@ plugins {
 
 dependencies {
     implementation(libs.bundles.parsers)
+    implementation(libs.slf4j)
 }

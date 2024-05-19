@@ -1,4 +1,4 @@
-package live.shuuyu.discord.interactions.commands.slash
+package live.shuuyu.discord.interactions.commands.slash.moderation
 
 import dev.kord.common.entity.ChannelType
 import dev.kord.core.cache.data.ChannelData

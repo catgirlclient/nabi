@@ -7,6 +7,9 @@ A bot that specializes in ease of use, and versatility.
 * An actually good permissions system
 * Completely free (Looking at you Mee6)
 
+## Planned features
+* [ ] Session Checkpoints
+
 ## Hosting
 Before running Nabi, please note that you will not be given support if something breaks/goes wrong. The source code is 
 available purely for educational purposes. Nabi was originally created to be a closed-sourced, private bot, 

@@ -1,4 +1,4 @@
-package live.shuuyu.discord.interactions.commands.slash
+package live.shuuyu.discord.interactions.commands.slash.moderation
 
 import dev.kord.common.entity.DiscordInteraction
 import dev.kord.common.entity.Permission
@@ -6,9 +6,6 @@ import dev.kord.core.cache.data.GuildData
 import dev.kord.core.cache.data.UserData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
-import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
-import dev.kord.rest.builder.message.embed
-import dev.kord.rest.json.request.DMCreateRequest
 import dev.kord.rest.request.RestRequestException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
@@ -18,8 +15,6 @@ import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.MessageUtils
-import net.perfectdreams.discordinteraktions.common.builder.message.MessageBuilder
-import net.perfectdreams.discordinteraktions.common.builder.message.embed
 import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 

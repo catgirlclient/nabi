@@ -11,6 +11,7 @@ import dev.kord.rest.request.KtorRequestHandler
 import dev.kord.rest.request.StackTraceRecoveringKtorRequestHandler
 import dev.kord.rest.service.RestClient
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.launchIn
 import live.shuuyu.discord.database.NabiDatabaseCore
 import live.shuuyu.discord.events.EventContext
 import live.shuuyu.discord.events.impl.PhishingBlocker
@@ -36,10 +37,7 @@ class NabiCore(
         }
     }
 
-    @OptIn(KordUnsafe::class)
     val rest = RestClient(KtorRequestHandler(config.token, ExclusionRequestRateLimiter()))
-
-    val jda = JDABuilder.createLight(config.token)
 
     private val scope = object : CoroutineScope {
         override val coroutineContext = Dispatchers.IO + SupervisorJob()
@@ -56,7 +54,6 @@ class NabiCore(
         runBlocking {
             database.initialize()
             database.createMissingSchemaAndColumns()
-            // Don't let this be registered several times, as it might cause ratelimits on our part
             manager.registerGlobalApplicationCommands()
             manager.registerGuildApplicationCommands(config.defaultGuild)
 

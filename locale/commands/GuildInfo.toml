@@ -1,0 +1,5 @@
+[string]
+name = "guild"
+description = "Returns information on the sequestered guild/server."
+
+embedBody = "**Guild ID:** {0}"
