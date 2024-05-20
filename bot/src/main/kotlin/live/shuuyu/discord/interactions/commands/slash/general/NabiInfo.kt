@@ -4,9 +4,11 @@ import dev.kord.common.annotation.KordExperimental
 import dev.kord.common.annotation.KordUnsafe
 import dev.kord.rest.route.Route
 import kotlinx.datetime.Clock
+import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.formatBytes
 import net.perfectdreams.discordinteraktions.common.builder.message.embed
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
@@ -14,45 +16,44 @@ import net.perfectdreams.discordinteraktions.common.commands.options.SlashComman
 import net.perfectdreams.discordinteraktions.common.commands.slashCommand
 import java.lang.management.ManagementFactory
 
-class NabiInfo(nabi: NabiCore): NabiSlashCommandExecutor(nabi), SlashCommandDeclarationWrapper {
+class NabiInfo(
+    nabi: NabiCore
+): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/NabiInfo.toml")), SlashCommandDeclarationWrapper {
     @OptIn(KordUnsafe::class, KordExperimental::class)
     override suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments) {
         val gatewayInfo = nabi.rest.unsafe(Route.GatewayBotGet) {}
         val os = ManagementFactory.getOperatingSystemMXBean()
-
-        // memory stuff
         val runtime = Runtime.getRuntime()
-        val memoryUsage = runtime.freeMemory().formatBytes()
-        val totalMemoryUsage = runtime.totalMemory().formatBytes()
-        val memoryAllocated = runtime.maxMemory().formatBytes()
 
         context.respond {
             embed {
                 title = "Nabi"
                 field {
                     name = "» System Information"
-                    value = buildString {
-                        append("**Operating System:** ${os.name} (${os.arch}; ${os.version})")
-                        append("\n")
-                        append("**RAM Usage:** $memoryUsage/$totalMemoryUsage [$memoryAllocated]")
-                        append("\n")
-                        append("**Java Version:** ${System.getProperty("java.version")}")
-                        append("\n")
-                        append("**Java Distributor:** ${System.getProperty("java.vendor")}")
-                        append("\n")
-                        append("**Kotlin Version:** ${KotlinVersion.CURRENT}")
-                    }
+                    value = i18n!!.get("embedBodySystemInformation", mapOf(
+                        "0" to os.name,
+                        "1" to os.arch,
+                        "2" to os.version,
+                        "3" to runtime.freeMemory().formatBytes(),
+                        "4" to runtime.totalMemory().formatBytes(),
+                        "5" to runtime.maxMemory().formatBytes(),
+                        "6" to System.getProperty("java.version"),
+                        "7" to System.getProperty("java.vendor"),
+                        "8" to KotlinVersion.CURRENT
+                    ))
                 }
+
                 field {
                     name = "» Sharding Information"
-                    value = buildString {
-                        append("**Gateway Ping:** ${kord.gateway.averagePing?.inWholeMilliseconds} ms")
-                        append("\n")
-                        append("**Shards Launched This Session:** ${gatewayInfo.shards}")
-                        append("\n")
-                        append("**Session Limit:** ${gatewayInfo.sessionStartLimit.remaining}/${gatewayInfo.sessionStartLimit.total}")
-                    }
+                    value = i18n!!.get("embedBodyGatewayInformation", mapOf(
+                        "0" to kord.gateway.averagePing?.inWholeMilliseconds,
+                        "1" to gatewayInfo.shards,
+                        "2" to gatewayInfo.sessionStartLimit.remaining,
+                        "3" to gatewayInfo.sessionStartLimit.total
+                    ))
                 }
+
+                color = ColorUtils.DEFAULT
                 image = kord.getSelf().defaultAvatar.cdnUrl.toUrl()
                 timestamp = Clock.System.now()
             }

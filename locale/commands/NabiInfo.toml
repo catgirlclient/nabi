@@ -1,0 +1,14 @@
+[string]
+embedBodySystemInformation = """
+    **Operating System:** {0} ({1}; {2}) \n\
+    **RAM Usage:** {3}}/{4} [{5}] \n\
+    **Java Version:** {6} \n\
+    **Java Distributor:** {7} \n\
+    **Kotlin Version:** {8}
+"""
+
+embedBodyGatewayInformation = """
+    **Gateway Ping:** {0} ms \n\
+    **Shards Launched This Session:** {1} \n\
+    **Session Limit:** {2}/{3}
+"""

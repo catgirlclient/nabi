@@ -65,8 +65,13 @@ class NabiCore(
                         intents = Intents {
                             + Intent.MessageContent
                             + Intent.DirectMessages
-                            + Intent.GuildModeration
                             + Intent.Guilds
+                            + Intent.GuildIntegrations
+                            + Intent.GuildModeration
+                            + Intent.GuildMembers
+                            + Intent.GuildMessages
+                            + Intent.GuildPresences
+                            + Intent.GuildWebhooks
                         }
 
                         presence {

@@ -2,4 +2,9 @@
 name = "guild"
 description = "Returns information on the sequestered guild/server."
 
-embedBody = "**Guild ID:** {0}"
+embedBody = """
+    **ID:** {0} \n\
+    **Owner:** {1} \n\
+    **Creation Date:** {2} \n\
+    **Member Count:** {3}
+"""
