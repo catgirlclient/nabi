@@ -21,8 +21,7 @@ With the notice out of the way, you will need the following:
 * ~~An Interactions Endpoint~~ (We have removed webserver this for the time being. However, this will come back at a later date.)
 
 Nabi should automatically create a config file for you (titled ``nabi.conf``), and exit the process upon running. You will need to 
-fill out **ALL** the information. Otherwise, Hocon will not be able to parse the file correctly and/or some modules may not
-work correctly.
+fill out **ALL** the information. All of the information is required, and is not nullable.
 
 Your file should look something like this: 
 
