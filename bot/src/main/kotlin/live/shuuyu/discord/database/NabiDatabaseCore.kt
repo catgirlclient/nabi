@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory
 import com.zaxxer.hikari.util.IsolationLevel
 import live.shuuyu.discord.database.tables.BlacklistUser
+import live.shuuyu.discord.database.tables.LoggingChannel
 import live.shuuyu.discord.utils.config.DatabaseConfig
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -33,7 +34,8 @@ class NabiDatabaseCore(private val config: DatabaseConfig) {
     suspend fun createMissingSchemaAndColumns() {
         newSuspendedTransaction {
             SchemaUtils.createMissingTablesAndColumns(
-                BlacklistUser
+                BlacklistUser,
+                LoggingChannel
             )
         }
     }

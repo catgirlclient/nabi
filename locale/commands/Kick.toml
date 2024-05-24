@@ -1,0 +1,9 @@
+[string]
+userOptionName = "user"
+userOptionDescription = """
+    The user you want to kick from your server. The user must be in the current guild, or this command will fail.
+"""
+reasonOptionName = "reason"
+reasonOptionDescription = """
+    The reason you want to kick the user from your guild. If left blank, the reason will default to "No reason provided".
+"""

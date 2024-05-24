@@ -1,17 +1,19 @@
 package live.shuuyu.discord.interactions.utils
 
-import dev.kord.core.entity.Member
-import dev.kord.core.entity.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
 import net.perfectdreams.discordinteraktions.common.commands.MessageCommandExecutor
 import net.perfectdreams.discordinteraktions.common.entities.messages.Message
 
-abstract class NabiMessageCommandExecutor(val nabi: NabiCore): MessageCommandExecutor(), NabiCommandHandler {
+abstract class NabiMessageCommandExecutor(
+    val nabi: NabiCore,
+    val i18n: LanguageManager
+): MessageCommandExecutor(), NabiCommandHandler {
     val kord = nabi.kord
     val rest = nabi.rest
     val scope = object: CoroutineScope {

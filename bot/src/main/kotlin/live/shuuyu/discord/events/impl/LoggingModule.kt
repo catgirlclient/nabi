@@ -13,18 +13,20 @@ class LoggingModule(nabi: NabiCore): AbstractEventModule(nabi) {
     override suspend fun process(context: EventContext) {
         when (val event = context.event) {
             is GuildBanAdd -> {
-
+                val user = event.ban.user
             }
 
             is GuildBanRemove -> {
-
+                val user = event.ban.user
             }
 
             is GuildRoleCreate -> {
+                val role = event.role.role
 
             }
 
             is GuildRoleDelete -> {
+                val role = event.role
 
             }
 

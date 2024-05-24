@@ -9,7 +9,7 @@ import net.perfectdreams.discordinteraktions.common.commands.options.SlashComman
 
 abstract class NabiSlashCommandExecutor(
     val nabi: NabiCore,
-    val i18n: LanguageManager? = null
+    val i18n: LanguageManager
 ): SlashCommandExecutor(), NabiCommandHandler {
     val kord = nabi.kord
     val rest = nabi.rest

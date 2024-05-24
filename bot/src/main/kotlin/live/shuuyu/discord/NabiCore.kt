@@ -26,10 +26,6 @@ class NabiCore(
     val database: NabiDatabaseCore,
     val config: NabiConfig
 ) {
-    companion object {
-        const val NAME = "Nabi"
-    }
-
     @OptIn(KordExperimental::class)
     val kord = Kord.restOnly(config.token) {
         requestHandler {

@@ -9,6 +9,7 @@ import dev.kord.core.entity.User
 import dev.kord.rest.request.RestRequestException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
+import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
@@ -18,7 +19,7 @@ import live.shuuyu.discord.utils.MessageUtils
 import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 
-class KickCommand(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
+class Kick(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")) {
     inner class Options: ApplicationCommandOptions() {
         val user = user("user", "The supplied user to be kicked from the guild.")
         val reason = optionalString("reason", "The supplied reason for why the member was kicked. This is an optional argument.")

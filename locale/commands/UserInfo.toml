@@ -1,0 +1,12 @@
+[string]
+name = "user"
+description = "Looks up the sequestered user's information."
+embedUserBody = """
+    **Mention:** {0} \n\
+    **Join Date:** {1} \n\
+    **
+"""
+embedMemberBody = """
+    **Member Name:** {0} \n\
+    **Guild Join Date:** {1} \n\
+"""

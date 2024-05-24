@@ -4,6 +4,7 @@ import dev.kord.common.entity.ChannelType
 import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.Channel
+import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
@@ -11,7 +12,7 @@ import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 
-class SlowmodeCommand(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
+class Slowmode(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Slowmode.toml")) {
     inner class Options: ApplicationCommandOptions() {
         val channel = optionalChannel("channel", "The supplied channel to apply the ratelimit to.") {
             channelTypes = listOf(

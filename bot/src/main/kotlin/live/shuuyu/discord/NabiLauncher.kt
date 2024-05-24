@@ -24,7 +24,8 @@ object NabiLauncher {
                 result.database.username,
                 result.database.password,
                 result.database.url
-            )
+            ),
+            result.ownerIds
         )
 
         // This should NEVER be less than 0, otherwise there would be no instance I think

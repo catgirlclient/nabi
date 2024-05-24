@@ -10,6 +10,7 @@ import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.formatBytes
+import net.perfectdreams.discordinteraktions.common.builder.message.actionRow
 import net.perfectdreams.discordinteraktions.common.builder.message.embed
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
@@ -30,7 +31,7 @@ class NabiInfo(
                 title = "Nabi"
                 field {
                     name = "» System Information"
-                    value = i18n!!.get("embedBodySystemInformation", mapOf(
+                    value = i18n.get("embedBodySystemInformation", mapOf(
                         "0" to os.name,
                         "1" to os.arch,
                         "2" to os.version,
@@ -45,7 +46,7 @@ class NabiInfo(
 
                 field {
                     name = "» Sharding Information"
-                    value = i18n!!.get("embedBodyGatewayInformation", mapOf(
+                    value = i18n.get("embedBodyGatewayInformation", mapOf(
                         "0" to kord.gateway.averagePing?.inWholeMilliseconds,
                         "1" to gatewayInfo.shards,
                         "2" to gatewayInfo.sessionStartLimit.remaining,
@@ -54,8 +55,13 @@ class NabiInfo(
                 }
 
                 color = ColorUtils.DEFAULT
-                image = kord.getSelf().defaultAvatar.cdnUrl.toUrl()
+                image = kord.getSelf().avatar?.cdnUrl?.toUrl() ?: kord.getSelf().defaultAvatar.cdnUrl.toUrl()
                 timestamp = Clock.System.now()
+            }
+            actionRow {
+                linkButton("https://github.com/catgirlclient/discord/tree/main") {
+                     label = "Source Code"
+                }
             }
         }
     }

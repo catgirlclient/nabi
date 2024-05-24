@@ -8,4 +8,10 @@ import live.shuuyu.discord.events.EventContext
 open class NabiGatewayManager(
     shards: Int,
     val gateways: Map<Int, Gateway> = mapOf(),
-)
+) {
+    init {
+        require(gateways.isNotEmpty()) {
+            "Your gateway instance should never be empty! This could potentially be a bug."
+        }
+    }
+}

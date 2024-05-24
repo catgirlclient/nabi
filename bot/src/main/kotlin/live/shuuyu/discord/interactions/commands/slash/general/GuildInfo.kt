@@ -1,7 +1,6 @@
 package live.shuuyu.discord.interactions.commands.slash.general
 
 import dev.kord.common.DiscordTimestampStyle
-import dev.kord.common.entity.optional.value
 import dev.kord.common.toMessageFormat
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
@@ -23,16 +22,15 @@ class GuildInfo(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
         context.respond {
             embed {
                 title = guild.name
-                description = i18n!!.get(
-                    "embedBody",
-                    mapOf(
-                        "0" to guild.id,
-                        "1" to guild.owner.mention,
-                        "2" to guild.id.timestamp.toMessageFormat(DiscordTimestampStyle.LongDateTime),
-                        "3" to guild.members.count() // apparently guild.memberCount literally doesn't work
-                    )
-                )
+
+                description = i18n.get("embedBody", mapOf(
+                    "0" to guild.id,
+                    "1" to guild.owner.mention,
+                    "2" to guild.id.timestamp.toMessageFormat(DiscordTimestampStyle.LongDate),
+                    "3" to guild.members.count() // apparently guild.memberCount literally doesn't work
+                ))
                 color = ColorUtils.DEFAULT
+                image = guild.icon?.cdnUrl?.toUrl()
                 timestamp = Clock.System.now()
             }
         }

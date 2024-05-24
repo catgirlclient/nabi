@@ -1,0 +1,15 @@
+[string]
+name = "ban"
+description = "Bans the sequestered user from the guild you're in."
+userOptionName = "user"
+userOptionDescription = "The user you want to ban from the guild."
+reasonOptionName = "reason"
+reasonOptionDescription = """
+    The reason for why this user is being banned. If left blank, the reason will default to "No reason provided".
+"""
+deleteMessageDurationOptionName = "duration"
+deleteMessageDurationOptionDescription = """
+    The number of seconds to delete message for. The value must be between 0 and 7 days. If left blank, this value will
+    default to 7 days.
+"""
+
