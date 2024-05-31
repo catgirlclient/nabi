@@ -1,0 +1,25 @@
+[string]
+name = "mute"
+description = "Mutes/Times out the sequestered user."
+userOptionName = "user"
+userOptionDescription = "The user you want to mute."
+durationOptionName = "duration"
+durationOptionDescription = "The duration you want to mute the user for."
+reasonOptionName = "reason"
+reasonOptionDescription = """
+    The reason for why this user is being muted.
+"""
+insufficientPermissions = """
+    Nabi is either missing the `MODERATE_MEMBERS` permission, or has a role below the target member. Check if
+    Nabi has the valid permissions and position, then re-execute the command.
+"""
+targetRoleEqualOrHigher = """
+    The person you're trying to mute has equal to or more permissions than you. This is either because your highest
+    role is below the target's highest role in raw position.
+"""
+durationOutsideOfRange = """
+    The duration of the mute is outside of the range of 0-28 days. This is due to a Discord limitation. Please include
+    a duration within the given interval.
+"""
+targetIsOwner = "You cannot mute the owner of the guild!"
+targetIsSelf = "You cannot mute yourself!"

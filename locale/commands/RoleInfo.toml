@@ -1,0 +1,10 @@
+[string]
+name = "role"
+description = "Looks up information on the sequestered roles."
+roleOptionName = "role"
+roleOptionDescription = "The role you want to look up."
+embedBody = """
+    **Mention:** {0} \n\
+    **ID:** {1} \n\
+    **Creation Date:** {2}
+"""

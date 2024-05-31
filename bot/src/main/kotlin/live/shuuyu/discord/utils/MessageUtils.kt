@@ -1,7 +1,9 @@
 package live.shuuyu.discord.utils
 
 import dev.kord.common.Color
+import dev.kord.core.entity.Embed
 import dev.kord.core.entity.User
+import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kord.rest.json.request.DMCreateRequest
@@ -10,6 +12,8 @@ import dev.kord.rest.request.RestRequestException
 import dev.kord.rest.route.Route
 import dev.kord.rest.service.RestClient
 import kotlinx.datetime.Clock
+import net.perfectdreams.discordinteraktions.common.builder.message.MessageBuilder
+import net.perfectdreams.discordinteraktions.common.builder.message.embed
 
 object MessageUtils {
     suspend fun directMessageUser(
@@ -31,7 +35,7 @@ object MessageUtils {
         builder: UserMessageCreateBuilder.() -> (Unit)
     ) = directMessageUser(user, rest, UserMessageCreateBuilder().apply(builder).toRequest())
 
-    suspend fun createDirectMessageEmbed(
+    fun createDirectMessageEmbed(
         title: String,
         description: String,
         color: Color
@@ -41,6 +45,19 @@ object MessageUtils {
             this.description = description
             this.color = color
             this.timestamp = Clock.System.now()
+        }
+    }
+
+    fun MessageBuilder.createRespondEmbed(description: String, executor: User) = this.apply {
+        embed {
+            this.title = "Error"
+            this.description = description
+            this.color = ColorUtils.DEFAULT
+            this.timestamp = Clock.System.now()
+            footer {
+                text = "Executed by ${executor.username}"
+                icon = executor.avatar?.cdnUrl?.toUrl() ?: executor.defaultAvatar.cdnUrl.toUrl()
+            }
         }
     }
 }

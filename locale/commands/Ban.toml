@@ -4,12 +4,24 @@ description = "Bans the sequestered user from the guild you're in."
 userOptionName = "user"
 userOptionDescription = "The user you want to ban from the guild."
 reasonOptionName = "reason"
-reasonOptionDescription = """
-    The reason for why this user is being banned. If left blank, the reason will default to "No reason provided".
-"""
+reasonOptionDescription = "The reason for why this user is being banned."
 deleteMessageDurationOptionName = "duration"
-deleteMessageDurationOptionDescription = """
-    The number of seconds to delete message for. The value must be between 0 and 7 days. If left blank, this value will
-    default to 7 days.
+deleteMessageDurationOptionDescription = "The number of seconds to delete message for. The value must be between 0 and 7 days."
+insufficientPermissions = """
+    Nabi is either missing the `BAN_MEMBERS` permission, or has a role below the target member. Check if
+    Nabi has the valid permissions and position, then re-execute the command.
 """
-
+targetRoleEqualOrHigher = """
+    The person you're trying to ban has equal to or more permissions than you. This is either because your highest
+    role is below the target's highest role in raw position.
+"""
+deleteMessageDurationOutsideRange = """
+    You must have a delete message duration within the intervals of 0 seconds to 7 days. This is due to a Discord API
+    limitation. Please reconfigure the duration, then try again.
+"""
+targetIsOwner = "You cannot ban the owner of the guild!"
+targetIsSelf = "You cannot ban yourself!"
+punishmentEmbedTitle = "User Banned"
+punishmentEmbedDescription = """
+    You've been banned from **{0}** for **{1}**.
+"""

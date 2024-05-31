@@ -7,7 +7,6 @@ import live.shuuyu.discord.utils.config.DatabaseConfig
 import live.shuuyu.discord.utils.config.NabiConfig
 
 object NabiLauncher {
-
     @JvmStatic
     fun main(args: Array<String>) {
         val result = ParserUtils.readOrWriteConfig<NabiConfig>("nabi.conf")

@@ -1,6 +1,8 @@
 package live.shuuyu.discord.interactions.commands.slash.moderation
 
-import dev.kord.common.entity.Snowflake
+import dev.kord.common.entity.DiscordInteraction
+import dev.kord.common.entity.Permission
+import dev.kord.common.entity.Permissions
 import dev.kord.core.behavior.ban
 import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.cache.data.GuildData
@@ -8,38 +10,37 @@ import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.Channel
+import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
+import dev.kord.rest.builder.message.embed
 import dev.kord.rest.request.KtorRequestException
-import io.ktor.util.cio.*
+import dev.kord.rest.request.RestRequestException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
+import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
-import live.shuuyu.discord.database.tables.LoggingChannel
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.discord.utils.ColorUtils
+import live.shuuyu.discord.utils.MessageUtils
+import live.shuuyu.discord.utils.MessageUtils.createRespondEmbed
+import net.perfectdreams.discordinteraktions.common.builder.message.MessageBuilder
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 import net.perfectdreams.discordinteraktions.common.commands.slashCommand
-import okhttp3.internal.wait
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class Ban(
     nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/language/BanCommand.toml")), SlashCommandDeclarationWrapper {
+): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Ban.toml")), SlashCommandDeclarationWrapper {
     inner class Options: ApplicationCommandOptions() {
-        val user = user(
-            i18n.get("userOptionName"),
-            i18n.get("userOptionDescription")
-        )
+        val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
 
-        val reason = optionalString(
-            i18n.get("reasonOptionName"),
-            i18n.get("reasonOptionDescription")
-        )
+        val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription"))
 
         val deleteMessageDuration = optionalString(
             i18n.get("deleteMessageDurationOptionName"),
@@ -55,69 +56,105 @@ class Ban(
 
         val target = args[options.user]
         val executor = context.sender
-        val guildData = GuildData.from(rest.guild.getGuild(context.guildId))
+        val channel = Channel.from(ChannelData.from(rest.channel.getChannel(context.channelId)), kord)
+        val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
         val reason = args[options.reason]
         val deleteMessageDuration = Duration.parse(args[options.deleteMessageDuration] ?: "7d")
 
-        val data = BanData(target, executor, guildData, reason, deleteMessageDuration)
+        val data = BanData(target, executor, channel, guild, reason, deleteMessageDuration)
 
-        val interactonCheck = validate(data)
+        val interactonCheck = validate(data, context.discordInteraction)
         val failInteractionCheck = interactonCheck.filter { it.result != BanInteractionResult.SUCCESS }
         val successInteractionCheck = interactonCheck - failInteractionCheck.toSet()
 
         if (successInteractionCheck.isEmpty()) {
             context.fail {
                 for (fail in failInteractionCheck) {
-
+                    buildInteractionFailMessages(fail, this)
                 }
             }
+        }
+
+        try {
+            ban(data)
+        } catch (e: RestRequestException) {
+
         }
     }
 
     private suspend fun ban(data: BanData) {
         val target = data.target
         val executor = data.executor
-        val guild = Guild(data.guild, kord)
+        val channel = data.channel
+        val guild = data.guild
 
         try {
             guild.ban(target.id) {
                 reason = data.reason
                 deleteMessageDuration = data.deleteMessageDuration
             }
+
+            rest.channel.createMessage(channel.id, createBanConfirmationEmbed())
+            MessageUtils.directMessageUser(target, rest, createDirectMessageEmbed(guild, data.reason))
         } catch (e: KtorRequestException) {
-            
+            e.printStackTrace()
         }
     }
 
-    private suspend fun validate(data: BanData): List<BanInteractionCheck> {
+    private suspend fun validate(data: BanData, interaction: DiscordInteraction): List<BanInteractionCheck> {
         val check = mutableListOf<BanInteractionCheck>()
 
         val target = data.target
         val executor = data.executor
-        val guild = Guild(data.guild, kord)
+        val guild = data.guild
         val deleteMessageDuration = data.deleteMessageDuration
 
+        val nabiAsMember = kord.getSelf().asMember(guild.id)
         val targetAsMember = target.asMemberOrNull(guild.id) ?: target as? Member
-        val executorAsMember = target.asMember(guild.id)
+        val executorAsMember = executor.fetchMemberOrNull(guild.id) ?: executor as? Member
 
+        val nabiRolePosition = guild.roles.filter { it.id in nabiAsMember.roleIds }
+            .toList()
+            .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
-        val checkIfBanned = guild.bans.filter { it.user.id == target.id }
+        val targetRolePosition = guild.roles.filter { it.id in targetAsMember!! .roleIds }
+            .toList()
+            .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
+        val executorRolePosition = guild.roles.filter { it.id in executorAsMember!!.roleIds }
+            .toList()
+            .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
         when {
+            Permission.BanMembers !in interaction.appPermissions.value!! -> check.add(
+                BanInteractionCheck(
+                    target,
+                    executor,
+                    BanInteractionResult.INSUFFICIENT_PERMISSIONS
+                )
+            )
+
+            targetRolePosition >= nabiRolePosition -> check.add(
+                BanInteractionCheck(
+                    target,
+                    executor,
+                    BanInteractionResult.INSUFFICIENT_PERMISSIONS
+                )
+            )
+
+            targetRolePosition >= executorRolePosition -> check.add(
+                BanInteractionCheck(
+                    target,
+                    executor,
+                    BanInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER
+                )
+            )
+
             deleteMessageDuration !in 0.seconds..7.days -> check.add(
                 BanInteractionCheck(
                     target,
                     executor,
                     BanInteractionResult.DELETE_MESSAGE_DURATION_OUTSIDE_OF_RANGE
-                )
-            )
-
-             checkIfBanned.equals(target.id)-> check.add(
-                BanInteractionCheck(
-                    target,
-                    executor,
-                    BanInteractionResult.TARGET_ALREADY_BANNED
                 )
             )
 
@@ -149,21 +186,72 @@ class Ban(
         return check
     }
 
-    private data class BanData(
-        val target: User,
-        val executor: User,
-        val guild: GuildData,
-        val reason: String?,
-        val deleteMessageDuration: Duration
-    ) {
-        init {
-            require(deleteMessageDuration in 0.seconds..7.days) {
-                "This should NEVER return! Did something break?"
+    private fun buildInteractionFailMessages(check: BanInteractionCheck, builder: MessageBuilder) {
+        val (target, executor, result) = check
+
+        builder.apply {
+            when(result) {
+                BanInteractionResult.INSUFFICIENT_PERMISSIONS -> createRespondEmbed (
+                    i18n.get("insufficientPermissions"),
+                    executor
+                )
+
+                BanInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> createRespondEmbed(
+                    i18n.get("targetRoleEqualOrHigher"),
+                    executor
+                )
+
+                BanInteractionResult.DELETE_MESSAGE_DURATION_OUTSIDE_OF_RANGE -> createRespondEmbed(
+                    i18n.get("deleteMessageDurationOutsideRange"),
+                    executor
+                )
+
+                BanInteractionResult.TARGET_IS_OWNER -> createRespondEmbed(
+                    i18n.get("targetIsOwner"),
+                    executor
+                )
+
+                BanInteractionResult.TARGET_IS_SELF -> createRespondEmbed(
+                    i18n.get("targetIsSelf"),
+                    executor
+                )
+
+                BanInteractionResult.SUCCESS -> TODO()
             }
         }
     }
 
-    private class BanInteractionCheck(
+    private fun createDirectMessageEmbed(guild: Guild, reason: String?): UserMessageCreateBuilder.() -> (Unit) = {
+        embed {
+            title = i18n.get("punishmentEmbedTitle")
+            description = i18n.get("punishmentEmbedDescription", mapOf("0" to guild.name, "1" to reason))
+            thumbnail {
+                url = guild.icon?.cdnUrl?.toUrl().toString()
+            }
+            color = ColorUtils.BAN_COLOR
+            timestamp = Clock.System.now()
+        }
+    }
+
+    private fun createBanConfirmationEmbed(): UserMessageCreateBuilder.() -> (Unit) = {
+        embed {
+            title = i18n.get("confirmationEmbedTitle")
+            description = i18n.get("confirmationEmbedDescription")
+            color = ColorUtils.DEFAULT
+            timestamp = Clock.System.now()
+        }
+    }
+
+    private class BanData(
+        val target: User,
+        val executor: User,
+        val channel: Channel,
+        val guild: Guild,
+        val reason: String?,
+        val deleteMessageDuration: Duration
+    )
+
+    private data class BanInteractionCheck(
         val target: User,
         val executor: User,
         val result: BanInteractionResult
@@ -173,14 +261,17 @@ class Ban(
         INSUFFICIENT_PERMISSIONS,
         TARGET_PERMISSION_IS_EQUAL_OR_HIGHER,
         DELETE_MESSAGE_DURATION_OUTSIDE_OF_RANGE,
-        TARGET_ALREADY_BANNED,
         TARGET_IS_OWNER,
         TARGET_IS_SELF,
         SUCCESS
     }
 
     override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
+        defaultMemberPermissions = Permissions {
+            + Permission.BanMembers
+        }
 
+        dmPermission = false
 
         executor = this@Ban
     }

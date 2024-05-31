@@ -5,5 +5,5 @@ userOptionDescription = """
 """
 reasonOptionName = "reason"
 reasonOptionDescription = """
-    The reason you want to kick the user from your guild. If left blank, the reason will default to "No reason provided".
+    The reason you want to kick the user from your guild.
 """

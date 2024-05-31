@@ -1,8 +1,6 @@
 package live.shuuyu.discord
 
 import dev.kord.common.annotation.KordExperimental
-import dev.kord.common.annotation.KordUnsafe
-import dev.kord.common.entity.DiscordShard
 import dev.kord.common.entity.PresenceStatus
 import dev.kord.core.Kord
 import dev.kord.gateway.*
@@ -11,18 +9,17 @@ import dev.kord.rest.request.KtorRequestHandler
 import dev.kord.rest.request.StackTraceRecoveringKtorRequestHandler
 import dev.kord.rest.service.RestClient
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
 import live.shuuyu.discord.database.NabiDatabaseCore
 import live.shuuyu.discord.events.EventContext
 import live.shuuyu.discord.events.impl.PhishingBlocker
 import live.shuuyu.discord.interactions.InteractionsManager
 import live.shuuyu.discord.utils.config.NabiConfig
-import net.dv8tion.jda.api.JDABuilder
 import net.perfectdreams.discordinteraktions.common.DiscordInteraKTions
 import net.perfectdreams.discordinteraktions.platforms.kord.installDiscordInteraKTions
+import kotlin.concurrent.thread
 
 class NabiCore(
-    private val gatewayManager: NabiGatewayManager,
+    val gatewayManager: NabiGatewayManager,
     val database: NabiDatabaseCore,
     val config: NabiConfig
 ) {
@@ -84,6 +81,22 @@ class NabiCore(
                     }
                 }
             }
+
+            shutdownHook()
         }
+    }
+
+    private suspend fun shutdownHook() {
+        val runtime = Runtime.getRuntime()
+
+        runtime.addShutdownHook(
+            thread(start = false, name = "Nabi's Shutdown-Hook") {
+                scope.launch {
+                    gatewayManager.gateways.forEach { (shardId, gateway) ->
+                        gateway.stop()
+                    }
+                }
+            }
+        )
     }
 }

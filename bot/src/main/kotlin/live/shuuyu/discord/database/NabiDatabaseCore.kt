@@ -23,6 +23,7 @@ class NabiDatabaseCore(private val config: DatabaseConfig) {
             driverClassName = DRIVER_CLASS_NAME
             username = config.username
             password = config.password
+            isAutoCommit = false
             transactionIsolation = IsolationLevel.TRANSACTION_REPEATABLE_READ.name
             metricsTrackerFactory = PrometheusMetricsTrackerFactory()
         }),

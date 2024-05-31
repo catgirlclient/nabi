@@ -54,8 +54,11 @@ class NabiInfo(
                     ))
                 }
 
+                thumbnail {
+                    url = kord.getSelf().avatar?.cdnUrl?.toUrl() ?: kord.getSelf().defaultAvatar.cdnUrl.toUrl()
+                }
+
                 color = ColorUtils.DEFAULT
-                image = kord.getSelf().avatar?.cdnUrl?.toUrl() ?: kord.getSelf().defaultAvatar.cdnUrl.toUrl()
                 timestamp = Clock.System.now()
             }
             actionRow {

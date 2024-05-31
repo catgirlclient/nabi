@@ -22,7 +22,7 @@ import net.perfectdreams.discordinteraktions.common.commands.slashCommand
 class UserInfo(
     nabi: NabiCore
 ): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/UserInfo.toml")), SlashCommandDeclarationWrapper {
-    inner class Options(): ApplicationCommandOptions() {
+    inner class Options: ApplicationCommandOptions() {
         val user = optionalUser("user", "The user you want to look up.")
     }
 
@@ -57,9 +57,6 @@ class UserInfo(
                 image = user.avatar?.cdnUrl?.toUrl() ?: user.defaultAvatar.cdnUrl.toUrl()
                 timestamp = Clock.System.now()
                 color = ColorUtils.DEFAULT
-
-            }
-            actionRow {
 
             }
         }
