@@ -24,7 +24,6 @@ import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclara
 import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 import net.perfectdreams.discordinteraktions.common.commands.slashCommand
-import net.perfectdreams.discordinteraktions.common.utils.thumbnailUrl
 
 class UserInfo(
     nabi: NabiCore
