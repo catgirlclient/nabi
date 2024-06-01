@@ -1,11 +1,12 @@
 [string]
 name = "user"
 description = "Looks up the sequestered user's information."
-embedUserBody = """
+embedUserField = """
     **Mention:** {0} \n\
-    **Join Date:** {1}
+    **User ID:** {1} \n\
+    **Join Date:** {2}
 """
-embedMemberBody = """
-    **Member Name:** {0} \n\
+embedMemberField = """
+    **Name:** {0} \n\
     **Guild Join Date:** {1} \n\
 """
