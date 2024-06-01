@@ -2,8 +2,6 @@ package live.shuuyu.discord.interactions.utils
 
 import dev.kord.common.entity.DiscordInteraction
 import dev.kord.common.entity.Snowflake
-import dev.kord.core.cache.data.GuildData
-import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
 import live.shuuyu.discord.NabiCore
