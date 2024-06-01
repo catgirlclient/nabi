@@ -1,12 +1,12 @@
 package live.shuuyu.discord.interactions.commands.slash.general
 
 import dev.kord.common.DiscordTimestampStyle
-import dev.kord.common.entity.PresenceStatus
 import dev.kord.common.toMessageFormat
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
-import dev.kord.gateway.UpdateStatus
+import dev.kord.rest.Image
 import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
@@ -14,8 +14,8 @@ import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.ColorUtils
+import live.shuuyu.discord.utils.GuildUtils.getGuildIcon
 import net.perfectdreams.discordinteraktions.common.builder.message.embed
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationBuilder
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 import net.perfectdreams.discordinteraktions.common.commands.slashCommand
@@ -30,15 +30,17 @@ class GuildInfo(
         context.respond {
             embed {
                 title = guild.name
-                description = i18n.get("embedBody", mapOf(
-                    "0" to guild.id,
-                    "1" to guild.owner.mention,
-                    "2" to guild.id.timestamp.toMessageFormat(DiscordTimestampStyle.LongDate),
-                    "3" to guild.members.count()
-                ))
-                thumbnail {
-                    url = guild.icon?.cdnUrl?.toUrl().toString()
+                field {
+                    name = i18n.get("guildInformationEmbedTitle")
+                    value = i18n.get("guildInformationEmbedDescription", mapOf(
+                        "0" to guild.id,
+                        "1" to guild.owner.mention,
+                        "2" to guild.id.timestamp.toMessageFormat(DiscordTimestampStyle.LongDate),
+                        "3" to guild.members.count(),
+                        "4" to guild.roles.toList().size
+                    ))
                 }
+                thumbnailUrl = guild.getGuildIcon(Image.Size.Size512)
                 color = ColorUtils.DEFAULT
                 timestamp = Clock.System.now()
             }
