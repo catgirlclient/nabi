@@ -5,5 +5,6 @@ plugins {
 
 dependencies {
     implementation(libs.bundles.parsers)
+    implementation(libs.bundles.caching)
     implementation(libs.slf4j)
 }
