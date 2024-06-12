@@ -11,7 +11,7 @@ repositories {
 
 node {
     version.set("20.13.1")
-    pnpmVersion.set("9.1.1")
+    pnpmVersion.set("9.3.0")
     download.set(true)
 }
 
