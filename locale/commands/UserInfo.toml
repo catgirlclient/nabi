@@ -1,6 +1,7 @@
 [string]
 name = "user"
 description = "Looks up the sequestered user's information."
+embedEasterEggName = "I have an easter egg!"
 embedUserField = """
     **Mention:** {0} \n\
     **User ID:** {1} \n\
@@ -10,3 +11,8 @@ embedMemberField = """
     **Name:** {0} \n\
     **Guild Join Date:** {1} \n\
 """
+secretKeyYujin = "I'm cute <3"
+secretKeyLily = "gg"
+secretKeyNicky = "(secretly a catgirl)"
+secretKeyJaminul = "Please give Skyblock coins ty"
+secretKeyMeph = "Spooky"

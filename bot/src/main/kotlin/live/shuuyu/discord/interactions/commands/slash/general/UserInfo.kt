@@ -1,9 +1,11 @@
 package live.shuuyu.discord.interactions.commands.slash.general
 
 import dev.kord.common.DiscordTimestampStyle
+import dev.kord.common.entity.Snowflake
 import dev.kord.common.entity.UserFlag
 import dev.kord.common.toMessageFormat
 import dev.kord.core.entity.Member
+import dev.kord.core.entity.User
 import dev.kord.core.entity.effectiveName
 import dev.kord.rest.Image
 import kotlinx.coroutines.flow.toList
@@ -38,11 +40,20 @@ class UserInfo(
         val user = args[options.user] ?: context.sender
 
         val userAsMember = user.asMemberOrNull((context as NabiGuildApplicationContext).guildId) ?: user as? Member
+        val easterEgg = easterEggs(user)
 
         context.respond {
             embed {
                 title = user.username
                 description = user.publicFlags?.values?.joinToString(separator = " ") { getUserFlags(it) ?: "" }
+
+                if (easterEgg != null) {
+                    field {
+                        name = i18n.get("embedEasterEggName")
+                        value = easterEgg
+                    }
+                }
+
                 field {
                     name = "» User Information"
                     value = i18n.get("embedUserField", mapOf(
@@ -63,7 +74,9 @@ class UserInfo(
 
                     field {
                         name = "» Roles (${userAsMember.roles.toList().size})"
-                        value = userAsMember.roles.toList().joinToString(separator = " - ") { it.mention }
+                        value = userAsMember.roles.toList().sortedByDescending {
+                            it.rawPosition
+                        }.joinToString(separator = " - ") { it.mention }
                     }
                 }
 
@@ -73,7 +86,6 @@ class UserInfo(
                 image = userAsMember?.getMemberBanner(Image.Size.Size2048) ?: user.getUserBanner(Image.Size.Size2048)
                 timestamp = Clock.System.now()
                 color = ColorUtils.DEFAULT
-
             }
 
             actionRow {
@@ -104,6 +116,25 @@ class UserInfo(
 
             is UserFlag.Unknown -> null
         }
+    }
+
+    private fun easterEggs(user: User): String? {
+        return when (user.id) {
+            yujin -> i18n.get("secretKeyYujin")
+            lily -> i18n.get("secretKeyLily")
+            nicky -> i18n.get("secretKeyNicky")
+            jaminul -> i18n.get("secretKeyJaminul")
+            meph -> i18n.get("secretKeyMeph")
+            else -> return null
+        }
+    }
+
+    companion object {
+        val yujin = Snowflake(647675269057871885) // owner
+        val lily = Snowflake(150427554166210560) // owner
+        val nicky = Snowflake(347884694408265729) // owner
+        val jaminul = Snowflake(234089402777731072) // some random
+        val meph = Snowflake(426497602716958731) // another random
     }
 
     override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
