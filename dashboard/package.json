@@ -3,14 +3,24 @@
   "description": "The frontend dashboard for Nabi.",
   "version": "0.0.1",
   "license": "Polyform Shield License v1.0.0",
+  "engines": {
+    "node": "20.13.1"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
   "dependencies": {
-    "astro": "^4.8.3"
+    "astro": "^4.10.2",
+    "unocss": "^0.61.0",
+    "@unocss/vite": "^0.61.0"
   },
   "devDependencies": {
-    "vite": "^5.2.11",
+    "vite": "^5.2.13",
     "vitest": "^1.6.0",
-    "typescript": "^5.4.5",
-    "unocss": "^0.60.2",
-    "@unocss/vite": "^0.60.2"
+    "typescript": "^5.4.5"
   }
 }
