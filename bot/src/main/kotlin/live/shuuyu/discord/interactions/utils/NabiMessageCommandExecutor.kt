@@ -16,7 +16,8 @@ abstract class NabiMessageCommandExecutor(
 ): MessageCommandExecutor(), NabiCommandHandler {
     val kord = nabi.kord
     val rest = nabi.rest
-    val scope = object: CoroutineScope {
+    val database = nabi.database
+    private val scope = object: CoroutineScope {
         override val coroutineContext = Dispatchers.IO + SupervisorJob()
     }
 

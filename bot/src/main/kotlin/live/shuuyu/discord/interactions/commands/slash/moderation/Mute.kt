@@ -5,7 +5,6 @@ import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
 import dev.kord.core.behavior.edit
 import dev.kord.core.cache.data.GuildData
-import dev.kord.core.cache.data.InteractionData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
@@ -47,7 +46,14 @@ class Mute(
         val duration = Duration.parse(args[options.duration])
         val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
 
-        val data = MuteData(target, context.sender, guild, duration, reason)
+        val data = MuteData(
+            target,
+            context.sender,
+            guild,
+            duration,
+            reason
+        )
+
         val check = validate(data, context.discordInteraction)
         val failCheck = check.filter { it.result != MuteInteractionResults.SUCCESS }
         val successCheck = check - failCheck.toSet()

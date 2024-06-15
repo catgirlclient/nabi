@@ -10,6 +10,7 @@ import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.Channel
+import dev.kord.rest.Image
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kord.rest.request.KtorRequestException
@@ -23,13 +24,16 @@ import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.ColorUtils
+import live.shuuyu.discord.utils.GuildUtils.getGuildIcon
 import live.shuuyu.discord.utils.MessageUtils
 import live.shuuyu.discord.utils.MessageUtils.createRespondEmbed
+import live.shuuyu.discord.utils.UserUtils.getUserAvatar
 import net.perfectdreams.discordinteraktions.common.builder.message.MessageBuilder
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 import net.perfectdreams.discordinteraktions.common.commands.slashCommand
+import net.perfectdreams.discordinteraktions.common.utils.thumbnailUrl
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
@@ -39,9 +43,7 @@ class Ban(
 ): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Ban.toml")), SlashCommandDeclarationWrapper {
     inner class Options: ApplicationCommandOptions() {
         val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
-
         val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription"))
-
         val deleteMessageDuration = optionalString(
             i18n.get("deleteMessageDurationOptionName"),
             i18n.get("deleteMessageDurationOptionDescription")
@@ -61,7 +63,14 @@ class Ban(
         val reason = args[options.reason]
         val deleteMessageDuration = Duration.parse(args[options.deleteMessageDuration] ?: "7d")
 
-        val data = BanData(target, executor, channel, guild, reason, deleteMessageDuration)
+        val data = BanData(
+            target,
+            executor,
+            channel,
+            guild,
+            reason,
+            deleteMessageDuration
+        )
 
         val interactonCheck = validate(data, context.discordInteraction)
         val failInteractionCheck = interactonCheck.filter { it.result != BanInteractionResult.SUCCESS }
@@ -94,8 +103,12 @@ class Ban(
                 deleteMessageDuration = data.deleteMessageDuration
             }
 
-            rest.channel.createMessage(channel.id, createBanConfirmationEmbed())
-            MessageUtils.directMessageUser(target, rest, createDirectMessageEmbed(guild, data.reason))
+            rest.channel.createMessage(channel.id, createBanConfirmationEmbed(target))
+            try {
+                MessageUtils.directMessageUser(target, rest, createDirectMessageEmbed(guild, data.reason))
+            } catch (e: RestRequestException) {
+
+            }
         } catch (e: KtorRequestException) {
             e.printStackTrace()
         }
@@ -225,18 +238,17 @@ class Ban(
         embed {
             title = i18n.get("punishmentEmbedTitle")
             description = i18n.get("punishmentEmbedDescription", mapOf("0" to guild.name, "1" to reason))
-            thumbnail {
-                url = guild.icon?.cdnUrl?.toUrl().toString()
-            }
+            thumbnailUrl = guild.getGuildIcon(Image.Size.Size512)
             color = ColorUtils.BAN_COLOR
             timestamp = Clock.System.now()
         }
     }
 
-    private fun createBanConfirmationEmbed(): UserMessageCreateBuilder.() -> (Unit) = {
+    private fun createBanConfirmationEmbed(target: User): UserMessageCreateBuilder.() -> (Unit) = {
         embed {
             title = i18n.get("confirmationEmbedTitle")
             description = i18n.get("confirmationEmbedDescription")
+            thumbnailUrl = target.getUserAvatar(Image.Size.Size512)
             color = ColorUtils.DEFAULT
             timestamp = Clock.System.now()
         }

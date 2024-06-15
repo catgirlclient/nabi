@@ -1,6 +1,9 @@
 package live.shuuyu.discord.interactions.utils
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
@@ -13,7 +16,8 @@ abstract class NabiSlashCommandExecutor(
 ): SlashCommandExecutor(), NabiCommandHandler {
     val kord = nabi.kord
     val rest = nabi.rest
-    val scope = object: CoroutineScope {
+    val database = nabi.database
+    private val scope = object: CoroutineScope {
         override val coroutineContext = Dispatchers.IO + SupervisorJob()
     }
 

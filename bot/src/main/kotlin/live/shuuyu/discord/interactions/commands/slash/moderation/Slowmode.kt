@@ -63,7 +63,7 @@ class Slowmode(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("
         return mapOf()
     }
 
-    private fun createSlowmodeConfirmationEmbed(duration: Duration): UserMessageCreateBuilder.() -> (Unit) = {
+    private fun createSlowmodeConfirmationEmbed(channel: Channel, duration: Duration): UserMessageCreateBuilder.() -> (Unit) = {
         embed {
             title = i18n.get("confirmationEmbedTitle")
             description = i18n.get("confirmationEmbedDescription", mapOf("0" to "${duration.absoluteValue}"))

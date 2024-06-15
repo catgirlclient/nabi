@@ -1,18 +1,21 @@
 [versions]
 caching = "0.4.0"
-exposed = "0.49.0"
+coroutines = "1.8.1"
+exposed = "0.51.1"
 hikari = "5.1.0"
-interaktions = "e92c2a407b"
+interaktions = "0.0.22-SNAPSHOT"
 icu4j = "75.1"
 jda = "5.0.0-beta.23"
-kotlin = "1.9.21"
-slf4j = "1.4.5"
-kord = "0.14.0-SNAPSHOT"
+kotlin = "2.0.0"
+ktor = "2.3.11"
+logback = "1.4.12"
+kord = "0.15.0-SNAPSHOT"
 kotlin-serialization = "1.6.3"
 ktoml = "0.5.1"
 postgresql = "42.7.3"
 prometheus = "0.16.0"
 redisson = "3.31.0"
+zstd = "1.5.6-3"
 
 [libraries]
 # Discord libraries/frameworks
@@ -44,8 +47,14 @@ ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
 ktoml-file = { module = "com.akuleshov7:ktoml-file", version.ref = "ktoml" }
 icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 
+zstd = { module = "com.github.luben:zstd-jni", version.ref = "zstd" }
+ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
+ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor"}
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
+
 # Logger
-slf4j = { module = "ch.qos.logback:logback-classic", version.ref = "slf4j" }
+logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 prometheus-httpserver = { module = "io.prometheus:simpleclient_httpserver", version.ref = "prometheus" }
 
 [bundles]
@@ -72,6 +81,15 @@ parsers = [
     "ktoml-file",
     "icu4j"
 ]
+
+ktor = [
+    "zstd",
+    "ktor-http",
+    "ktor-client-encoding",
+    "ktor-client-core",
+    "ktor-utils"
+]
+
 caching = [
     "cache-api",
     "cache-map",
@@ -79,6 +97,6 @@ caching = [
 ]
 
 logger = [
-    "slf4j",
+    "logback",
     "prometheus-httpserver"
 ]

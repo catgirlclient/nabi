@@ -2,9 +2,7 @@ package live.shuuyu.common.locale
 
 import com.akuleshov7.ktoml.Toml
 import com.akuleshov7.ktoml.TomlInputConfig
-import com.ibm.icu.message2.MessageFormatter
 import com.ibm.icu.text.MessageFormat
-import com.ibm.icu.text.MessagePattern
 import kotlinx.serialization.decodeFromString
 import live.shuuyu.common.locale.data.LanguageType
 import org.slf4j.LoggerFactory

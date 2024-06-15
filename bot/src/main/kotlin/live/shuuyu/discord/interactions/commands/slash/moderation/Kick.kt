@@ -2,8 +2,8 @@ package live.shuuyu.discord.interactions.commands.slash.moderation
 
 import dev.kord.common.entity.DiscordInteraction
 import dev.kord.common.entity.Permission
+import dev.kord.common.entity.Permissions
 import dev.kord.core.cache.data.GuildData
-import dev.kord.core.cache.data.UserData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
 import dev.kord.rest.request.RestRequestException
@@ -16,10 +16,14 @@ import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.MessageUtils
+import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
+import net.perfectdreams.discordinteraktions.common.commands.slashCommand
 
-class Kick(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")) {
+class Kick(
+    nabi: NabiCore
+): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), SlashCommandDeclarationWrapper {
     inner class Options: ApplicationCommandOptions() {
         val user = user("user", "The supplied user to be kicked from the guild.")
         val reason = optionalString("reason", "The supplied reason for why the member was kicked. This is an optional argument.")
@@ -33,13 +37,13 @@ class Kick(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./lo
 
         val target = args[options.user]
         val reason = args[options.reason]
-        val guildData = GuildData.from(rest.guild.getGuild(context.guildId))
+        val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
 
         val check = validate(
             KickData(
-                context.sender.data,
-                target.data,
-                guildData,
+                context.sender,
+                target,
+                guild,
                 reason
             ),
             context.discordInteraction
@@ -75,9 +79,9 @@ class Kick(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./lo
     private suspend fun validate(data: KickData, interaction: DiscordInteraction): Map<User, List<KickInteractionCheck>> {
         val checkMap = mutableMapOf<User, List<KickInteractionCheck>>()
         val check = mutableListOf<KickInteractionCheck>()
-        val executor = User(data.executor, kord)
-        val target = User(data.target, kord)
-        val guild = Guild(data.guild, kord)
+        val executor = data.executor
+        val target = data.target
+        val guild = data.guild
 
         val executorAsMember = executor.asMember(guild.id) // should NEVER be null
         val targetAsMember = target.asMemberOrNull(guild.id)
@@ -142,9 +146,9 @@ class Kick(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./lo
     )
 
     private data class KickData(
-        val executor: UserData,
-        val target: UserData,
-        val guild: GuildData, // Guild should NEVER be null!
+        val executor: User,
+        val target: User,
+        val guild: Guild,
         val reason: String?
     )
 
@@ -155,5 +159,15 @@ class Kick(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./lo
         TARGET_IS_NULL,
         TARGET_IS_SELF,
         SUCCESS
+    }
+
+    override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
+        defaultMemberPermissions = Permissions {
+            + Permission.KickMembers
+        }
+
+        dmPermission = false
+
+        executor = this@Kick
     }
 }

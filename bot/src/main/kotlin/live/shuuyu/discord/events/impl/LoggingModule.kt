@@ -1,6 +1,5 @@
 package live.shuuyu.discord.events.impl
 
-import dev.kord.core.event.guild.BanAddEvent
 import dev.kord.gateway.GuildBanAdd
 import dev.kord.gateway.GuildBanRemove
 import dev.kord.gateway.GuildRoleCreate
@@ -8,9 +7,10 @@ import dev.kord.gateway.GuildRoleDelete
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.events.AbstractEventModule
 import live.shuuyu.discord.events.EventContext
+import live.shuuyu.discord.events.EventResult
 
 class LoggingModule(nabi: NabiCore): AbstractEventModule(nabi) {
-    override suspend fun process(context: EventContext) {
+    override suspend fun onEvent(context: EventContext): EventResult {
         when (val event = context.event) {
             is GuildBanAdd -> {
                 val user = event.ban.user
@@ -18,6 +18,7 @@ class LoggingModule(nabi: NabiCore): AbstractEventModule(nabi) {
 
             is GuildBanRemove -> {
                 val user = event.ban.user
+                val guildId = event.ban.guildId
             }
 
             is GuildRoleCreate -> {
@@ -32,6 +33,7 @@ class LoggingModule(nabi: NabiCore): AbstractEventModule(nabi) {
 
             else -> {}
         }
-    }
 
+        return EventResult.Return
+    }
 }

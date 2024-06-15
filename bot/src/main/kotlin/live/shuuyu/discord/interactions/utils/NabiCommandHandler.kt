@@ -1,10 +1,18 @@
 package live.shuuyu.discord.interactions.utils
 
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import live.shuuyu.discord.NabiCore
 import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
 import net.perfectdreams.discordinteraktions.common.commands.GuildApplicationCommandContext
 
 interface NabiCommandHandler {
+    companion object: CoroutineScope {
+        override val coroutineContext = Dispatchers.Default + SupervisorJob() + CoroutineName("Nabi's Command Handler")
+    }
+
     fun handleCommandContext(
         nabi: NabiCore,
         context: ApplicationCommandContext

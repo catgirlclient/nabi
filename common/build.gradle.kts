@@ -5,6 +5,12 @@ plugins {
 
 dependencies {
     implementation(libs.bundles.parsers)
+    implementation(libs.redisson)
     implementation(libs.bundles.caching)
-    implementation(libs.slf4j)
+    implementation(libs.logback)
+    implementation(libs.bundles.ktor)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

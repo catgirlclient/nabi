@@ -1,0 +1,3 @@
+[string]
+name = "channel"
+description = "Returns information on the sequestered channel."
