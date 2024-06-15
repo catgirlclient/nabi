@@ -29,7 +29,6 @@ class NabiProjectModule: Plugin<Project> {
             }
 
             kotlinExtension.apply {
-                explicitApi()
                 jvmToolchain(17) // Minimum (LTS) Java version we support
 
                 compilerOptions {
