@@ -1,6 +1,5 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+    id("live.shuuyu.plugins.nabi")
 }
 
 dependencies {

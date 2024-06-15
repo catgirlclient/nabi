@@ -20,7 +20,6 @@ zstd = "1.5.6-3"
 [libraries]
 # Discord libraries/frameworks
 jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
-
 kord-common = { module = "dev.kord:kord-core", version.ref = "kord" }
 kord-core = { module = "dev.kord:kord-core", version.ref = "kord" }
 kord-gateway = { module = "dev.kord:kord-gateway", version.ref = "kord" }
@@ -47,6 +46,7 @@ ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
 ktoml-file = { module = "com.akuleshov7:ktoml-file", version.ref = "ktoml" }
 icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 
+# Encoding/Decoding
 zstd = { module = "com.github.luben:zstd-jni", version.ref = "zstd" }
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor"}
@@ -56,6 +56,10 @@ ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 # Logger
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 prometheus-httpserver = { module = "io.prometheus:simpleclient_httpserver", version.ref = "prometheus" }
+
+# plugins for build-logic
+kotlin-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 [bundles]
 discord = [
@@ -99,4 +103,9 @@ caching = [
 logger = [
     "logback",
     "prometheus-httpserver"
+]
+
+buildLogic = [
+    "kotlin-plugin",
+    "kotlin-serialization-plugin"
 ]

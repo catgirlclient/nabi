@@ -1,7 +1,14 @@
 @file:Suppress("UnstableApiUsage")
 
 pluginManagement {
+    plugins {
+        id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    }
+
+    includeBuild("build-logic")
     repositories {
+        google()
+        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
         maven("https://jitpack.io")
