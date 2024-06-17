@@ -1,1 +1,7 @@
 [string]
+phishingLoggingTitle = "Automated Phishing Module Triggered"
+phishingLoggingDescription = """
+    **Member:** {0} ({1}) \n\
+    **Action:** {2} \n\
+    **Link:** {3}
+"""

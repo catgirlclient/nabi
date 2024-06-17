@@ -6,7 +6,8 @@ import live.shuuyu.discord.database.tables.GuildSettingsTable
 import live.shuuyu.discord.events.AbstractEventModule
 import live.shuuyu.discord.events.EventContext
 import live.shuuyu.discord.events.EventResult
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 
 class GatewayResponseModule(nabi: NabiCore): AbstractEventModule(nabi) {
     override suspend fun onEvent(context: EventContext): EventResult {
@@ -14,9 +15,11 @@ class GatewayResponseModule(nabi: NabiCore): AbstractEventModule(nabi) {
             is GuildDelete -> {
                 val guild = event.guild
 
-                GuildSettingsTable.selectAll().where {
-                    GuildSettingsTable.guildId eq guild.id.value.toLong()
-                }
+                // Delete guild settings related to the server where Nabi was kicked or where the guild was deleted.
+                database.asyncSuspendableTransaction {
+                    logger.info("Deleting Guild Setting from guild: ${guild.id}")
+                    GuildSettingsTable.deleteWhere { guildId eq guild.id.value.toLong() }
+                }.await()
             }
 
             else -> {}

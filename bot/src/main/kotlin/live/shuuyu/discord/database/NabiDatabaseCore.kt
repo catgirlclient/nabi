@@ -7,9 +7,11 @@ import com.zaxxer.hikari.util.IsolationLevel
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import live.shuuyu.discord.database.tables.BlacklistUserTable
+import live.shuuyu.discord.database.tables.BlacklistedUserTable
 import live.shuuyu.discord.database.tables.GuildSettingsTable
 import live.shuuyu.discord.database.tables.WarnTable
+import live.shuuyu.discord.database.utils.GuildDatabaseUtils
+import live.shuuyu.discord.database.utils.UserDatabaseUtils
 import live.shuuyu.discord.utils.config.DatabaseConfig
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -39,10 +41,13 @@ class NabiDatabaseCore(private val config: DatabaseConfig) {
         }
     )
 
+    val user = UserDatabaseUtils(this)
+    val guild = GuildDatabaseUtils(this)
+
     suspend fun createMissingSchemaAndColumns() {
         newSuspendedTransaction {
             SchemaUtils.createMissingTablesAndColumns(
-                BlacklistUserTable,
+                BlacklistedUserTable,
                 GuildSettingsTable,
                 WarnTable
             )

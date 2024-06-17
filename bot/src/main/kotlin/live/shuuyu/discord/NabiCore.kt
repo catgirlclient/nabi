@@ -19,9 +19,9 @@ import live.shuuyu.discord.events.EventResult
 import live.shuuyu.discord.events.impl.PhishingBlocker
 import live.shuuyu.discord.interactions.InteractionsManager
 import live.shuuyu.discord.utils.config.NabiConfig
+import mu.KotlinLogging
 import net.perfectdreams.discordinteraktions.common.DiscordInteraKTions
 import net.perfectdreams.discordinteraktions.platforms.kord.installDiscordInteraKTions
-import org.slf4j.LoggerFactory
 import kotlin.concurrent.thread
 import kotlin.time.measureTimedValue
 
@@ -31,7 +31,7 @@ class NabiCore(
     val config: NabiConfig
 ) {
     companion object {
-        val logger = LoggerFactory.getLogger("Nabi")
+        val logger = KotlinLogging.logger("Nabi")
     }
 
     @OptIn(KordExperimental::class)

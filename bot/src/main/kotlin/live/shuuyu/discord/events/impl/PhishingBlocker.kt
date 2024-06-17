@@ -1,7 +1,9 @@
 package live.shuuyu.discord.events.impl
 
 import com.github.luben.zstd.Zstd
+import dev.kord.common.entity.DiscordInteraction
 import dev.kord.common.entity.DiscordUser
+import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.cache.data.GuildData
@@ -28,6 +30,8 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -40,12 +44,13 @@ import live.shuuyu.discord.events.EventResult
 import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.MemberUtils.getMemberAvatar
 import live.shuuyu.discord.utils.UserUtils.getUserAvatar
+import mu.KotlinLogging
 import net.perfectdreams.discordinteraktions.common.utils.thumbnailUrl
-import org.slf4j.LoggerFactory
 
 class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
     companion object : CoroutineScope {
-        private val logger = LoggerFactory.getLogger("Nabi's Phishing Blocker")
+        const val FEED_URL = "wss://phish.sinking.yachts/feed"
+        private val logger = KotlinLogging.logger("Nabi's Phishing Module")
         private val urlRegex = Regex("(?:[A-z0-9](?:[A-z0-9-]{0,61}[A-z0-9])?\\.)+[A-z0-9][A-z0-9-]{0,61}[A-z0-9]")
 
         override val coroutineContext = Dispatchers.Default + SupervisorJob() + CoroutineName("Nabi's Phishing Blocker")
@@ -92,20 +97,20 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
         when (val event = context.event) {
             is MessageCreate -> {
                 val author = event.message.author
-                val guildId = event.message.guildId.value ?: EventResult.Return
-                val content = event.message.content
-                val channelId = event.message.channelId.value
+                val guildId = event.message.guildId.value ?: return EventResult.Continue
+                val messageId = event.message.id
+                val channelId = event.message.channelId
 
-                if (author.bot.discordBoolean) return EventResult.Return
+                return detectAndInvokePunishment(author, guildId, channelId, messageId)
             }
 
             is MessageUpdate -> {
-                val author = event.message.author.value
-                val guildId = event.message.guildId.value ?: EventResult.Return
-                val content = event.message.content
-                val channelId = event.message.channelId.value
+                val author = event.message.author.value ?: return EventResult.Continue
+                val guildId = event.message.guildId.value ?: return  EventResult.Continue
+                val content = event.message.id
+                val channelId = event.message.channelId
 
-                if (author?.bot?.discordBoolean == true) return EventResult.Return
+                return detectAndInvokePunishment(author, guildId, channelId, content)
             }
 
             else -> {}
@@ -123,24 +128,93 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
         val guild = Guild(GuildData.from(rest.guild.getGuild(guildId)), kord)
         val channel = Channel.from(ChannelData.from(rest.channel.getChannel(channelId)), kord)
         val message = Message(MessageData.from(rest.channel.getMessage(channelId, messageId)), kord)
+        val targetAsMember = target.asMember(guild.id)
+
+        val guildPhishingConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.phishingConfigId
+        val phishingConfig = database.guild.getPhishingConfig(guildPhishingConfigId) ?: return EventResult.Continue
+
+        val punishmentType = when(phishingConfig.punishmentType) {
+            0 -> PunishmentType.Ban
+            1 -> PunishmentType.Kick
+            2 -> PunishmentType.Mute
+            3 -> PunishmentType.Warn
+            4 -> PunishmentType.None
+            else -> error("This should never return! Is there some type of bug?")
+        }
+
+        // Return if the phishing module isn't enabled.
+        if (!phishingConfig.enabled)
+            return EventResult.Continue
 
         try {
+            if (phishingConfig.channelId != null || phishingConfig.sendMessageToChannel) {
+                rest.channel.createMessage(
+                    Snowflake(phishingConfig.channelId!!),
+                    createPhishingLoggingMessage(targetAsMember, punishmentType, urlRegex.find(message.content)!!.value)
+                )
+            }
             message.delete("Triggered automatic phishing detection with the link: ${urlRegex.find(message.content)?.value}.")
 
-            rest.channel.createMessage(channelId, createPhishingBlockerMessage(target.asMember(guild.id)))
+            rest.channel.createMessage(channelId, createPhishingBlockerMessage(targetAsMember))
         } catch (e: RestRequestException) {
             logger.error("Failed to delete the suspicious link! There could be a potential bug.")
         }
         return EventResult.Return
     }
 
-    private suspend fun validateUser() {
+    private suspend fun validate(
+        target: Member,
+        guild: Guild,
+        interaction: DiscordInteraction
+    ): List<PhishingModuleCheck> {
+        val check = mutableListOf<PhishingModuleCheck>()
+        val nabi = kord.getSelf().asMember(guild.id)
 
+        val targetRolePosition = guild.roles.filter { it.id in target.roleIds }
+            .toList()
+            .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
+
+        val nabiRolePosition = guild.roles.filter { it.id in nabi.roleIds }
+            .toList()
+            .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
+
+        when {
+            Permission.KickMembers !in interaction.appPermissions.value!! -> check.add(
+                PhishingModuleCheck(
+                    target,
+                    PhishingModuleResult.INSUFFICIENT_PERMISSIONS
+                )
+            )
+
+            targetRolePosition >= nabiRolePosition -> check.add(
+                PhishingModuleCheck(
+                    target,
+                    PhishingModuleResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER
+                )
+            )
+
+            target.isOwner() -> check.add(
+                PhishingModuleCheck(
+                    target,
+                    PhishingModuleResult.TARGET_IS_OWNER
+                )
+            )
+
+            else -> check.add(
+                PhishingModuleCheck(
+                    target,
+                    PhishingModuleResult.SUCCESS
+                )
+            )
+        }
+        return check
     }
 
     private suspend fun launchRequestProcess() = scope.launch {
-        client.webSocket {
+        client.webSocket(FEED_URL) {
+            while (isActive) {
 
+            }
         }
     }
 
@@ -154,11 +228,51 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
         }
     }
 
-    private enum class PunishmentType(severity: Int) {
-        Ban(0),
-        Kick(1),
-        Mute(2),
-        Warn(3),
-        None(4)
+    private fun createPhishingLoggingMessage(
+        target: Member,
+        punishmentType: PunishmentType,
+        suspectLink: String
+    ): UserMessageCreateBuilder.() -> (Unit) = {
+        val punishmentTypeString = when(punishmentType) {
+            PunishmentType.Ban -> "Ban"
+            PunishmentType.Kick -> "Kick"
+            PunishmentType.Mute -> "Mute"
+            PunishmentType.Warn -> "Warn"
+            PunishmentType.None -> "Delete"
+        }
+
+        embed {
+            title = i18n.get("phishingLoggingTitle")
+            description = i18n.get("phishingLoggingDescription", mapOf(
+                "0" to target.username,
+                "1" to target.id,
+                "2" to punishmentTypeString,
+                "3" to suspectLink
+            ))
+            color = ColorUtils.DEFAULT
+            thumbnailUrl = target.getMemberAvatar(Image.Size.Size512) ?: target.getUserAvatar(Image.Size.Size512)
+            timestamp = Clock.System.now()
+        }
+    }
+
+    private data class PhishingModuleCheck(
+        val target: Member,
+        val result: PhishingModuleResult
+    )
+
+    // We need this since you shouldn't ban a moderator.
+    private enum class PhishingModuleResult {
+        INSUFFICIENT_PERMISSIONS,
+        TARGET_PERMISSION_IS_EQUAL_OR_HIGHER,
+        TARGET_IS_OWNER,
+        SUCCESS
+    }
+
+    private enum class PunishmentType {
+        Ban,
+        Kick,
+        Mute,
+        Warn,
+        None
     }
 }

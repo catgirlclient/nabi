@@ -11,13 +11,14 @@ class ChatCommandModule(nabi: NabiCore): AbstractEventModule(nabi) {
     override suspend fun onEvent(context: EventContext): EventResult {
         when(val event = context.event) {
             is MessageCreate -> {
+                val guild = event.message.guildId.value ?: return EventResult.Continue
                 val message = event.message
                 val author = event.message.author
 
                 val arguments = message.content.split(" ")
 
-                if (author.bot.discordBoolean) return EventResult.Return
-                if (event.message.type != MessageType.Default) return EventResult.Return
+                if (author.bot.discordBoolean) return EventResult.Continue
+                if (event.message.type != MessageType.Default) return EventResult.Continue
 
 
             }

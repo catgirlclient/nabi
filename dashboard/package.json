@@ -16,11 +16,9 @@
   "dependencies": {
     "astro": "^4.10.2",
     "unocss": "^0.61.0",
-    "@unocss/vite": "^0.61.0"
+    "sass": "^1.77.5"
   },
   "devDependencies": {
-    "vite": "^5.2.13",
-    "vitest": "^1.6.0",
     "typescript": "^5.4.5"
   }
 }

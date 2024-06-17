@@ -10,9 +10,9 @@ class GuildSettingsEntity(id: EntityID<Long>): LongEntity(id) {
 
     var guildId by GuildSettingsTable.guildId
     var prefix by GuildSettingsTable.prefix
-    var modChannel by GuildSettingsTable.modChannel
     var welcomeChannel by GuildSettingsTable.welcomeChannel
     var leaveChannel by GuildSettingsTable.leaveChannel
-    val phishingChannel by GuildSettingsTable.phishingChannel
+    var modConfig by GuildSettingsTable.modConfig
+    val phishingConfig by GuildSettingsTable.phishingConfig
     var warnPunishmentType by GuildSettingsTable.warnPunishmentType
 }

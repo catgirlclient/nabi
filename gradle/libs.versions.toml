@@ -1,15 +1,15 @@
 [versions]
 caching = "0.4.0"
-coroutines = "1.8.1"
 exposed = "0.51.1"
 hikari = "5.1.0"
-interaktions = "0.0.22-SNAPSHOT"
 icu4j = "75.1"
+interaktions = "0.0.22-SNAPSHOT"
 jda = "5.0.0-beta.23"
 kotlin = "2.0.0"
 ktor = "2.3.11"
 logback = "1.4.12"
 kord = "0.15.0-SNAPSHOT"
+kotlin-coroutines = "1.9.0-RC"
 kotlin-serialization = "1.6.3"
 ktoml = "0.5.1"
 postgresql = "42.7.3"
@@ -18,6 +18,10 @@ redisson = "3.31.0"
 zstd = "1.5.6-3"
 
 [libraries]
+# Default Kotlin Libraries
+kotlin-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization"}
+kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines"}
+
 # Discord libraries/frameworks
 jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
 kord-common = { module = "dev.kord:kord-core", version.ref = "kord" }
@@ -62,6 +66,11 @@ kotlin-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 [bundles]
+kotlin = [
+    "kotlin-serialization-core",
+    "kotlin-coroutines-core"
+]
+
 discord = [
     "jda",
     "kord-common",
@@ -71,6 +80,7 @@ discord = [
     "interaktions-gateway",
     "interaktions-webserver"
 ]
+
 database = [
     "postgresql",
     "hikaricp",
@@ -79,6 +89,7 @@ database = [
     "exposed-jdbc",
     "exposed-kotlin-datetime"
 ]
+
 parsers = [
     "kotlin-hocon",
     "ktoml-core",

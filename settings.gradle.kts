@@ -23,8 +23,10 @@ dependencyResolutionManagement {
     }
 }
 
+rootProject.name = "nabi"
+
 include(
     ":bot",
     ":common",
-    ":dashboard"
+    // ":dashboard"
 )
