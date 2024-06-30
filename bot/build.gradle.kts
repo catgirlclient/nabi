@@ -7,10 +7,15 @@ dependencies {
     implementation(libs.bundles.database)
     implementation(libs.bundles.parsers)
     implementation(libs.bundles.logger)
-    implementation(libs.redisson)
+    implementation(libs.bundles.caching)
+    implementation(libs.kotlin.protobuf)
     implementation(project(":common"))
     implementation(libs.bundles.ktor)
     implementation("io.ktor:ktor-client-okhttp-jvm:2.3.11")
+    implementation(libs.cache.caffeine) {
+        exclude("kotlin")
+        exclude("caffeine")
+    }
 }
 
 tasks.test {

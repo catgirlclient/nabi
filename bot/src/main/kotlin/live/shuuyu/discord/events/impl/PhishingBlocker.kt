@@ -1,9 +1,7 @@
 package live.shuuyu.discord.events.impl
 
 import com.github.luben.zstd.Zstd
-import dev.kord.common.entity.DiscordInteraction
 import dev.kord.common.entity.DiscordUser
-import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.cache.data.GuildData
@@ -142,8 +140,8 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
             else -> error("This should never return! Is there some type of bug?")
         }
 
-        // Return if the phishing module isn't enabled.
-        if (!phishingConfig.enabled)
+        // Return if the phishing module isn't enabled or the user is a bot (We can't ban bots).
+        if (target.isBot || !phishingConfig.enabled)
             return EventResult.Continue
 
         try {
@@ -164,8 +162,7 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
 
     private suspend fun validate(
         target: Member,
-        guild: Guild,
-        interaction: DiscordInteraction
+        guild: Guild
     ): List<PhishingModuleCheck> {
         val check = mutableListOf<PhishingModuleCheck>()
         val nabi = kord.getSelf().asMember(guild.id)
@@ -179,13 +176,6 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
         when {
-            Permission.KickMembers !in interaction.appPermissions.value!! -> check.add(
-                PhishingModuleCheck(
-                    target,
-                    PhishingModuleResult.INSUFFICIENT_PERMISSIONS
-                )
-            )
-
             targetRolePosition >= nabiRolePosition -> check.add(
                 PhishingModuleCheck(
                     target,

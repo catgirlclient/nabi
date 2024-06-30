@@ -17,6 +17,4 @@ open class NabiGatewayManager(
 
     fun fetchGateway(shardId: Int): Gateway =
         fetchGatewayOrNull(shardId) ?: throw GatewayNotFoundException("Gateway with ID $shardId does not exist!")
-
-
 }

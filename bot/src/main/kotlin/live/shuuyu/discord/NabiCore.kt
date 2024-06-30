@@ -13,6 +13,7 @@ import dev.kord.rest.request.KtorRequestHandler
 import dev.kord.rest.request.StackTraceRecoveringKtorRequestHandler
 import dev.kord.rest.service.RestClient
 import kotlinx.coroutines.*
+import live.shuuyu.discord.cache.NabiCacheManager
 import live.shuuyu.discord.database.NabiDatabaseCore
 import live.shuuyu.discord.events.EventContext
 import live.shuuyu.discord.events.EventResult
@@ -27,28 +28,29 @@ import kotlin.time.measureTimedValue
 
 class NabiCore(
     val gatewayManager: NabiGatewayManager,
-    val database: NabiDatabaseCore,
-    val config: NabiConfig
+    val config: NabiConfig,
+    val cache: NabiCacheManager,
+    val database: NabiDatabaseCore
 ) {
     companion object {
         val logger = KotlinLogging.logger("Nabi")
     }
 
     @OptIn(KordExperimental::class)
-    val kord = Kord.restOnly(config.token) {
+    val kord = Kord.restOnly(config.discord.token) {
         requestHandler {
             StackTraceRecoveringKtorRequestHandler(KtorRequestHandler(it.token))
         }
     }
 
     @OptIn(KordUnsafe::class)
-    val rest = RestClient(KtorRequestHandler(config.token, ParallelRequestRateLimiter()))
+    val rest = RestClient(KtorRequestHandler(config.discord.token, ParallelRequestRateLimiter()))
 
     private val scope = object : CoroutineScope {
         override val coroutineContext = Dispatchers.IO + SupervisorJob()
     }
 
-    val interaktions = DiscordInteraKTions(config.token, config.applicationId)
+    val interaktions = DiscordInteraKTions(config.discord.token, config.discord.applicationId)
     private val manager = InteractionsManager(this)
 
     private val modules = listOf(PhishingBlocker(this))
@@ -59,13 +61,14 @@ class NabiCore(
             database.initialize()
             database.createMissingSchemaAndColumns()
             manager.registerGlobalApplicationCommands()
-            manager.registerGuildApplicationCommands(config.defaultGuild)
+            manager.registerGuildApplicationCommands(config.discord.defaultGuildId)
+            cache.connect()
 
             gatewayManager.gateways.forEach { (shardId, gateway) ->
                 gateway.installDiscordInteraKTions(interaktions)
 
                 scope.launch {
-                    gateway.start(config.token) {
+                    gateway.start(config.discord.token) {
                         intents = Intents {
                             + Intent.MessageContent
                             + Intent.DirectMessages
@@ -92,6 +95,7 @@ class NabiCore(
             }
 
             shutdownHook()
+            cache.redisShutdownHook()
         }
     }
 
@@ -126,7 +130,7 @@ class NabiCore(
                     gatewayManager.gateways.forEach { (shardId, gateway) ->
                         logger.info("Shutting down gateway instance with Shard ID: $shardId")
 
-                        gateway.stop()
+                        gateway.detach()
                     }
                 }
             }

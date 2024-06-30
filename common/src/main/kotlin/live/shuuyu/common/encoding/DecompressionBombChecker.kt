@@ -19,7 +19,7 @@ import java.io.InputStream
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-internal class  DecompressionBombChecker(private val maxRatio: Long) {
+internal class DecompressionBombChecker(private val maxRatio: Long) {
     private var inputByteCount = 0L
     private var outputByteCount = 0L
 

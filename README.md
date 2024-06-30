@@ -1,5 +1,5 @@
 # Nabi
-A bot that specializes in ease of use, and versatility.
+A non-profit bot that specializes in ease of use, and versatility.
 
 ## Features
 * Automoderation via events
@@ -11,9 +11,10 @@ A bot that specializes in ease of use, and versatility.
 * [ ] Session Checkpoints
 
 ## Hosting
-Before running Nabi, please note that you will not be given support if something breaks/goes wrong. The source code is 
-available purely for educational purposes. Nabi was originally created to be a closed-sourced, private bot, 
-and was specifically made for large servers in mind, so please take this into mind when looking at the source code.
+> [!CAUTION]
+> You will not be given support if Nabi's code breaks or something goes wrong. Nabi's source code is available purely for 
+> educational purposes, and was originally meant to be closed sourced and private. Nabi was intentionally made for
+> larger servers, so please keep that in mind when looking at the source code.
 
 With the notice out of the way, you will need the following: 
 * Java 17 (This is the minimum version, since we are using Java 15's API for webservers)
@@ -50,11 +51,6 @@ Your file should look something like this:
 ```
 
 Once you've filled out all the required information, relaunch your bot. Your bot should be running perfectly from then-on.
-
-## Credits
-Nabi would not be possible without the following libraries/projects.
-* [Kord](https://github.com/kordlib/kord)
-* [Discord InteraKTions](https://github.com/catgirlclient/DiscordInteraKTions)
 
 ___
 <p style="text-align: center">

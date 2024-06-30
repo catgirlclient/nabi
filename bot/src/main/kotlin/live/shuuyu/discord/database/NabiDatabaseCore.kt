@@ -28,7 +28,7 @@ class NabiDatabaseCore(private val config: DatabaseConfig) {
 
     fun initialize(): Database = Database.connect(
         datasource = HikariDataSource(HikariConfig().apply {
-            jdbcUrl = config.url
+            jdbcUrl = config.address
             driverClassName = DRIVER_CLASS_NAME
             username = config.username
             password = config.password

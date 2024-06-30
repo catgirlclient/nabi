@@ -1,12 +1,8 @@
 package live.shuuyu.discord.database.utils
 
 import live.shuuyu.discord.database.NabiDatabaseCore
-import live.shuuyu.discord.database.config.GuildSettingsConfig
-import live.shuuyu.discord.database.config.ModLoggingConfig
-import live.shuuyu.discord.database.config.PhishingConfig
-import live.shuuyu.discord.database.tables.GuildSettingsTable
-import live.shuuyu.discord.database.tables.ModLoggingTable
-import live.shuuyu.discord.database.tables.PhishingTable
+import live.shuuyu.discord.database.config.*
+import live.shuuyu.discord.database.tables.*
 import org.jetbrains.exposed.sql.selectAll
 
 class GuildDatabaseUtils(val database: NabiDatabaseCore) {
@@ -17,10 +13,23 @@ class GuildDatabaseUtils(val database: NabiDatabaseCore) {
             GuildSettingsConfig(
                 it[GuildSettingsTable.guildId],
                 it[GuildSettingsTable.prefix],
-                it[GuildSettingsTable.welcomeChannel],
-                it[GuildSettingsTable.leaveChannel],
-                it[GuildSettingsTable.modConfig]?.value,
+                it[GuildSettingsTable.welcomeConfig]?.value,
+                it[GuildSettingsTable.leaveConfig]?.value,
+                it[GuildSettingsTable.modLoggingConfig]?.value,
                 it[GuildSettingsTable.phishingConfig]?.value
+            )
+        }.firstOrNull()
+    }.await()
+
+    suspend fun getLeaveChannelConfig(leaveChannelConfigId: Long?) = database.asyncSuspendableTransaction {
+        LeaveChannelTable.selectAll().where {
+            LeaveChannelTable.id eq leaveChannelConfigId
+        }.limit(1).map {
+            LeaveChannelConfig(
+                it[LeaveChannelTable.enabled],
+                it[LeaveChannelTable.channelId],
+                it[LeaveChannelTable.customMessage],
+                it[LeaveChannelTable.silentFail]
             )
         }.firstOrNull()
     }.await()
@@ -54,6 +63,19 @@ class GuildDatabaseUtils(val database: NabiDatabaseCore) {
                 it[PhishingTable.sendPunishmentToDm],
                 it[PhishingTable.punishmentType],
                 it[PhishingTable.silentFail]
+            )
+        }.firstOrNull()
+    }.await()
+
+    suspend fun getWelcomeChannelConfig(welcomeChannelConfigId: Long?) = database.asyncSuspendableTransaction {
+        WelcomeChannelTable.selectAll().where {
+            WelcomeChannelTable.id eq welcomeChannelConfigId
+        }.limit(1).map {
+            WelcomeChannelConfig (
+                it[WelcomeChannelTable.enabled],
+                it[WelcomeChannelTable.channelId],
+                it[WelcomeChannelTable.customMessage],
+                it[WelcomeChannelTable.silentFail]
             )
         }.firstOrNull()
     }.await()
