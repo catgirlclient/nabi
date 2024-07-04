@@ -11,11 +11,7 @@ dependencies {
     implementation(libs.kotlin.protobuf)
     implementation(project(":common"))
     implementation(libs.bundles.ktor)
-    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.11")
-    implementation(libs.cache.caffeine) {
-        exclude("kotlin")
-        exclude("caffeine")
-    }
+    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.12")
 }
 
 tasks.test {

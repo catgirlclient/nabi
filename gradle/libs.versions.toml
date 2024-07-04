@@ -7,7 +7,7 @@ icu4j = "75.1"
 interaktions = "0.0.22-SNAPSHOT"
 jda = "5.0.0-beta.24"
 kotlin = "2.0.0"
-ktor = "2.3.11"
+ktor = "2.3.12"
 logback = "1.4.12"
 lettuce = "6.4.0.M1"
 kord = "0.15.0-SNAPSHOT"
@@ -42,9 +42,6 @@ exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datet
 
 # Caching
 caffeine-core = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
-cache-api = { module = "dev.kord.cache:cache-api", version.ref = "caching" }
-cache-map = { module = "dev.kord.cache:cache-map", version.ref = "caching" }
-cache-caffeine = { module = "dev.kord.cache:cache-caffeine", version.ref = "caching" }
 lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
 
 # Config/Locale Purposes
@@ -111,8 +108,6 @@ ktor = [
 
 caching = [
     "caffeine-core",
-    "cache-api",
-    "cache-map",
     "lettuce"
 ]
 
