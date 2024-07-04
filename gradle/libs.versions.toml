@@ -1,5 +1,4 @@
 [versions]
-caching = "0.4.0"
 caffeine = "3.1.8"
 exposed = "0.51.1"
 hikari = "5.1.0"
