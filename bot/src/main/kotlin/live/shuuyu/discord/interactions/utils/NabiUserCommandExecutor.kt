@@ -8,8 +8,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
-import net.perfectdreams.discordinteraktions.common.commands.UserCommandExecutor
+import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
+import live.shuuyu.discordinteraktions.common.commands.UserCommandExecutor
 
 abstract class NabiUserCommandExecutor(
     val nabi: NabiCore,

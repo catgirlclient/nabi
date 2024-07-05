@@ -1,13 +1,13 @@
 package live.shuuyu.discord.interactions.utils
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import live.shuuyu.discord.NabiCore
-import mu.KotlinLogging
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
-import net.perfectdreams.discordinteraktions.common.commands.GuildApplicationCommandContext
+import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
+import live.shuuyu.discordinteraktions.common.commands.GuildApplicationCommandContext
 
 interface NabiCommandHandler {
     companion object: CoroutineScope {

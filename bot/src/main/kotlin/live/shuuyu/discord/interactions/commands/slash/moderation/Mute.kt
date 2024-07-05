@@ -18,11 +18,11 @@ import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.MessageUtils.createRespondEmbed
-import net.perfectdreams.discordinteraktions.common.builder.message.MessageBuilder
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
-import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
-import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
-import net.perfectdreams.discordinteraktions.common.commands.slashCommand
+import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
+import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
+import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
+import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 

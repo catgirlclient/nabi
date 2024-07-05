@@ -18,6 +18,7 @@ import dev.kord.rest.Image
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kord.rest.request.RestRequestException
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
@@ -42,8 +43,7 @@ import live.shuuyu.discord.events.EventResult
 import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.MemberUtils.getMemberAvatar
 import live.shuuyu.discord.utils.UserUtils.getUserAvatar
-import mu.KotlinLogging
-import net.perfectdreams.discordinteraktions.common.utils.thumbnailUrl
+import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
 
 class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
     companion object : CoroutineScope {
@@ -155,7 +155,7 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
 
             rest.channel.createMessage(channelId, createPhishingBlockerMessage(targetAsMember))
         } catch (e: RestRequestException) {
-            logger.error("Failed to delete the suspicious link! There could be a potential bug.")
+            logger.error { "Failed to delete the suspicious link! There could be a potential bug." }
         }
         return EventResult.Return
     }

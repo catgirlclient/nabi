@@ -7,12 +7,12 @@ import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
-import net.perfectdreams.discordinteraktions.common.builder.message.embed
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
-import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
-import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
-import net.perfectdreams.discordinteraktions.common.commands.slashCommand
-import net.perfectdreams.discordinteraktions.common.utils.thumbnailUrl
+import live.shuuyu.discordinteraktions.common.builder.message.embed
+import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
+import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
+import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.discordinteraktions.common.commands.slashCommand
+import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
 
 class RoleInfo(
     nabi: NabiCore

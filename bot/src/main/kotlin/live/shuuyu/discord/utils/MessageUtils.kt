@@ -1,19 +1,16 @@
 package live.shuuyu.discord.utils
 
 import dev.kord.common.Color
-import dev.kord.core.entity.Embed
 import dev.kord.core.entity.User
-import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kord.rest.json.request.DMCreateRequest
 import dev.kord.rest.json.request.MultipartMessageCreateRequest
 import dev.kord.rest.request.RestRequestException
-import dev.kord.rest.route.Route
 import dev.kord.rest.service.RestClient
 import kotlinx.datetime.Clock
-import net.perfectdreams.discordinteraktions.common.builder.message.MessageBuilder
-import net.perfectdreams.discordinteraktions.common.builder.message.embed
+import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
+import live.shuuyu.discordinteraktions.common.builder.message.embed
 
 object MessageUtils {
     suspend fun directMessageUser(

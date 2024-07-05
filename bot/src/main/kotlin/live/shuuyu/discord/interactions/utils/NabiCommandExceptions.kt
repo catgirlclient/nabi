@@ -1,6 +1,6 @@
 package live.shuuyu.discord.interactions.utils
 
-import net.perfectdreams.discordinteraktions.common.builder.message.create.InteractionOrFollowupMessageCreateBuilder
+import live.shuuyu.discordinteraktions.common.builder.message.create.InteractionOrFollowupMessageCreateBuilder
 
 open class CommandException: RuntimeException()
 

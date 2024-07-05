@@ -15,8 +15,8 @@ import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.ColorUtils
-import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
-import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
+import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import kotlin.time.Duration
 
 class Slowmode(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Slowmode.toml")) {

@@ -1,7 +1,7 @@
 package live.shuuyu.discord.events
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import live.shuuyu.discord.NabiCore
-import mu.KotlinLogging
 
 abstract class AbstractEventModule(val nabi: NabiCore) {
     val kord = nabi.kord

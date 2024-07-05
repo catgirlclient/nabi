@@ -2,10 +2,10 @@ package live.shuuyu.discord.interactions.utils
 
 import dev.kord.rest.builder.interaction.ModalBuilder
 import dev.kord.rest.builder.message.EmbedBuilder
-import net.perfectdreams.discordinteraktions.common.BarebonesInteractionContext
-import net.perfectdreams.discordinteraktions.common.builder.message.allowedMentions
-import net.perfectdreams.discordinteraktions.common.builder.message.create.InteractionOrFollowupMessageCreateBuilder
-import net.perfectdreams.discordinteraktions.common.modals.ModalExecutorDeclaration
+import live.shuuyu.discordinteraktions.common.BarebonesInteractionContext
+import live.shuuyu.discordinteraktions.common.builder.message.allowedMentions
+import live.shuuyu.discordinteraktions.common.builder.message.create.InteractionOrFollowupMessageCreateBuilder
+import live.shuuyu.discordinteraktions.common.modals.ModalExecutorDeclaration
 
 open class NabiBarebonesInteractionContext(open val interaction: BarebonesInteractionContext) {
     suspend inline fun deferChannelMessage() = interaction.deferChannelMessage()

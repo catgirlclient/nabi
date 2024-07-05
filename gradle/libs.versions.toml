@@ -3,7 +3,7 @@ caffeine = "3.1.8"
 exposed = "0.51.1"
 hikari = "5.1.0"
 icu4j = "75.1"
-interaktions = "0.0.22-SNAPSHOT"
+interaktions = "0.1.0"
 jda = "5.0.0-beta.24"
 kotlin = "2.0.0"
 ktor = "2.3.12"
@@ -28,8 +28,8 @@ kord-common = { module = "dev.kord:kord-core", version.ref = "kord" }
 kord-core = { module = "dev.kord:kord-core", version.ref = "kord" }
 kord-gateway = { module = "dev.kord:kord-gateway", version.ref = "kord" }
 kord-rest = { module = "dev.kord:kord-rest", version.ref = "kord" }
-interaktions-gateway = { module = "com.github.catgirlclient.DiscordInteraKTions:gateway-kord", version.ref = "interaktions" }
-interaktions-webserver = { module = "com.github.catgirlclient.DiscordInteraKTions:webserver-ktor-kord", version.ref = "interaktions" }
+interaktions-gateway = { module = "live.shuuyu.discordinteraktions:gateway-kord", version.ref = "interaktions" }
+interaktions-webserver = { module = "live.shuuyu.discordinteraktions:webserver-ktor-kord", version.ref = "interaktions" }
 
 # Database
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }

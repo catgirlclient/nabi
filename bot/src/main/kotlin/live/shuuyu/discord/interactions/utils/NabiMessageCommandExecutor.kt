@@ -6,9 +6,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
-import net.perfectdreams.discordinteraktions.common.commands.MessageCommandExecutor
-import net.perfectdreams.discordinteraktions.common.entities.messages.Message
+import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
+import live.shuuyu.discordinteraktions.common.commands.MessageCommandExecutor
+import live.shuuyu.discordinteraktions.common.entities.messages.Message
 
 abstract class NabiMessageCommandExecutor(
     val nabi: NabiCore,

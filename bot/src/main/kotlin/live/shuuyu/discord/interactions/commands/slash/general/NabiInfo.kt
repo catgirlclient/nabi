@@ -10,11 +10,11 @@ import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.formatBytes
-import net.perfectdreams.discordinteraktions.common.builder.message.actionRow
-import net.perfectdreams.discordinteraktions.common.builder.message.embed
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
-import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
-import net.perfectdreams.discordinteraktions.common.commands.slashCommand
+import live.shuuyu.discordinteraktions.common.builder.message.actionRow
+import live.shuuyu.discordinteraktions.common.builder.message.embed
+import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
+import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import java.lang.management.ManagementFactory
 
 class NabiInfo(

@@ -4,9 +4,9 @@ import dev.kord.common.entity.DiscordInteraction
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.entity.User
 import live.shuuyu.discord.NabiCore
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandDeclaration
-import net.perfectdreams.discordinteraktions.common.interactions.InteractionData
+import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
+import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandDeclaration
+import live.shuuyu.discordinteraktions.common.interactions.InteractionData
 
 open class NabiApplicationCommandContext(
     nabi: NabiCore,

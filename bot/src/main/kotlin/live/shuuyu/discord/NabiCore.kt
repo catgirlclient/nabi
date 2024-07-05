@@ -12,6 +12,7 @@ import dev.kord.rest.ratelimit.ParallelRequestRateLimiter
 import dev.kord.rest.request.KtorRequestHandler
 import dev.kord.rest.request.StackTraceRecoveringKtorRequestHandler
 import dev.kord.rest.service.RestClient
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.*
 import live.shuuyu.discord.cache.NabiCacheManager
 import live.shuuyu.discord.database.NabiDatabaseCore
@@ -20,9 +21,8 @@ import live.shuuyu.discord.events.EventResult
 import live.shuuyu.discord.events.impl.PhishingBlocker
 import live.shuuyu.discord.interactions.InteractionsManager
 import live.shuuyu.discord.utils.config.NabiConfig
-import mu.KotlinLogging
-import net.perfectdreams.discordinteraktions.common.DiscordInteraKTions
-import net.perfectdreams.discordinteraktions.platforms.kord.installDiscordInteraKTions
+import live.shuuyu.discordinteraktions.common.DiscordInteraKTions
+import live.shuuyu.discordinteraktions.platforms.kord.installDiscordInteraKTions
 import kotlin.concurrent.thread
 import kotlin.time.measureTimedValue
 
@@ -115,7 +115,7 @@ class NabiCore(
                         }
                     }
                 } catch (e: Throwable) {
-                    logger.warn("Failed to execute the event! Potential bug?", e)
+                    logger.warn(e) { "${"Failed to execute the event! Potential bug?"}" }
                 }
             }
         }
@@ -128,7 +128,7 @@ class NabiCore(
             thread(start = false, name = "Nabi's Shutdown-Hook") {
                 scope.launch {
                     gatewayManager.gateways.forEach { (shardId, gateway) ->
-                        logger.info("Shutting down gateway instance with Shard ID: $shardId")
+                        logger.info { "Shutting down gateway instance with Shard ID: $shardId" }
 
                         gateway.detach()
                     }
