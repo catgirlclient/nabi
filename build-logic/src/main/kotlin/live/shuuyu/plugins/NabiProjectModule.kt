@@ -25,6 +25,7 @@ class NabiProjectModule: Plugin<Project> {
                 mavenCentral()
                 gradlePluginPortal()
                 maven("https://oss.sonatype.org/content/repositories/snapshots")
+                maven("https://maven.pkg.github.com/catgirlclient/DiscordInteraKTions/")
             }
 
             kotlinExtension.apply {
