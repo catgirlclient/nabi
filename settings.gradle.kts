@@ -25,7 +25,8 @@ dependencyResolutionManagement {
 rootProject.name = "nabi"
 
 include(
+    ":api",
     ":bot",
     ":common",
-    // ":dashboard"
+    ":dashboard"
 )

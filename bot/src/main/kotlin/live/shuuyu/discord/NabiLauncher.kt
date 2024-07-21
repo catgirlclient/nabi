@@ -35,7 +35,7 @@ object NabiLauncher {
                 result.redis.port,
                 result.redis.username,
                 result.redis.password
-            ),
+            )
         )
 
         // This should NEVER be less than 0, otherwise there would be no instance
