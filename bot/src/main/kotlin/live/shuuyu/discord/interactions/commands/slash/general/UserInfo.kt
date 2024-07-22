@@ -68,7 +68,7 @@ class UserInfo(
                         name = "» Member Information"
                         value = i18n.get("embedMemberField", mapOf(
                             "0" to (userAsMember.nickname ?: user.effectiveName),
-                            "1" to userAsMember.joinedAt.toMessageFormat(DiscordTimestampStyle.LongDate)
+                            "1" to userAsMember.joinedAt?.toMessageFormat(DiscordTimestampStyle.LongDate)
                         ))
                     }
 
