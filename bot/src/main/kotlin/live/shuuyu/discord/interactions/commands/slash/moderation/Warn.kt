@@ -69,7 +69,7 @@ class Warn(
 
         try {
             WarnTable.insert {
-                it[this.id] = target.id.value.toLong()
+                it[this.userId] = target.id.value.toLong()
                 it[this.executorId] = executor.id.value.toLong()
                 it[this.guildId] = guild.id.value.toLong()
                 it[this.reason] = reason

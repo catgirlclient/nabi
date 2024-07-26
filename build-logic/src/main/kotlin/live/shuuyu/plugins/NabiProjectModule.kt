@@ -24,6 +24,7 @@ class NabiProjectModule: Plugin<Project> {
                 mavenLocal()
                 mavenCentral()
                 gradlePluginPortal()
+                maven("https://maven.shuyu.me/releases")
                 maven("https://oss.sonatype.org/content/repositories/snapshots")
                 maven("https://maven.pkg.github.com/catgirlclient/DiscordInteraKTions/")
             }

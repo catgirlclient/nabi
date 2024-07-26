@@ -1,1 +1,3 @@
 [string]
+name = "dashboard"
+description = "Opens the dashboard to this guild."

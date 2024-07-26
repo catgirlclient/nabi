@@ -3,7 +3,8 @@ package live.shuuyu.discord.events.impl
 import com.github.luben.zstd.Zstd
 import dev.kord.common.entity.DiscordUser
 import dev.kord.common.entity.Snowflake
-import dev.kord.core.cache.data.ChannelData
+import dev.kord.core.behavior.ban
+import dev.kord.core.behavior.edit
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.cache.data.MessageData
 import dev.kord.core.cache.data.toData
@@ -11,7 +12,6 @@ import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.User
-import dev.kord.core.entity.channel.Channel
 import dev.kord.gateway.MessageCreate
 import dev.kord.gateway.MessageUpdate
 import dev.kord.rest.Image
@@ -37,6 +37,7 @@ import kotlinx.serialization.modules.SerializersModule
 import live.shuuyu.common.encoding.zstd
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
+import live.shuuyu.discord.database.tables.utils.PunishmentType
 import live.shuuyu.discord.events.AbstractEventModule
 import live.shuuyu.discord.events.EventContext
 import live.shuuyu.discord.events.EventResult
@@ -44,6 +45,7 @@ import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.MemberUtils.getMemberAvatar
 import live.shuuyu.discord.utils.UserUtils.getUserAvatar
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
+import kotlin.time.Duration.Companion.seconds
 
 class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
     companion object : CoroutineScope {
@@ -91,13 +93,16 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
         private val zstd = Zstd()
     }
 
+    // There may be multiple suspicious links in the same message
+    private lateinit var suspiciousUrl: List<String>
+
     override suspend fun onEvent(context: EventContext): EventResult {
         when (val event = context.event) {
             is MessageCreate -> {
                 val author = event.message.author
                 val guildId = event.message.guildId.value ?: return EventResult.Continue
-                val messageId = event.message.id
                 val channelId = event.message.channelId
+                val messageId = event.message.id
 
                 return detectAndInvokePunishment(author, guildId, channelId, messageId)
             }
@@ -105,10 +110,10 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
             is MessageUpdate -> {
                 val author = event.message.author.value ?: return EventResult.Continue
                 val guildId = event.message.guildId.value ?: return  EventResult.Continue
-                val content = event.message.id
                 val channelId = event.message.channelId
+                val messageId = event.message.id
 
-                return detectAndInvokePunishment(author, guildId, channelId, content)
+                return detectAndInvokePunishment(author, guildId, channelId, messageId)
             }
 
             else -> {}
@@ -124,36 +129,48 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
     ): EventResult {
         val target = User(author.toData(), kord)
         val guild = Guild(GuildData.from(rest.guild.getGuild(guildId)), kord)
-        val channel = Channel.from(ChannelData.from(rest.channel.getChannel(channelId)), kord)
         val message = Message(MessageData.from(rest.channel.getMessage(channelId, messageId)), kord)
         val targetAsMember = target.asMember(guild.id)
 
         val guildPhishingConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.phishingConfigId
         val phishingConfig = database.guild.getPhishingConfig(guildPhishingConfigId) ?: return EventResult.Continue
 
-        val punishmentType = when(phishingConfig.punishmentType) {
-            0 -> PunishmentType.Ban
-            1 -> PunishmentType.Kick
-            2 -> PunishmentType.Mute
-            3 -> PunishmentType.Warn
-            4 -> PunishmentType.None
-            else -> error("This should never return! Is there some type of bug?")
-        }
-
-        // Return if the phishing module isn't enabled or the user is a bot (We can't ban bots).
-        if (target.isBot || !phishingConfig.enabled)
+        // Return if the phishing module isn't enabled, the user is a bot (We can't ban bots), or the list of sus links is empty.
+        if (target.isBot || !phishingConfig.enabled || suspiciousUrl.isEmpty())
             return EventResult.Continue
 
         try {
-            if (phishingConfig.channelId != null || phishingConfig.sendMessageToChannel) {
+            if (phishingConfig.channelId != null && phishingConfig.sendMessageToChannel) {
                 rest.channel.createMessage(
-                    Snowflake(phishingConfig.channelId!!),
-                    createPhishingLoggingMessage(targetAsMember, punishmentType, urlRegex.find(message.content)!!.value)
+                    Snowflake(phishingConfig.channelId),
+                    createPhishingLoggingMessage(targetAsMember, phishingConfig.punishmentType)
                 )
             }
+
             message.delete("Triggered automatic phishing detection with the link: ${urlRegex.find(message.content)?.value}.")
 
             rest.channel.createMessage(channelId, createPhishingBlockerMessage(targetAsMember))
+
+            when (phishingConfig.punishmentType) {
+                PunishmentType.None -> return EventResult.Continue
+                PunishmentType.Warn -> {}
+                PunishmentType.Mute -> {
+                    targetAsMember.edit {
+                        communicationDisabledUntil = Clock.System.now().plus(phishingConfig.defaultMuteDuration.seconds)
+                    }
+                }
+                PunishmentType.Kick -> try {
+                    guild.kick(target.id)
+                } catch (e: RestRequestException) {
+                    logger.error(e) { "This should never happen! Potential REST request ratelimit?" }
+                }
+                PunishmentType.SoftBan -> TODO()
+                PunishmentType.Ban -> {
+                    guild.ban(target.id) {
+
+                    }
+                }
+            }
         } catch (e: RestRequestException) {
             logger.error { "Failed to delete the suspicious link! There could be a potential bug." }
         }
@@ -221,10 +238,10 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
     private fun createPhishingLoggingMessage(
         target: Member,
         punishmentType: PunishmentType,
-        suspectLink: String
     ): UserMessageCreateBuilder.() -> (Unit) = {
         val punishmentTypeString = when(punishmentType) {
             PunishmentType.Ban -> "Ban"
+            PunishmentType.SoftBan -> "Soft Ban"
             PunishmentType.Kick -> "Kick"
             PunishmentType.Mute -> "Mute"
             PunishmentType.Warn -> "Warn"
@@ -237,8 +254,9 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
                 "0" to target.username,
                 "1" to target.id,
                 "2" to punishmentTypeString,
-                "3" to suspectLink
+                "3" to suspiciousUrl.joinToString(separator = ", ") { "`$it`" }
             ))
+
             color = ColorUtils.DEFAULT
             thumbnailUrl = target.getMemberAvatar(Image.Size.Size512) ?: target.getUserAvatar(Image.Size.Size512)
             timestamp = Clock.System.now()
@@ -256,13 +274,5 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
         TARGET_PERMISSION_IS_EQUAL_OR_HIGHER,
         TARGET_IS_OWNER,
         SUCCESS
-    }
-
-    private enum class PunishmentType {
-        Ban,
-        Kick,
-        Mute,
-        Warn,
-        None
     }
 }

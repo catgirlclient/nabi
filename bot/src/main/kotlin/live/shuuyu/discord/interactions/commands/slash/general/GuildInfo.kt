@@ -27,7 +27,7 @@ class GuildInfo(
     override suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments) {
         val guild = Guild(GuildData.from(rest.guild.getGuild((context as NabiGuildApplicationContext).guildId)), kord)
 
-        context.respond {
+        context.sendMessage {
             embed {
                 title = guild.name
                 field {

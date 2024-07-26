@@ -43,15 +43,15 @@ exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datet
 caffeine-core = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
 
-# Config/Locale Purposes
+# encoding/decoding purposes
+zstd = { module = "com.github.luben:zstd-jni", version.ref = "zstd" }
 kotlin-hocon = { module = "org.jetbrains.kotlinx:kotlinx-serialization-hocon", version.ref = "kotlin-serialization" }
 kotlin-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "kotlin-serialization"}
 ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
 ktoml-file = { module = "com.akuleshov7:ktoml-file", version.ref = "ktoml" }
 icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 
-# Encoding/Decoding
-zstd = { module = "com.github.luben:zstd-jni", version.ref = "zstd" }
+# ktor
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -96,11 +96,11 @@ parsers = [
     "kotlin-hocon",
     "ktoml-core",
     "ktoml-file",
-    "icu4j"
+    "icu4j",
+    "zstd"
 ]
 
 ktor = [
-    "zstd",
     "ktor-http",
     "ktor-client-encoding",
     "ktor-client-core",

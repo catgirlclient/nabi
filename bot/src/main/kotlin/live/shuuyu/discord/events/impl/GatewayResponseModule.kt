@@ -17,7 +17,7 @@ class GatewayResponseModule(nabi: NabiCore): AbstractEventModule(nabi) {
 
                 // Delete guild settings related to the server where Nabi was kicked or where the guild was deleted.
                 database.asyncSuspendableTransaction {
-                    logger.info("Deleting Guild Setting from guild: ${guild.id}")
+                    logger.info { "Deleting Guild Setting from guild: ${guild.id}" }
                     GuildSettingsTable.deleteWhere { guildId eq guild.id.value.toLong() }
                 }.await()
             }

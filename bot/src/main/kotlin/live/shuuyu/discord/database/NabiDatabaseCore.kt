@@ -11,6 +11,7 @@ import live.shuuyu.discord.database.tables.BlacklistedUserTable
 import live.shuuyu.discord.database.tables.GuildSettingsTable
 import live.shuuyu.discord.database.tables.WarnTable
 import live.shuuyu.discord.database.utils.GuildDatabaseUtils
+import live.shuuyu.discord.database.utils.MemberDatabaseUtils
 import live.shuuyu.discord.database.utils.UserDatabaseUtils
 import live.shuuyu.discord.utils.config.DatabaseConfig
 import org.jetbrains.exposed.sql.Database
@@ -42,6 +43,7 @@ class NabiDatabaseCore(private val config: DatabaseConfig) {
     )
 
     val user = UserDatabaseUtils(this)
+    val member = MemberDatabaseUtils(this)
     val guild = GuildDatabaseUtils(this)
 
     suspend fun createMissingSchemaAndColumns() {

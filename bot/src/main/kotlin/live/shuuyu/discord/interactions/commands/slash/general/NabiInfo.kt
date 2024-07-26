@@ -26,7 +26,7 @@ class NabiInfo(
         val os = ManagementFactory.getOperatingSystemMXBean()
         val runtime = Runtime.getRuntime()
 
-        context.respond {
+        context.sendMessage {
             embed {
                 title = "Nabi"
                 field {

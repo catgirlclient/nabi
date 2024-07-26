@@ -18,7 +18,7 @@ object WelcomeChannelTable: LongIdTable() {
 
     /**
      * Sets whether the command should fail silently and not send an error message.
-     * This should almost never be enabled by the user unless they're a psychopath.
+     * This should almost never be disabled by the user unless they're a psychopath.
      */
     val silentFail = bool("silent_fail").default(true)
 }

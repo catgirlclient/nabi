@@ -42,7 +42,7 @@ Your file should look something like this:
   prefix = ["!", "?", "/"] // not added as of right now
   
   // For Developer Commands
-  owners = ["user_id"] // not added as of right now
+  owners = ["user_id"]
   
   // Setting this to development will send all of the debug logs.
   // Set this to production if you don't want to see it.

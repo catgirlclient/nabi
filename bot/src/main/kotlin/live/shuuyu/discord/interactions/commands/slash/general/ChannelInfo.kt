@@ -30,7 +30,7 @@ class ChannelInfo(
             kord
         )
 
-        context.respond {
+        context.sendMessage {
             embed {
                 title = channel.data.name.value
                 description = i18n.get("embedDescription", mapOf(

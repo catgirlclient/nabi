@@ -7,12 +7,12 @@ import live.shuuyu.discordinteraktions.common.builder.message.allowedMentions
 import live.shuuyu.discordinteraktions.common.builder.message.create.InteractionOrFollowupMessageCreateBuilder
 import live.shuuyu.discordinteraktions.common.modals.ModalExecutorDeclaration
 
-open class NabiBarebonesInteractionContext(open val interaction: BarebonesInteractionContext) {
+open class  NabiBarebonesInteractionContext(open val interaction: BarebonesInteractionContext) {
     suspend inline fun deferChannelMessage() = interaction.deferChannelMessage()
 
     suspend inline fun deferEphemeralChannelMessage() = interaction.deferChannelMessageEphemerally()
 
-    suspend inline fun respond(builder: InteractionOrFollowupMessageCreateBuilder.() -> (Unit)) =
+    suspend inline fun sendMessage(builder: InteractionOrFollowupMessageCreateBuilder.() -> (Unit)) =
         interaction.sendMessage {
             allowedMentions {
                 repliedUser = true
@@ -22,7 +22,7 @@ open class NabiBarebonesInteractionContext(open val interaction: BarebonesIntera
         }
 
 
-    suspend inline fun ephemeralRespond(builder: InteractionOrFollowupMessageCreateBuilder.() -> (Unit)) =
+    suspend inline fun sendEphemeralMessage(builder: InteractionOrFollowupMessageCreateBuilder.() -> (Unit)) =
         interaction.sendEphemeralMessage {
             allowedMentions {
                 repliedUser = true
@@ -32,7 +32,7 @@ open class NabiBarebonesInteractionContext(open val interaction: BarebonesIntera
         }
 
     suspend inline fun embed(builder: EmbedBuilder.() -> (Unit)) {
-        respond {
+        sendMessage {
             embeds = (embeds ?: mutableListOf()).also {
                 it.add(EmbedBuilder().apply(builder))
             }
@@ -40,7 +40,7 @@ open class NabiBarebonesInteractionContext(open val interaction: BarebonesIntera
     }
 
     suspend inline fun ephemeralEmbed(builder: EmbedBuilder.() -> (Unit)) {
-        ephemeralRespond {
+        sendEphemeralMessage {
             embeds = (embeds ?: mutableListOf()).also {
                 it.add(EmbedBuilder().apply(builder))
             }

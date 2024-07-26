@@ -26,7 +26,7 @@ class RoleInfo(
     override suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments) {
         val role = args[options.role]
 
-        context.respond {
+        context.sendMessage {
             embed {
                 title = role.name
                 description = i18n.get("embedBody", mapOf(

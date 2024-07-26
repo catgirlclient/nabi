@@ -17,5 +17,5 @@ class UserDatabaseUtils(val database: NabiDatabaseCore) {
                 it[BlacklistedUserTable.ownerId]
             )
         }.firstOrNull()
-    }
+    }.await()
 }

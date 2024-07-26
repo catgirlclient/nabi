@@ -42,7 +42,7 @@ class UserInfo(
         val userAsMember = user.asMemberOrNull((context as NabiGuildApplicationContext).guildId) ?: user as? Member
         val easterEgg = easterEggs(user)
 
-        context.respond {
+        context.sendMessage {
             embed {
                 title = user.username
                 description = user.publicFlags?.values?.joinToString(separator = " ") { getUserFlags(it) ?: "" }

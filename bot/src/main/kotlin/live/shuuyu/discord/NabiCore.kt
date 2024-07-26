@@ -18,7 +18,7 @@ import live.shuuyu.discord.cache.NabiCacheManager
 import live.shuuyu.discord.database.NabiDatabaseCore
 import live.shuuyu.discord.events.EventContext
 import live.shuuyu.discord.events.EventResult
-import live.shuuyu.discord.events.impl.PhishingBlocker
+import live.shuuyu.discord.events.impl.*
 import live.shuuyu.discord.interactions.InteractionsManager
 import live.shuuyu.discord.utils.config.NabiConfig
 import live.shuuyu.discordinteraktions.common.DiscordInteraKTions
@@ -53,7 +53,13 @@ class NabiCore(
     val interaktions = DiscordInteraKTions(config.discord.token, config.discord.applicationId)
     private val manager = InteractionsManager(this)
 
-    private val modules = listOf(PhishingBlocker(this))
+    private val modules = listOf(
+        ChatCommandModule(this),
+        GatewayResponseModule(this),
+        MemberModule(this),
+        PhishingBlocker(this),
+        UserModule(this)
+    )
 
     @OptIn(PrivilegedIntent::class)
     fun initialize() {
@@ -115,7 +121,7 @@ class NabiCore(
                         }
                     }
                 } catch (e: Throwable) {
-                    logger.warn(e) { "${"Failed to execute the event! Potential bug?"}" }
+                    logger.warn(e) { "Failed to execute the event! Potential bug?" }
                 }
             }
         }

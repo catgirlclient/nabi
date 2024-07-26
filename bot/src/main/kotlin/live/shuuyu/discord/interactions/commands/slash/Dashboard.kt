@@ -8,7 +8,7 @@ import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArgum
 
 class Dashboard(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Dashboard.toml")) {
     override suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments) {
-        context.respond {
+        context.sendMessage {
 
         }
     }

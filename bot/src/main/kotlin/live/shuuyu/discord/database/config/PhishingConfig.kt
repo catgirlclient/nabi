@@ -1,6 +1,7 @@
 package live.shuuyu.discord.database.config
 
 import kotlinx.serialization.Serializable
+import live.shuuyu.discord.database.tables.utils.PunishmentType
 
 @Serializable
 data class PhishingConfig(
@@ -8,6 +9,8 @@ data class PhishingConfig(
     val channelId: Long?,
     val sendMessageToChannel: Boolean,
     val sendPunishmentToDm: Boolean,
-    val punishmentType: Int,
-    val silentFail: Boolean
+    val punishmentType: PunishmentType,
+    val silentFail: Boolean,
+    val defaultMuteDuration: Long,
+    val defaultSoftBanDuration: Long
 )

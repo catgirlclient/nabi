@@ -59,7 +59,7 @@ class Kick(
         }
     }
 
-    private suspend fun kickUsers(executor: User, target: User, reason: String?, guild: Guild) {
+    private suspend fun kick(executor: User, target: User, reason: String?, guild: Guild) {
         try {
             guild.kick(target.id, reason)
             MessageUtils.directMessageUser(

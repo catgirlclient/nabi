@@ -9,5 +9,6 @@ data class GuildSettingsConfig(
     val welcomeConfigId: Long?,
     val leaveConfigId: Long?,
     val moderationConfigId: Long?,
-    val phishingConfigId: Long?
+    val phishingConfigId: Long?,
+    val accountAgeConfigId: Long?,
 )

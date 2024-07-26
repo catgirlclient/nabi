@@ -16,7 +16,20 @@ class GuildDatabaseUtils(val database: NabiDatabaseCore) {
                 it[GuildSettingsTable.welcomeConfig]?.value,
                 it[GuildSettingsTable.leaveConfig]?.value,
                 it[GuildSettingsTable.modLoggingConfig]?.value,
-                it[GuildSettingsTable.phishingConfig]?.value
+                it[GuildSettingsTable.phishingConfig]?.value,
+                it[GuildSettingsTable.accountAgeConfig]?.value
+            )
+        }.firstOrNull()
+    }.await()
+
+    suspend fun getAccountAgeConfig(accountAgeConfigId: Long?) = database.asyncSuspendableTransaction {
+        AccountAgeTable.selectAll().where {
+            AccountAgeTable.id eq accountAgeConfigId
+        }.limit(1).map {
+            AccountAgeConfig(
+                it[AccountAgeTable.enabled],
+                it[AccountAgeTable.minAccountAge],
+                it[AccountAgeTable.silentFail]
             )
         }.firstOrNull()
     }.await()
@@ -62,7 +75,9 @@ class GuildDatabaseUtils(val database: NabiDatabaseCore) {
                 it[PhishingTable.sendMessagesToChannel],
                 it[PhishingTable.sendPunishmentToDm],
                 it[PhishingTable.punishmentType],
-                it[PhishingTable.silentFail]
+                it[PhishingTable.silentFail],
+                it[PhishingTable.defaultMuteDuration],
+                it[PhishingTable.defaultSoftBanDuration]
             )
         }.firstOrNull()
     }.await()

@@ -10,6 +10,6 @@ object GuildSettingsTable: LongIdTable() {
     val leaveConfig = optReference("leave_config", LeaveChannelTable, onDelete = ReferenceOption.CASCADE)
     val modLoggingConfig = optReference("moderation_config", ModLoggingTable, onDelete = ReferenceOption.CASCADE)
     val phishingConfig = optReference("phishing_config", PhishingTable, onDelete = ReferenceOption.CASCADE)
-    val warnPunishmentType = integer("warnPunishmentType").default(1)
+    val accountAgeConfig = optReference("account_age_config", AccountAgeTable, onDelete = ReferenceOption.CASCADE)
 }
 
