@@ -1,4 +1,4 @@
-# Nabi
+<h1 align="center">Nabi 🦋</h1>
 A non-profit bot that specializes in ease of use, and versatility.
 
 ## Features
