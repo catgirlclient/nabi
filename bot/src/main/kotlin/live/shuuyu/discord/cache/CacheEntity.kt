@@ -1,6 +1,5 @@
 package live.shuuyu.discord.cache
 
-import dev.kord.common.entity.DiscordGuild
 import io.github.oshai.kotlinlogging.KotlinLogging
 import live.shuuyu.discord.NabiCore
 
@@ -13,7 +12,5 @@ class CacheEntity(val nabi: NabiCore) {
     private val kord = nabi.kord
     private val cache = nabi.cache
 
-    suspend fun createGuildCache(guild: DiscordGuild) {
 
-    }
 }

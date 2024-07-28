@@ -65,6 +65,9 @@ class NabiInfo(
                 linkButton("https://github.com/catgirlclient/discord/tree/main") {
                      label = "Source Code"
                 }
+                linkButton("https://discord.gg/42da8JWwKa") {
+                    label = "Support Server"
+                }
             }
         }
     }

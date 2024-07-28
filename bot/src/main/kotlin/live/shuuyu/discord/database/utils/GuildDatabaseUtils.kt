@@ -17,7 +17,8 @@ class GuildDatabaseUtils(val database: NabiDatabaseCore) {
                 it[GuildSettingsTable.leaveConfig]?.value,
                 it[GuildSettingsTable.modLoggingConfig]?.value,
                 it[GuildSettingsTable.phishingConfig]?.value,
-                it[GuildSettingsTable.accountAgeConfig]?.value
+                it[GuildSettingsTable.accountAgeConfig]?.value,
+                it[GuildSettingsTable.preconfiguredBanReason]
             )
         }.firstOrNull()
     }.await()
@@ -56,6 +57,7 @@ class GuildDatabaseUtils(val database: NabiDatabaseCore) {
                 it[ModLoggingTable.channelId],
                 it[ModLoggingTable.sendMessageToChannel],
                 it[ModLoggingTable.logUserBans],
+                it[ModLoggingTable.logUserKicks],
                 it[ModLoggingTable.logUserMutes],
                 it[ModLoggingTable.logUserWarns],
                 it[ModLoggingTable.logMessageDelete],

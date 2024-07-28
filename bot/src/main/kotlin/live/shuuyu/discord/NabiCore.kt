@@ -62,47 +62,45 @@ class NabiCore(
     )
 
     @OptIn(PrivilegedIntent::class)
-    fun initialize() {
-        runBlocking {
-            database.initialize()
-            database.createMissingSchemaAndColumns()
-            manager.registerGlobalApplicationCommands()
-            manager.registerGuildApplicationCommands(config.discord.defaultGuildId)
-            cache.connect()
+    fun initialize() = runBlocking {
+        database.initialize()
+        database.createMissingSchemaAndColumns()
+        manager.registerGlobalApplicationCommands()
+        manager.registerGuildApplicationCommands(config.discord.defaultGuildId)
+        cache.connect()
 
-            gatewayManager.gateways.forEach { (shardId, gateway) ->
-                gateway.installDiscordInteraKTions(interaktions)
+        gatewayManager.gateways.forEach { (shardId, gateway) ->
+            gateway.installDiscordInteraKTions(interaktions)
 
-                scope.launch {
-                    gateway.start(config.discord.token) {
-                        intents = Intents {
-                            + Intent.MessageContent
-                            + Intent.DirectMessages
-                            + Intent.Guilds
-                            + Intent.GuildIntegrations
-                            + Intent.GuildModeration
-                            + Intent.GuildMembers
-                            + Intent.GuildMessages
-                            + Intent.GuildPresences
-                            + Intent.GuildWebhooks
-                        }
-
-                        presence {
-                            afk = false
-                            playing("idk")
-                            status = PresenceStatus.Idle
-                        }
+            scope.launch {
+                gateway.start(config.discord.token) {
+                    intents = Intents {
+                        + Intent.MessageContent
+                        + Intent.DirectMessages
+                        + Intent.Guilds
+                        + Intent.GuildIntegrations
+                        + Intent.GuildModeration
+                        + Intent.GuildMembers
+                        + Intent.GuildMessages
+                        + Intent.GuildPresences
+                        + Intent.GuildWebhooks
                     }
 
-                    gateway.events.collect {
-                        launchEventProcesses(EventContext(it, shardId))
+                    presence {
+                        afk = false
+                        playing("idk")
+                        status = PresenceStatus.Idle
                     }
                 }
-            }
 
-            shutdownHook()
-            cache.redisShutdownHook()
+                gateway.events.collect {
+                    launchEventProcesses(EventContext(it, shardId))
+                }
+            }
         }
+
+        shutdownHook()
+        cache.redisShutdownHook()
     }
 
     private suspend fun launchEventProcesses(context: EventContext) {

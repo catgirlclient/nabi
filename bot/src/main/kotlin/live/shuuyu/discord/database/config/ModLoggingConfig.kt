@@ -8,6 +8,7 @@ data class  ModLoggingConfig (
     val channelId: Long?,
     val sendMessageToChannel: Boolean,
     val logUserBans: Boolean,
+    val logUserKicks: Boolean,
     val logUserMutes: Boolean,
     val logUserWarns: Boolean,
     val logMessageDelete: Boolean,

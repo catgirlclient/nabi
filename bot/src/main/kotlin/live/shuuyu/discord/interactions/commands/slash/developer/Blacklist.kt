@@ -1,6 +1,8 @@
 package live.shuuyu.discord.interactions.commands.slash.developer
 
 import dev.kord.core.entity.User
+import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
+import dev.kord.rest.builder.message.embed
 import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
@@ -8,6 +10,9 @@ import live.shuuyu.discord.database.tables.BlacklistedUserTable
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.discord.utils.ColorUtils
+import live.shuuyu.discord.utils.MessageUtils
+import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import org.jetbrains.exposed.sql.upsert
@@ -29,6 +34,19 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
         val executor = context.sender
         val target = args[options.user]
         val reason = args[options.reason]
+        val data = BlacklistData(executor, target, reason)
+
+        val interactionCheck = validate(data)
+        val failInteractionCheck = interactionCheck.filter { it.results != BlacklistInteractionResults.SUCCESS }
+        val successInteractionCheck = interactionCheck - failInteractionCheck.toSet()
+
+        if (successInteractionCheck.isEmpty()) {
+            context.fail {
+                for (fail in failInteractionCheck) {
+                    buildInteractionFailMessage(fail, this)
+                }
+            }
+        }
 
 
     }
@@ -38,17 +56,23 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
         val target = data.target
         val reason = data.reason
 
-        database.asyncSuspendableTransaction {
-            BlacklistedUserTable.upsert {
-                it[this.userId] = target.id.value.toLong()
-                it[this.reason] = reason
-                it[this.ownerId] = executor.id.value.toLong()
-                it[this.timestamp] = Clock.System.now().epochSeconds
-            }
-        }.await()
+        try {
+            database.asyncSuspendableTransaction {
+                BlacklistedUserTable.upsert {
+                    it[this.userId] = target.id.value.toLong()
+                    it[this.reason] = reason
+                    it[this.ownerId] = executor.id.value.toLong()
+                    it[this.timestamp] = Clock.System.now().epochSeconds
+                }
+            }.await()
+
+            MessageUtils.directMessageUser(target, rest, createBlacklistDirectMessage())
+        } catch (e: Exception) {
+
+        }
     }
 
-    private suspend fun validate(data: BlacklistData): List<BlacklistInteractionCheck> {
+    private fun validate(data: BlacklistData): List<BlacklistInteractionCheck> {
         val check = mutableListOf<BlacklistInteractionCheck>()
 
         val target = data.target
@@ -97,10 +121,31 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
         return check
     }
 
+    private fun buildInteractionFailMessage(check: BlacklistInteractionCheck, builder: MessageBuilder) {
+        val (results, executor, target) = check
+
+        builder.apply {
+            when(results) {
+                BlacklistInteractionResults.EXECUTOR_IS_NOT_DEVELOPER -> i18n.get("executorIsNotDeveloper")
+                BlacklistInteractionResults.TARGET_IS_DEVELOPER -> i18n.get("targetIsDeveloper")
+                BlacklistInteractionResults.TARGET_IS_SELF -> i18n.get("targetIsSelf")
+                BlacklistInteractionResults.SUCCESS -> ""
+            }
+        }
+    }
+
+    private fun createBlacklistDirectMessage(): UserMessageCreateBuilder.() -> (Unit) = {
+        embed {
+            description = i18n.get("directMessageDescription")
+            color = ColorUtils.ERROR
+            timestamp = Clock.System.now()
+        }
+    }
+
     private class BlacklistData(
         val executor: User,
         val target: User,
-        val reason: String,
+        val reason: String?,
     )
 
     private data class BlacklistInteractionCheck (

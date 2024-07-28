@@ -37,6 +37,7 @@ import kotlinx.serialization.modules.SerializersModule
 import live.shuuyu.common.encoding.zstd
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
+import live.shuuyu.discord.database.tables.WarnTable
 import live.shuuyu.discord.database.tables.utils.PunishmentType
 import live.shuuyu.discord.events.AbstractEventModule
 import live.shuuyu.discord.events.EventContext
@@ -45,6 +46,7 @@ import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.MemberUtils.getMemberAvatar
 import live.shuuyu.discord.utils.UserUtils.getUserAvatar
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
+import org.jetbrains.exposed.sql.upsert
 import kotlin.time.Duration.Companion.seconds
 
 class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
@@ -134,6 +136,7 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
 
         val guildPhishingConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.phishingConfigId
         val phishingConfig = database.guild.getPhishingConfig(guildPhishingConfigId) ?: return EventResult.Continue
+        val punishmentReason = i18n.get("phishingReason", mapOf("0" to urlRegex.find(message.content)?.value))
 
         // Return if the phishing module isn't enabled, the user is a bot (We can't ban bots), or the list of sus links is empty.
         if (target.isBot || !phishingConfig.enabled || suspiciousUrl.isEmpty())
@@ -153,27 +156,41 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
 
             when (phishingConfig.punishmentType) {
                 PunishmentType.None -> return EventResult.Continue
-                PunishmentType.Warn -> {}
+                PunishmentType.Warn -> {
+                    database.asyncSuspendableTransaction {
+                        val selfId = kord.getSelf().id.value.toLong() // apparently not in a suspenable function????
+
+                        WarnTable.upsert {
+                            it[this.userId] = target.id.value.toLong()
+                            it[this.executorId] = selfId
+                            it[this.guildId] = guildId.value.toLong()
+                            it[this.reason] = punishmentReason
+                            it[this.timestamp] = Clock.System.now().epochSeconds
+                        }
+                    }.await()
+                }
                 PunishmentType.Mute -> {
                     targetAsMember.edit {
                         communicationDisabledUntil = Clock.System.now().plus(phishingConfig.defaultMuteDuration.seconds)
+                        reason = punishmentReason
                     }
                 }
                 PunishmentType.Kick -> try {
-                    guild.kick(target.id)
+                    guild.kick(target.id, punishmentReason)
                 } catch (e: RestRequestException) {
                     logger.error(e) { "This should never happen! Potential REST request ratelimit?" }
                 }
                 PunishmentType.SoftBan -> TODO()
                 PunishmentType.Ban -> {
                     guild.ban(target.id) {
-
+                        reason = punishmentReason
                     }
                 }
             }
         } catch (e: RestRequestException) {
             logger.error { "Failed to delete the suspicious link! There could be a potential bug." }
         }
+
         return EventResult.Return
     }
 

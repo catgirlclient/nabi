@@ -62,15 +62,7 @@ class Ban(
         val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
         val reason = args[options.reason]
         val deleteMessageDuration = Duration.parse(args[options.deleteMessageDuration] ?: "7d")
-
-        val data = BanData(
-            target,
-            executor,
-            channel,
-            guild,
-            reason,
-            deleteMessageDuration
-        )
+        val data = BanData(target, executor, channel, guild, reason, deleteMessageDuration)
 
         val interactonCheck = validate(data, context.discordInteraction)
         val failInteractionCheck = interactonCheck.filter { it.result != BanInteractionResult.SUCCESS }
@@ -97,18 +89,22 @@ class Ban(
         val channel = data.channel
         val guild = data.guild
 
+        val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
+        val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
+
         try {
+            if (modLogConfig != null && modLogConfig.logUserBans) {
+                val channelId = modLogConfig.channelId
+            }
+
             guild.ban(target.id) {
                 reason = data.reason
                 deleteMessageDuration = data.deleteMessageDuration
             }
 
             rest.channel.createMessage(channel.id, createBanConfirmationEmbed(target))
-            try {
-                MessageUtils.directMessageUser(target, rest, createDirectMessageEmbed(guild, data.reason))
-            } catch (e: RestRequestException) {
 
-            }
+            MessageUtils.directMessageUser(target, rest, createDirectMessageEmbed(guild, data.reason))
         } catch (e: KtorRequestException) {
             e.printStackTrace()
         }

@@ -5,3 +5,4 @@ phishingLoggingDescription = """
     **Action:** {2} \n\
     **Links:** {3}
 """
+phishingReason = "Punishment invoked due to a suspicious link: {0}"

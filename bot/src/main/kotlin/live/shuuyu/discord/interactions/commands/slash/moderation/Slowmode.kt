@@ -1,6 +1,8 @@
 package live.shuuyu.discord.interactions.commands.slash.moderation
 
 import dev.kord.common.entity.ChannelType
+import dev.kord.common.entity.Permission
+import dev.kord.common.entity.Permissions
 import dev.kord.core.behavior.channel.edit
 import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.entity.User
@@ -15,11 +17,15 @@ import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.ColorUtils
+import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import kotlin.time.Duration
 
-class Slowmode(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Slowmode.toml")) {
+class Slowmode(
+    nabi: NabiCore
+): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Slowmode.toml")), SlashCommandDeclarationWrapper {
     inner class Options: ApplicationCommandOptions() {
         val channel = optionalChannel("channel", "The supplied channel to apply the ratelimit to.") {
             channelTypes = listOf(
@@ -89,5 +95,15 @@ class Slowmode(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("
         INSUFFICIENT_PERMISSIONS,
         INVALID_CHANNEL,
         SUCCESS
+    }
+
+    override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
+        defaultMemberPermissions = Permissions {
+            + Permission.ManageChannels
+        }
+
+        dmPermission = false
+
+        executor = this@Slowmode
     }
 }

@@ -1,6 +1,6 @@
 [versions]
 caffeine = "3.1.8"
-exposed = "0.51.1"
+exposed = "0.52.0"
 hikari = "5.1.0"
 icu4j = "75.1"
 interaktions = "0.1.1"
@@ -55,6 +55,7 @@ icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp-jvm", version.ref = "ktor" }
 ktor-server = { module = "io.ktor:ktor-server", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
@@ -68,10 +69,7 @@ kotlin-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 [bundles]
-kotlin = [
-    "kotlin-serialization-core",
-    "kotlin-coroutines-core"
-]
+kotlin = ["kotlin-serialization-core", "kotlin-coroutines-core"]
 
 discord = [
     "jda",
@@ -93,33 +91,24 @@ database = [
 ]
 
 parsers = [
+    "zstd",
     "kotlin-hocon",
+    "kotlin-protobuf",
     "ktoml-core",
     "ktoml-file",
-    "icu4j",
-    "zstd"
+    "icu4j"
 ]
 
 ktor = [
     "ktor-http",
     "ktor-client-encoding",
     "ktor-client-core",
+    "ktor-client-okhttp",
     "ktor-server",
     "ktor-server-netty",
     "ktor-utils"
 ]
 
-caching = [
-    "caffeine-core",
-    "lettuce"
-]
-
-logger = [
-    "logback",
-    "prometheus-httpserver"
-]
-
-buildLogic = [
-    "kotlin-plugin",
-    "kotlin-serialization-plugin"
-]
+caching = ["caffeine-core", "lettuce"]
+logger = ["logback", "prometheus-httpserver"]
+buildLogic = ["kotlin-plugin", "kotlin-serialization-plugin"]

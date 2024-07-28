@@ -11,7 +11,6 @@ import dev.kord.rest.builder.message.embed
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.database.tables.WarnTable
@@ -47,13 +46,7 @@ class Warn(
         val target = args[options.user]
         val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
         val reason = args[options.reason]
-        val data = WarnData(
-            target,
-            context.sender,
-            guild,
-            reason,
-            Clock.System.now()
-        )
+        val data = WarnData(target, context.sender, guild, reason)
     }
 
     private suspend fun warn(data: WarnData) {
@@ -61,7 +54,6 @@ class Warn(
         val executor = data.executor
         val guild = data.guild
         val reason = data.reason
-        val timestamp = data.timestamp.toEpochMilliseconds()
 
         val warnCount = WarnTable.selectAll().where {
             (WarnTable.guildId eq guild.id.value.toLong()) and (WarnTable.id eq target.id.value.toLong())
@@ -73,7 +65,7 @@ class Warn(
                 it[this.executorId] = executor.id.value.toLong()
                 it[this.guildId] = guild.id.value.toLong()
                 it[this.reason] = reason
-                it[this.timestamp] = timestamp
+                it[this.timestamp] = Clock.System.now().epochSeconds
             }
 
             MessageUtils.directMessageUser(target, rest, directMessageUserEmbed())
@@ -134,8 +126,7 @@ class Warn(
         val target: User,
         val executor: User,
         val guild: Guild,
-        val reason: String?,
-        val timestamp: Instant
+        val reason: String?
     )
 
     private class WarnInteractionCheck(

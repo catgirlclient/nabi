@@ -11,4 +11,5 @@ data class GuildSettingsConfig(
     val moderationConfigId: Long?,
     val phishingConfigId: Long?,
     val accountAgeConfigId: Long?,
+    val preconfiguredBanReason: String
 )
