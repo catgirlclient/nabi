@@ -1,4 +1,4 @@
-package live.shuuyu.discord.interactions.commands.slash.general
+package live.shuuyu.discord.interactions.commands.discord
 
 import dev.kord.common.DiscordTimestampStyle
 import dev.kord.common.toMessageFormat

@@ -1,0 +1,5 @@
+[string]
+name = "avatar"
+description = "Displays the user's avatar."
+userOptionName = "user"
+userOptionDescription = "The user's avatar you want to look up."

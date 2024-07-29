@@ -1,4 +1,4 @@
-package live.shuuyu.discord.interactions.commands.slash.moderation
+package live.shuuyu.discord.interactions.commands.moderation
 
 import dev.kord.common.entity.DiscordInteraction
 import dev.kord.common.entity.Permission

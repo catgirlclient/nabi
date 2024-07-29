@@ -1,4 +1,4 @@
-package live.shuuyu.discord.interactions.commands.slash.moderation
+package live.shuuyu.discord.interactions.commands.moderation
 
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
@@ -98,12 +98,36 @@ class Warn(
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
         
         when {
+            targetRolePosition >= executorRolePosition -> {
+                WarnInteractionCheck(
+                    target,
+                    executor,
+                    WarnInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER
+                )
+            }
+
             targetAsMember == null -> check.add(
-                WarnInteractionCheck(target, executor, WarnInteractionResult.MEMBER_IS_NULL)
+                WarnInteractionCheck(
+                    target,
+                    executor,
+                    WarnInteractionResult.TARGET_IS_NULL
+                )
+            )
+
+            targetAsMember.isSelf -> check.add(
+                WarnInteractionCheck(
+                    target,
+                    executor,
+                    WarnInteractionResult.TARGET_IS_SELF
+                )
             )
 
             else -> check.add(
-                WarnInteractionCheck(target, executor, WarnInteractionResult.SUCCESS)
+                WarnInteractionCheck(
+                    target,
+                    executor,
+                    WarnInteractionResult.SUCCESS
+                )
             )
         }
 
@@ -137,8 +161,9 @@ class Warn(
 
     private enum class WarnInteractionResult {
         INSUFFICIENT_PERMISSIONS,
-        MEMBER_IS_NULL,
-        MEMBER_IS_SELF,
+        TARGET_PERMISSION_IS_EQUAL_OR_HIGHER,
+        TARGET_IS_NULL,
+        TARGET_IS_SELF,
         SUCCESS
     }
 

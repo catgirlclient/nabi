@@ -1,4 +1,4 @@
-package live.shuuyu.discord.interactions.commands.slash.general
+package live.shuuyu.discord.interactions.commands.developer
 
 import dev.kord.common.annotation.KordExperimental
 import dev.kord.common.annotation.KordUnsafe

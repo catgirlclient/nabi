@@ -1,4 +1,4 @@
-package live.shuuyu.discord.interactions.commands.slash.developer
+package live.shuuyu.discord.interactions.commands.developer.blacklist
 
 import dev.kord.core.entity.User
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
@@ -37,7 +37,7 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
         val data = BlacklistData(executor, target, reason)
 
         val interactionCheck = validate(data)
-        val failInteractionCheck = interactionCheck.filter { it.results != BlacklistInteractionResults.SUCCESS }
+        val failInteractionCheck = interactionCheck.filter { it.result != BlacklistInteractionResults.SUCCESS }
         val successInteractionCheck = interactionCheck - failInteractionCheck.toSet()
 
         if (successInteractionCheck.isEmpty()) {
@@ -82,9 +82,9 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
             executor.id !in nabi.config.discord.ownerIds -> {
                 check.add(
                     BlacklistInteractionCheck (
-                        BlacklistInteractionResults.EXECUTOR_IS_NOT_DEVELOPER,
+                        target,
                         executor,
-                        target
+                        BlacklistInteractionResults.EXECUTOR_IS_NOT_DEVELOPER
                     )
                 )
             }
@@ -92,9 +92,9 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
             target.id in nabi.config.discord.ownerIds -> {
                 check.add(
                     BlacklistInteractionCheck (
-                        BlacklistInteractionResults.TARGET_IS_DEVELOPER,
+                        target,
                         executor,
-                        target
+                        BlacklistInteractionResults.TARGET_IS_DEVELOPER
                     )
                 )
             }
@@ -102,18 +102,18 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
             executor == target -> {
                 check.add(
                     BlacklistInteractionCheck(
-                        BlacklistInteractionResults.TARGET_IS_SELF,
+                        target,
                         executor,
-                        target
+                        BlacklistInteractionResults.TARGET_IS_SELF
                     )
                 )
             }
 
             else -> check.add(
                 BlacklistInteractionCheck(
-                    BlacklistInteractionResults.SUCCESS,
+                    target,
                     executor,
-                    target
+                    BlacklistInteractionResults.SUCCESS
                 )
             )
         }
@@ -122,10 +122,10 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
     }
 
     private fun buildInteractionFailMessage(check: BlacklistInteractionCheck, builder: MessageBuilder) {
-        val (results, executor, target) = check
+        val (target, executor, result) = check
 
         builder.apply {
-            when(results) {
+            when(result) {
                 BlacklistInteractionResults.EXECUTOR_IS_NOT_DEVELOPER -> i18n.get("executorIsNotDeveloper")
                 BlacklistInteractionResults.TARGET_IS_DEVELOPER -> i18n.get("targetIsDeveloper")
                 BlacklistInteractionResults.TARGET_IS_SELF -> i18n.get("targetIsSelf")
@@ -149,9 +149,9 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
     )
 
     private data class BlacklistInteractionCheck (
-        val results: BlacklistInteractionResults,
+        val target: User,
         val executor: User,
-        val target: User
+        val result: BlacklistInteractionResults
     )
 
     private enum class BlacklistInteractionResults {

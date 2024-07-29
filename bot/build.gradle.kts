@@ -11,7 +11,6 @@ dependencies {
     implementation(libs.kotlin.protobuf)
     implementation(project(":common"))
     implementation(libs.bundles.ktor)
-    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.12")
 }
 
 tasks.test {
