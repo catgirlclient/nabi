@@ -7,7 +7,7 @@ import live.shuuyu.discordinteraktions.common.builder.message.allowedMentions
 import live.shuuyu.discordinteraktions.common.builder.message.create.InteractionOrFollowupMessageCreateBuilder
 import live.shuuyu.discordinteraktions.common.modals.ModalExecutorDeclaration
 
-open class  NabiBarebonesInteractionContext(open val interaction: BarebonesInteractionContext) {
+open class NabiBarebonesInteractionContext(open val interaction: BarebonesInteractionContext) {
     suspend inline fun deferChannelMessage() = interaction.deferChannelMessage()
 
     suspend inline fun deferEphemeralChannelMessage() = interaction.deferChannelMessageEphemerally()
