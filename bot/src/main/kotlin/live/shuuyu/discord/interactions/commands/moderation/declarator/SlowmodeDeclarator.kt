@@ -4,8 +4,8 @@ import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
-import live.shuuyu.discord.interactions.commands.moderation.Slowmode
-import live.shuuyu.discord.interactions.commands.moderation.SlowmodeRemove
+import live.shuuyu.discord.interactions.commands.moderation.SlowmodeExecutor
+import live.shuuyu.discord.interactions.commands.moderation.SlowmodeRemoveExecutor
 import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import live.shuuyu.discordinteraktions.common.commands.slashCommand
 
@@ -21,7 +21,7 @@ class SlowmodeDeclarator(val nabi: NabiCore): SlashCommandDeclarationWrapper {
 
         dmPermission = false
 
-        executor = Slowmode(nabi)
+        executor = SlowmodeExecutor(nabi)
 
         subcommand(i18n.get("removeName"), i18n.get("removeDescription")) {
             defaultMemberPermissions = Permissions {
@@ -30,7 +30,7 @@ class SlowmodeDeclarator(val nabi: NabiCore): SlashCommandDeclarationWrapper {
 
             dmPermission = false
 
-            executor = SlowmodeRemove(nabi)
+            executor = SlowmodeRemoveExecutor(nabi)
         }
     }
 }

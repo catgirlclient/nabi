@@ -7,7 +7,7 @@ import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.CoroutineScope
 
 object ZstdEncoder: ContentEncoder {
-    override val name: String = "zstd"
+    override val name = "zstd"
 
     override fun CoroutineScope.decode(source: ByteReadChannel): ByteReadChannel {
         return ZstdInputStream(source.toInputStream()).toByteReadChannel()

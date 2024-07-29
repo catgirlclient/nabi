@@ -38,8 +38,25 @@ class BlacklistRemove(
 
     }
 
-    private suspend fun validate() {
+    private suspend fun validate(data: BlacklistRemoveData): List<BlacklistRemoveInteractionCheck> {
+        val check = mutableListOf<BlacklistRemoveInteractionCheck>()
 
+        val target = data.target
+        val executor = data.executor
+
+        when {
+            executor.id !in nabi.config.discord.ownerIds -> check.add(
+                BlacklistRemoveInteractionCheck(
+                    target,
+                    executor,
+                    BlacklistRemoveResult.EXECUTOR_IS_NOT_DEVELOPER
+                )
+            )
+
+
+        }
+
+        return check
     }
 
     private data class BlacklistRemoveData(
@@ -53,5 +70,9 @@ class BlacklistRemove(
         val result: BlacklistRemoveResult
     )
 
-    private enum class BlacklistRemoveResult
+    private enum class BlacklistRemoveResult {
+        EXECUTOR_IS_NOT_DEVELOPER,
+        TARGET_IS_NOT_BLACKLISTED,
+        SUCCESS
+    }
 }

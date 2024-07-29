@@ -10,4 +10,5 @@ object ColorUtils {
     // Used in automoderation
     val BAN_COLOR = Color(255, 60, 60)
     val KICK_COLOR = Color(255, 165, 86)
+    val WARN_COLOR = Color(255, 255, 100)
 }

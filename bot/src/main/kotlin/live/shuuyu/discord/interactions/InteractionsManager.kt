@@ -10,10 +10,10 @@ import live.shuuyu.discord.interactions.commands.discord.RoleInfo
 import live.shuuyu.discord.interactions.commands.discord.declarators.UserAvatarUserDeclarator
 import live.shuuyu.discord.interactions.commands.discord.declarators.UserInfoUserDeclarator
 import live.shuuyu.discord.interactions.commands.discord.declarators.UserSlashDeclarator
-import live.shuuyu.discord.interactions.commands.moderation.Ban
 import live.shuuyu.discord.interactions.commands.moderation.Kick
 import live.shuuyu.discord.interactions.commands.moderation.Mute
 import live.shuuyu.discord.interactions.commands.moderation.Warn
+import live.shuuyu.discord.interactions.commands.moderation.declarator.BanDeclarator
 import live.shuuyu.discord.interactions.commands.moderation.declarator.SlowmodeDeclarator
 
 class InteractionsManager(private val nabi: NabiCore) {
@@ -30,7 +30,7 @@ class InteractionsManager(private val nabi: NabiCore) {
         manager.register(RoleInfo(nabi))
 
         // Moderation Related Commands
-        manager.register(Ban(nabi))
+        manager.register(BanDeclarator(nabi))
         manager.register(Kick(nabi))
         manager.register(Mute(nabi))
         manager.register(SlowmodeDeclarator(nabi))

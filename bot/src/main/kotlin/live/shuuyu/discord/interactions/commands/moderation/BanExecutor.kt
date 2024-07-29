@@ -2,14 +2,12 @@ package live.shuuyu.discord.interactions.commands.moderation
 
 import dev.kord.common.entity.DiscordInteraction
 import dev.kord.common.entity.Permission
-import dev.kord.common.entity.Permissions
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.ban
-import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
-import dev.kord.core.entity.channel.Channel
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
@@ -20,6 +18,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
+import live.shuuyu.discord.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
@@ -27,20 +26,17 @@ import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.GuildUtils.getGuildIcon
 import live.shuuyu.discord.utils.MessageUtils
 import live.shuuyu.discord.utils.MessageUtils.createRespondEmbed
-import live.shuuyu.discord.utils.UserUtils.getUserAvatar
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
-import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
-import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
-class Ban(
+class BanExecutor(
     nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Ban.toml")), SlashCommandDeclarationWrapper {
+): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Ban.toml")), ModerationInteractionWrapper {
     inner class Options: ApplicationCommandOptions() {
         val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
         val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription"))
@@ -58,11 +54,11 @@ class Ban(
 
         val target = args[options.user]
         val executor = context.sender
-        val channel = Channel.from(ChannelData.from(rest.channel.getChannel(context.channelId)), kord)
         val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
         val reason = args[options.reason]
         val deleteMessageDuration = Duration.parse(args[options.deleteMessageDuration] ?: "7d")
-        val data = BanData(target, executor, channel, guild, reason, deleteMessageDuration)
+
+        val data = BanData(target, executor, guild, reason, deleteMessageDuration)
 
         val interactonCheck = validate(data, context.discordInteraction)
         val failInteractionCheck = interactonCheck.filter { it.result != BanInteractionResult.SUCCESS }
@@ -86,25 +82,28 @@ class Ban(
     private suspend fun ban(data: BanData) {
         val target = data.target
         val executor = data.executor
-        val channel = data.channel
         val guild = data.guild
+        val reason = data.reason
 
         val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
         val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
 
         try {
-            if (modLogConfig != null && modLogConfig.logUserBans) {
-                val channelId = modLogConfig.channelId
+            if (modLogConfig?.channelId != null && modLogConfig.logUserBans) {
+                val channelIdToSnowflake = Snowflake(modLogConfig.channelId)
+
+                rest.channel.createMessage(
+                    channelIdToSnowflake,
+                    sendModerationLoggingMessage(target, executor, reason, ModerationInteractionWrapper.ModerationType.Ban)
+                )
             }
+
+            MessageUtils.directMessageUser(target, rest, createDirectMessageEmbed(guild, reason))
 
             guild.ban(target.id) {
-                reason = data.reason
-                deleteMessageDuration = data.deleteMessageDuration
+                this.reason = reason
+                this.deleteMessageDuration = data.deleteMessageDuration
             }
-
-            rest.channel.createMessage(channel.id, createBanConfirmationEmbed(target))
-
-            MessageUtils.directMessageUser(target, rest, createDirectMessageEmbed(guild, data.reason))
         } catch (e: KtorRequestException) {
             e.printStackTrace()
         }
@@ -198,6 +197,8 @@ class Ban(
     private fun buildInteractionFailMessages(check: BanInteractionCheck, builder: MessageBuilder) {
         val (target, executor, result) = check
 
+
+
         builder.apply {
             when(result) {
                 BanInteractionResult.INSUFFICIENT_PERMISSIONS -> createRespondEmbed (
@@ -240,20 +241,9 @@ class Ban(
         }
     }
 
-    private fun createBanConfirmationEmbed(target: User): UserMessageCreateBuilder.() -> (Unit) = {
-        embed {
-            title = i18n.get("confirmationEmbedTitle")
-            description = i18n.get("confirmationEmbedDescription")
-            thumbnailUrl = target.getUserAvatar(Image.Size.Size512)
-            color = ColorUtils.DEFAULT
-            timestamp = Clock.System.now()
-        }
-    }
-
     private class BanData(
         val target: User,
         val executor: User,
-        val channel: Channel,
         val guild: Guild,
         val reason: String?,
         val deleteMessageDuration: Duration
@@ -272,15 +262,5 @@ class Ban(
         TARGET_IS_OWNER,
         TARGET_IS_SELF,
         SUCCESS
-    }
-
-    override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
-        defaultMemberPermissions = Permissions {
-            + Permission.BanMembers
-        }
-
-        dmPermission = false
-
-        executor = this@Ban
     }
 }

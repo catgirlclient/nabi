@@ -57,9 +57,13 @@ class GuildDatabaseUtils(val database: NabiDatabaseCore) {
                 it[ModLoggingTable.channelId],
                 it[ModLoggingTable.sendMessageToChannel],
                 it[ModLoggingTable.logUserBans],
+                it[ModLoggingTable.logUserUnbans],
                 it[ModLoggingTable.logUserKicks],
                 it[ModLoggingTable.logUserMutes],
+                it[ModLoggingTable.logUserUnmutes],
                 it[ModLoggingTable.logUserWarns],
+                it[ModLoggingTable.logUserWarnRemoves],
+                it[ModLoggingTable.logChannelSlowmode],
                 it[ModLoggingTable.logMessageDelete],
                 it[ModLoggingTable.logMessageModify],
                 it[ModLoggingTable.silentFail]

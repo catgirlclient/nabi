@@ -1,8 +1,11 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
 import dev.kord.common.entity.ChannelType
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.edit
 import dev.kord.core.cache.data.ChannelData
+import dev.kord.core.cache.data.GuildData
+import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.Channel
 import dev.kord.core.entity.channel.TextChannel
@@ -12,6 +15,7 @@ import dev.kord.rest.request.RestRequestException
 import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
+import live.shuuyu.discord.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
@@ -22,9 +26,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
-class Slowmode(
+class SlowmodeExecutor(
     nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Slowmode.toml")) {
+): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Slowmode.toml")), ModerationInteractionWrapper {
     inner class Options: ApplicationCommandOptions() {
         // oPtIoNaL aRgS cAn'T bE oN tOp (said discord)
         val duration = string(i18n.get("durationOptionName"), i18n.get("durationOptionDescription"))
@@ -47,18 +51,35 @@ class Slowmode(
 
         val channel = args[options.channel] ?: Channel.from(ChannelData.from(rest.channel.getChannel(context.channelId)), kord)
         val duration = Duration.parse(args[options.duration])
+        val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
         val reason = args[options.reason]
 
-        val data = SlowmodeData(context.sender, channel, duration, reason)
+        val data = SlowmodeData(context.sender, channel, guild, duration, reason)
     }
 
     private suspend fun slowmode(data: SlowmodeData) {
         val channel = data.channel as TextChannel
+        val executor = data.executor
         val duration = data.duration
+        val guild = data.guild
+        val reason = data.reason
+
+        val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
+        val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
 
         try {
+            if (modLogConfig?.channelId != null && modLogConfig.logChannelSlowmode) {
+                val channelIdToSnowflake = Snowflake(modLogConfig.channelId)
+
+                rest.channel.createMessage(
+                    channelIdToSnowflake,
+                    sendChannelLoggingMessage(channel, executor, reason, ModerationInteractionWrapper.ChannelModerationType.Slowmode)
+                )
+            }
+
             channel.edit {
-                rateLimitPerUser = duration
+                this.rateLimitPerUser = duration
+                this.reason = reason
             }
 
             rest.channel.createMessage(channel.id, createSlowmodeConfirmationEmbed(channel, duration))
@@ -110,6 +131,7 @@ class Slowmode(
     private data class SlowmodeData(
         val executor: User,
         val channel: Channel,
+        val guild: Guild,
         val duration: Duration,
         val reason: String?
     )
