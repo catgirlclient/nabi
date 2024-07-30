@@ -71,6 +71,8 @@ class SlowmodeExecutor(
                 }
             }
         }
+
+        slowmode(data)
     }
 
     private suspend fun slowmode(data: SlowmodeData) {
