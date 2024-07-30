@@ -20,6 +20,7 @@ import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.ColorUtils
+import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import kotlin.time.Duration
@@ -49,12 +50,27 @@ class SlowmodeExecutor(
         if (context !is NabiGuildApplicationContext)
             return
 
-        val channel = args[options.channel] ?: Channel.from(ChannelData.from(rest.channel.getChannel(context.channelId)), kord)
-        val duration = Duration.parse(args[options.duration])
-        val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
-        val reason = args[options.reason]
+        context.deferEphemeralChannelMessage()
 
-        val data = SlowmodeData(context.sender, channel, guild, duration, reason)
+        val data = SlowmodeData(
+            args[options.channel] ?: Channel.from(ChannelData.from(rest.channel.getChannel(context.guildId)), kord),
+            context.sender,
+            Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
+            Duration.parse(args[options.duration]),
+            args[options.reason]
+        )
+
+        val interactionCheck = validate(data)
+        val failInteractionCheck = interactionCheck.filter { it.results != SlowmodeInteractionResult.SUCCESS }
+        val successInteractionCheck = interactionCheck - failInteractionCheck.toSet()
+
+        if (successInteractionCheck.isEmpty()) {
+            context.ephemeralFail {
+                for (fail in failInteractionCheck) {
+                    buildInteractionFailMessage(fail, this)
+                }
+            }
+        }
     }
 
     private suspend fun slowmode(data: SlowmodeData) {
@@ -98,22 +114,35 @@ class SlowmodeExecutor(
         when {
             duration !in 0.seconds..6.hours -> check.add(
                 SlowmodeInteractionCheck(
-                    executor,
                     channel,
+                    executor,
                     SlowmodeInteractionResult.DURATION_OUTSIDE_OF_RANGE
                 )
             )
 
             else -> check.add(
                 SlowmodeInteractionCheck(
-                    executor,
                     channel,
+                    executor,
                     SlowmodeInteractionResult.SUCCESS
                 )
             )
         }
 
         return check
+    }
+
+    private suspend fun buildInteractionFailMessage(check: SlowmodeInteractionCheck, builder: MessageBuilder) {
+        val (channel, executor, results) = check
+
+        builder.apply {
+            when (results) {
+                SlowmodeInteractionResult.INSUFFICIENT_PERMISSIONS -> TODO()
+                SlowmodeInteractionResult.DURATION_OUTSIDE_OF_RANGE -> TODO()
+                SlowmodeInteractionResult.INVALID_CHANNEL -> TODO()
+                SlowmodeInteractionResult.SUCCESS -> TODO()
+            }
+        }
     }
 
     private fun createSlowmodeConfirmationEmbed(
@@ -129,17 +158,17 @@ class SlowmodeExecutor(
     }
 
     private data class SlowmodeData(
-        val executor: User,
         val channel: Channel,
+        val executor: User,
         val guild: Guild,
         val duration: Duration,
         val reason: String?
     )
 
     private data class SlowmodeInteractionCheck(
-        val executor: User,
         val channel: Channel,
-        val result: SlowmodeInteractionResult
+        val executor: User,
+        val results: SlowmodeInteractionResult
     )
 
     private enum class SlowmodeInteractionResult {

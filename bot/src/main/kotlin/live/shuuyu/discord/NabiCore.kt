@@ -61,6 +61,16 @@ class NabiCore(
         UserModule(this)
     )
 
+    /*
+    We need to do this for 2 main reasons.
+
+    1. We cannot register more than 100 slash commands, 5 user commands, and 5 message commands
+    2. It's better if we do this before initializing to prevent issues from coming up.
+     */
+    fun preInitialization() = runBlocking {
+        val slashCommandCount = interaktions.manager.applicationCommandsDeclarations.count()
+    }
+
     @OptIn(PrivilegedIntent::class)
     fun initialize() = runBlocking {
         database.initialize()

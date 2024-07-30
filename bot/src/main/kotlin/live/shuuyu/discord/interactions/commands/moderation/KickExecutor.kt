@@ -1,8 +1,5 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
-import dev.kord.common.entity.DiscordInteraction
-import dev.kord.common.entity.Permission
-import dev.kord.common.entity.Permissions
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
@@ -13,18 +10,19 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
+import live.shuuyu.discord.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.MessageUtils
-import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
+import live.shuuyu.discord.utils.MessageUtils.createRespondEmbed
+import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
-import live.shuuyu.discordinteraktions.common.commands.slashCommand
 
-class Kick(
+class KickExecutor(
     nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), SlashCommandDeclarationWrapper {
+): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), ModerationInteractionWrapper {
     inner class Options: ApplicationCommandOptions() {
         val user = user("user", "The supplied user to be kicked from the guild.")
         val reason = optionalString("reason", "The supplied reason for why the member was kicked. This is an optional argument.")
@@ -36,26 +34,22 @@ class Kick(
         if (context !is NabiGuildApplicationContext)
             return
 
-        val target = args[options.user]
-        val reason = args[options.reason]
-        val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
-
-        val check = validate(
-            KickData(
-                context.sender,
-                target,
-                guild,
-                reason
-            ),
-            context.discordInteraction
+        val data = KickData(
+            args[options.user],
+            context.sender  ,
+            Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
+            args[options.reason]
         )
 
-        val failCheck = check.filter { it.result != KickInteractionResult.SUCCESS }
-        val successfulCheck = check - failCheck.toSet()
+        val interactionCheck = validate(data)
+        val failInteractionCheck = interactionCheck.filter { it.results != KickInteractionResult.SUCCESS }
+        val successfulInteractionCheck = interactionCheck - failInteractionCheck.toSet()
 
-        if (successfulCheck.isEmpty()) {
-            for (fail in failCheck) {
-
+        if (successfulInteractionCheck.isEmpty()) {
+            context.ephemeralFail {
+                for (fail in failInteractionCheck) {
+                    buildInteractionFailMessage(fail, this)
+                }
             }
         }
     }
@@ -82,12 +76,14 @@ class Kick(
         }
     }
 
-    private suspend fun validate(data: KickData, interaction: DiscordInteraction): List<KickInteractionCheck> {
+    private suspend fun validate(data: KickData): List<KickInteractionCheck> {
         val check = mutableListOf<KickInteractionCheck>()
+
         val executor = data.executor
         val target = data.target
         val guild = data.guild
 
+        val nabiAsMember = kord.getSelf().asMember(guild.id)
         val executorAsMember = executor.asMember(guild.id) // should NEVER be null
         val targetAsMember = target.asMemberOrNull(guild.id)
 
@@ -100,47 +96,58 @@ class Kick(
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
         when {
-            Permission.KickMembers !in interaction.appPermissions.value!! -> check.add(
-                KickInteractionCheck(
-                    KickInteractionResult.INSUFFICIENT_PERMISSIONS,
-                    executor,
-                    target
-                )
-            )
-
             targetAsMember == null -> check.add(
                 KickInteractionCheck(
-                    KickInteractionResult.TARGET_IS_NULL,
+                    target,
                     executor,
-                    target
+                    KickInteractionResult.TARGET_IS_NULL
                 )
             )
 
             targetAsMember.isOwner() -> check.add(
                 KickInteractionCheck(
-                    KickInteractionResult.TARGET_IS_OWNER,
+                    target,
                     executor,
-                    target
+                    KickInteractionResult.TARGET_IS_OWNER
                 )
             )
 
             targetRolePosition >= executorRolePosition -> check.add(
                 KickInteractionCheck(
-                    KickInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER,
+                    target,
                     executor,
-                    target
+                    KickInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER
                 )
             )
 
             targetAsMember == executorAsMember -> check.add(
                 KickInteractionCheck(
-                    KickInteractionResult.TARGET_IS_SELF,
+                    target,
                     executor,
-                    target
+                    KickInteractionResult.TARGET_IS_SELF
                 )
             )
         }
+
         return check
+    }
+
+    private suspend fun buildInteractionFailMessage(check: KickInteractionCheck, builder: MessageBuilder) {
+        val (target, executor, results) = check
+
+        builder.apply {
+            when(results) {
+                KickInteractionResult.INSUFFICIENT_PERMISSIONS -> createRespondEmbed(
+                    i18n.get("insufficientPermissions"),
+                    executor
+                )
+                KickInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> TODO()
+                KickInteractionResult.TARGET_IS_OWNER -> TODO()
+                KickInteractionResult.TARGET_IS_NULL -> TODO()
+                KickInteractionResult.TARGET_IS_SELF -> TODO()
+                KickInteractionResult.SUCCESS -> TODO()
+            }
+        }
     }
 
     private suspend fun createKickMessage(
@@ -149,17 +156,17 @@ class Kick(
 
     }
 
-    private data class KickInteractionCheck(
-        val result: KickInteractionResult,
-        val executor: User,
-        val target: User,
-    )
-
     private data class KickData(
-        val executor: User,
         val target: User,
+        val executor: User,
         val guild: Guild,
         val reason: String?
+    )
+
+    private data class KickInteractionCheck(
+        val target: User,
+        val executor: User,
+        val results: KickInteractionResult,
     )
 
     private enum class KickInteractionResult {
@@ -169,15 +176,5 @@ class Kick(
         TARGET_IS_NULL,
         TARGET_IS_SELF,
         SUCCESS
-    }
-
-    override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
-        defaultMemberPermissions = Permissions {
-            + Permission.KickMembers
-        }
-
-        dmPermission = false
-
-        executor = this@Kick
     }
 }

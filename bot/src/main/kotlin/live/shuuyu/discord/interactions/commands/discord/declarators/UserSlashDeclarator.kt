@@ -13,9 +13,13 @@ class UserSlashDeclarator(val nabi: NabiCore): SlashCommandDeclarationWrapper {
     }
 
     override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
+        dmPermission = true
+
         executor = UserInfoSlashExecutor(nabi)
 
         subcommand(i18n.get("avatarName"), i18n.get("avatarDescription")) {
+            dmPermission = true
+
             executor = UserAvatarSlashExecutor(nabi)
         }
     }

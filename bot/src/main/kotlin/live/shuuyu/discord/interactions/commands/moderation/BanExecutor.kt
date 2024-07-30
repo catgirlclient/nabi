@@ -1,7 +1,5 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
-import dev.kord.common.entity.DiscordInteraction
-import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.ban
 import dev.kord.core.cache.data.GuildData
@@ -12,7 +10,6 @@ import dev.kord.rest.Image
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kord.rest.request.KtorRequestException
-import dev.kord.rest.request.RestRequestException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
@@ -52,31 +49,31 @@ class BanExecutor(
         if (context !is NabiGuildApplicationContext)
             return
 
-        val target = args[options.user]
-        val executor = context.sender
-        val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
-        val reason = args[options.reason]
+        context.deferEphemeralChannelMessage()
+
         val deleteMessageDuration = Duration.parse(args[options.deleteMessageDuration] ?: "7d")
 
-        val data = BanData(target, executor, guild, reason, deleteMessageDuration)
+        val data = BanData(
+            args[options.user],
+            context.sender,
+            Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
+            args[options.reason],
+            deleteMessageDuration
+        )
 
-        val interactonCheck = validate(data, context.discordInteraction)
+        val interactonCheck = validate(data)
         val failInteractionCheck = interactonCheck.filter { it.result != BanInteractionResult.SUCCESS }
         val successInteractionCheck = interactonCheck - failInteractionCheck.toSet()
 
         if (successInteractionCheck.isEmpty()) {
-            context.fail {
+            context.ephemeralFail {
                 for (fail in failInteractionCheck) {
                     buildInteractionFailMessages(fail, this)
                 }
             }
         }
 
-        try {
-            ban(data)
-        } catch (e: RestRequestException) {
-
-        }
+        ban(data)
     }
 
     private suspend fun ban(data: BanData) {
@@ -109,7 +106,7 @@ class BanExecutor(
         }
     }
 
-    private suspend fun validate(data: BanData, interaction: DiscordInteraction): List<BanInteractionCheck> {
+    private suspend fun validate(data: BanData): List<BanInteractionCheck> {
         val check = mutableListOf<BanInteractionCheck>()
 
         val target = data.target
@@ -134,14 +131,6 @@ class BanExecutor(
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
         when {
-            Permission.BanMembers !in interaction.appPermissions.value!! -> check.add(
-                BanInteractionCheck(
-                    target,
-                    executor,
-                    BanInteractionResult.INSUFFICIENT_PERMISSIONS
-                )
-            )
-
             targetRolePosition >= nabiRolePosition -> check.add(
                 BanInteractionCheck(
                     target,
@@ -196,8 +185,6 @@ class BanExecutor(
 
     private fun buildInteractionFailMessages(check: BanInteractionCheck, builder: MessageBuilder) {
         val (target, executor, result) = check
-
-
 
         builder.apply {
             when(result) {

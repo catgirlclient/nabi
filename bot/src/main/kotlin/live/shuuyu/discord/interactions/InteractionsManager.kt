@@ -10,11 +10,7 @@ import live.shuuyu.discord.interactions.commands.discord.RoleInfo
 import live.shuuyu.discord.interactions.commands.discord.declarators.UserAvatarUserDeclarator
 import live.shuuyu.discord.interactions.commands.discord.declarators.UserInfoUserDeclarator
 import live.shuuyu.discord.interactions.commands.discord.declarators.UserSlashDeclarator
-import live.shuuyu.discord.interactions.commands.moderation.Kick
-import live.shuuyu.discord.interactions.commands.moderation.Mute
-import live.shuuyu.discord.interactions.commands.moderation.Warn
-import live.shuuyu.discord.interactions.commands.moderation.declarator.BanDeclarator
-import live.shuuyu.discord.interactions.commands.moderation.declarator.SlowmodeDeclarator
+import live.shuuyu.discord.interactions.commands.moderation.declarator.*
 
 class InteractionsManager(private val nabi: NabiCore) {
     suspend fun registerGlobalApplicationCommands() = with(nabi.interaktions) {
@@ -31,10 +27,11 @@ class InteractionsManager(private val nabi: NabiCore) {
 
         // Moderation Related Commands
         manager.register(BanDeclarator(nabi))
-        manager.register(Kick(nabi))
-        manager.register(Mute(nabi))
+        manager.register(KickDeclarator(nabi))
+        manager.register(MuteDeclarator(nabi))
         manager.register(SlowmodeDeclarator(nabi))
-        manager.register(Warn(nabi))
+        manager.register(UnbanDeclarator(nabi))
+        manager.register(WarnDeclarator(nabi))
         updateAllGlobalCommands()
     }
 

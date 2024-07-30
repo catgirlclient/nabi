@@ -1,7 +1,6 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
-import dev.kord.common.entity.Permission
-import dev.kord.common.entity.Permissions
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
@@ -14,22 +13,21 @@ import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.database.tables.WarnTable
+import live.shuuyu.discord.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.MessageUtils
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
-import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
-import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 
-class Warn(
+class WarnExecutor(
     nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Warn.toml")), SlashCommandDeclarationWrapper {
+): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Warn.toml")), ModerationInteractionWrapper {
     inner class Options : ApplicationCommandOptions() {
         val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
         val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription")) {
@@ -43,10 +41,28 @@ class Warn(
         if (context !is NabiGuildApplicationContext)
             return
 
-        val target = args[options.user]
-        val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
-        val reason = args[options.reason]
-        val data = WarnData(target, context.sender, guild, reason)
+        context.deferEphemeralChannelMessage()
+
+        val data = WarnData(
+            context.sender,
+            args[options.user],
+            Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
+            args[options.reason]
+        )
+
+        val interactionCheck = validate(data)
+        val failInteractionCheck = interactionCheck.filter { it.results != WarnInteractionResult.SUCCESS }
+        val successInteractionCheck = interactionCheck - failInteractionCheck.toSet()
+
+        if (successInteractionCheck.isEmpty()) {
+            context.ephemeralFail {
+                for (fail in failInteractionCheck) {
+                    buildInteractionFailMessage(fail, this)
+                }
+            }
+        }
+
+        warn(data)
     }
 
     private suspend fun warn(data: WarnData) {
@@ -55,11 +71,23 @@ class Warn(
         val guild = data.guild
         val reason = data.reason
 
+        val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
+        val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
+
         val warnCount = WarnTable.selectAll().where {
             (WarnTable.guildId eq guild.id.value.toLong()) and (WarnTable.id eq target.id.value.toLong())
         }.count().toInt()
 
         try {
+            if (modLogConfig?.channelId != null && modLogConfig.logUserUnbans) {
+                val channelIdToSnowflake = Snowflake(modLogConfig.channelId)
+
+                rest.channel.createMessage(
+                    channelIdToSnowflake,
+                    sendModerationLoggingMessage(target, executor, reason, ModerationInteractionWrapper.ModerationType.Warn)
+                )
+            }
+
             WarnTable.insert {
                 it[this.userId] = target.id.value.toLong()
                 it[this.executorId] = executor.id.value.toLong()
@@ -98,6 +126,14 @@ class Warn(
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
         
         when {
+            targetRolePosition >= nabiRolePosition -> {
+                WarnInteractionCheck(
+                    target,
+                    executor,
+                    WarnInteractionResult.INSUFFICIENT_PERMISSIONS
+                )
+            }
+
             targetRolePosition >= executorRolePosition -> {
                 WarnInteractionCheck(
                     target,
@@ -135,12 +171,22 @@ class Warn(
     }
 
     private suspend fun buildInteractionFailMessage(check: WarnInteractionCheck, builder: MessageBuilder) {
-        builder.apply {
+        val (target, executor, results) = check
 
+        builder.apply {
+            when (results) {
+                WarnInteractionResult.INSUFFICIENT_PERMISSIONS -> TODO()
+                WarnInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> TODO()
+                WarnInteractionResult.TARGET_IS_NULL -> TODO()
+                WarnInteractionResult.TARGET_IS_SELF -> TODO()
+                WarnInteractionResult.SUCCESS -> TODO()
+            }
         }
     }
 
-    private suspend fun directMessageUserEmbed(): UserMessageCreateBuilder.() -> (Unit) = {
+    private suspend fun directMessageUserEmbed(
+
+    ): UserMessageCreateBuilder.() -> (Unit) = {
         embed {
 
         }
@@ -153,10 +199,10 @@ class Warn(
         val reason: String?
     )
 
-    private class WarnInteractionCheck(
+    private data class WarnInteractionCheck(
         val target: User,
         val executor: User,
-        val result: WarnInteractionResult
+        val results: WarnInteractionResult
     )
 
     private enum class WarnInteractionResult {
@@ -169,15 +215,5 @@ class Warn(
 
     private enum class WarnInteractionPunishment {
         None, Mute, Kick, SoftBan, Ban
-    }
-
-    override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
-        defaultMemberPermissions = Permissions {
-            + Permission.ModerateMembers
-        }
-
-        dmPermission = false
-
-        executor = this@Warn
     }
 }

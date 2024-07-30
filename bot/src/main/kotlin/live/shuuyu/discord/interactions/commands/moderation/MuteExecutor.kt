@@ -1,8 +1,5 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
-import dev.kord.common.entity.DiscordInteraction
-import dev.kord.common.entity.Permission
-import dev.kord.common.entity.Permissions
 import dev.kord.core.behavior.edit
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
@@ -14,21 +11,20 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
+import live.shuuyu.discord.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.discord.utils.MessageUtils.createRespondEmbed
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
-import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
-import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-class Mute(
+class MuteExecutor(
     nabi: NabiCore,
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), SlashCommandDeclarationWrapper {
+): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), ModerationInteractionWrapper {
     inner class Options: ApplicationCommandOptions() {
         val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
         val duration = string(i18n.get("durationOptionName"), i18n.get("durationOptionDescription"))
@@ -41,24 +37,29 @@ class Mute(
         if (context !is NabiGuildApplicationContext)
             return
 
-        val target = args[options.user]
-        val reason = args[options.reason]
-        val duration = Duration.parse(args[options.duration])
-        val guild = Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord)
+        context.deferChannelMessage()
 
-        val data = MuteData(target, context.sender, guild, duration, reason)
+        val data = MuteData(
+            args[options.user],
+            context.sender,
+            Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
+            Duration.parse(args[options.duration]),
+            args[options.reason]
+        )
 
-        val check = validate(data, context.discordInteraction)
+        val check = validate(data)
         val failCheck = check.filter { it.result != MuteInteractionResults.SUCCESS }
         val successCheck = check - failCheck.toSet()
 
         if (successCheck.isEmpty()) {
-            context.fail {
+            context.ephemeralFail {
                 for (fail in failCheck) {
                      buildInteractionFailMessage(fail, this)
                 }
             }
         }
+
+        mute(data)
     }
 
     private suspend fun mute(data: MuteData) {
@@ -78,7 +79,7 @@ class Mute(
         }
     }
 
-    private suspend fun validate(data: MuteData, interaction: DiscordInteraction): List<MuteInteractionCheck> {
+    private suspend fun validate(data: MuteData): List<MuteInteractionCheck> {
         val check = mutableListOf<MuteInteractionCheck>()
 
         val guild = data.guild
@@ -104,14 +105,6 @@ class Mute(
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
         when {
-            Permission.ModerateMembers !in interaction.appPermissions.value!! -> check.add(
-                MuteInteractionCheck(
-                    target,
-                    executor,
-                    MuteInteractionResults.INSUFFICIENT_PERMISSIONS
-                )
-            )
-
             targetRolePosition >= nabiRolePosition -> check.add(
                 MuteInteractionCheck(
                     target,
@@ -234,15 +227,5 @@ class Mute(
         TARGET_IS_NULL,
         TARGET_IS_SELF,
         SUCCESS
-    }
-
-    override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
-        defaultMemberPermissions = Permissions {
-            + Permission.KickMembers
-        }
-
-        dmPermission = false
-
-        executor = this@Mute
     }
 }

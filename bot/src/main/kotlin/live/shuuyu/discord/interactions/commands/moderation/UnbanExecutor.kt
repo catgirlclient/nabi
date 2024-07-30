@@ -1,6 +1,7 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
 import dev.kord.common.entity.Snowflake
+import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
 import dev.kord.rest.request.RestRequestException
@@ -8,7 +9,9 @@ import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
+import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 
@@ -23,9 +26,31 @@ class UnbanExecutor(
     override val options = Options()
 
     override suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments) {
-        val target = args[options.user]
-        val user = args[options.reason]
+        if (context !is NabiGuildApplicationContext)
+            return
 
+        context.deferEphemeralChannelMessage()
+
+        val data = UnbanData(
+            args[options.user],
+            context.sender,
+            Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
+            args[options.reason]
+        )
+
+        val interactionCheck = validate(data)
+        val failInteractionCheck = interactionCheck.filter { it.results != UnbanInteractionResult.SUCCESS }
+        val successInteractionCheck = interactionCheck - failInteractionCheck.toSet()
+
+        if (successInteractionCheck.isEmpty()) {
+            context.ephemeralFail {
+                for (fail in failInteractionCheck) {
+                    buildInteractionFailMessage(fail, this)
+                }
+            }
+        }
+
+        unban(data)
     }
 
     private suspend fun unban(data: UnbanData) {
@@ -48,6 +73,7 @@ class UnbanExecutor(
             }
 
             guild.unban(target.id, reason)
+
         } catch (e: RestRequestException) {
 
         }
@@ -59,13 +85,40 @@ class UnbanExecutor(
         val target = data.target
         val executor = data.executor
         val guild = data.guild
-        val reason = data.reason
+
+        val targetAsMember = target.asMemberOrNull(guild.id)
 
         when {
+            targetAsMember != null -> check.add(
+                UnbanInteractionCheck(
+                    target,
+                    executor,
+                    UnbanInteractionResult.USER_IS_NOT_BANNED
+                )
+            )
 
+            else -> check.add(
+                UnbanInteractionCheck(
+                    target,
+                    executor,
+                    UnbanInteractionResult.SUCCESS
+                )
+            )
         }
 
         return check
+    }
+
+    private suspend fun buildInteractionFailMessage(check: UnbanInteractionCheck, builder: MessageBuilder) {
+        val (target, executor, results) = check
+
+        builder.apply {
+            when (results) {
+                UnbanInteractionResult.INSUFFICIENT_PERMISSION -> TODO()
+                UnbanInteractionResult.USER_IS_NOT_BANNED -> TODO()
+                UnbanInteractionResult.SUCCESS -> TODO()
+            }
+        }
     }
 
     private data class UnbanData(
@@ -78,7 +131,7 @@ class UnbanExecutor(
     private data class UnbanInteractionCheck(
         val target: User,
         val executor: User,
-        val result: UnbanInteractionResult
+        val results: UnbanInteractionResult
     )
 
     private enum class UnbanInteractionResult {
