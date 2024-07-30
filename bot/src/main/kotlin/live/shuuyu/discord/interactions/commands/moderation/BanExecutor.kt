@@ -23,7 +23,9 @@ import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.GuildUtils.getGuildIcon
 import live.shuuyu.discord.utils.MessageUtils
 import live.shuuyu.discord.utils.MessageUtils.createRespondEmbed
+import live.shuuyu.discord.utils.UserUtils.getUserAvatar
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
+import live.shuuyu.discordinteraktions.common.builder.message.embed
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
@@ -41,6 +43,7 @@ class BanExecutor(
             i18n.get("deleteMessageDurationOptionName"),
             i18n.get("deleteMessageDurationOptionDescription")
         )
+        val isEphemeral = optionalBoolean(i18n.get("isEphemeralOptionName"), i18n.get("isEphemeralOptionDescription"))
     }
 
     override val options = Options()
@@ -73,14 +76,38 @@ class BanExecutor(
             }
         }
 
-        ban(data)
+        val isEphemeral = args[options.isEphemeral] ?: database.guild.getGuildConfig(context.guildId.value.toLong())?.showPunishmentResultantMessage ?: true
+
+        if (isEphemeral) {
+            context.sendEphemeralMessage {
+                banUser(data, this)
+            }
+        } else {
+            context.sendMessage {
+                banUser(data, this )
+            }
+        }
     }
 
-    private suspend fun ban(data: BanData) {
+
+    private suspend fun banUser(data: BanData, builder: MessageBuilder) {
         val target = data.target
         val executor = data.executor
         val guild = data.guild
         val reason = data.reason
+
+        val resultantEmbed: MessageBuilder.() -> (Unit) = {
+            embed {
+                description = i18n.get("resultantEmbedDescription", mapOf(
+                    "0" to target.mention,
+                    "1" to target.globalName,
+                    "2" to reason
+                ))
+                thumbnailUrl = target.getUserAvatar(Image.Size.Size512)
+                color = ColorUtils.DEFAULT
+                timestamp = Clock.System.now()
+            }
+        }
 
         val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
         val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
@@ -101,8 +128,14 @@ class BanExecutor(
                 this.reason = reason
                 this.deleteMessageDuration = data.deleteMessageDuration
             }
+
+            builder.apply(resultantEmbed)
         } catch (e: KtorRequestException) {
-            e.printStackTrace()
+            val errorMessage: MessageBuilder.() -> (Unit) = {
+                content = "An error has occurred."
+            }
+
+            builder.apply(errorMessage)
         }
     }
 

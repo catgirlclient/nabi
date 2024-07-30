@@ -25,3 +25,7 @@ punishmentEmbedTitle = "User Banned"
 punishmentEmbedDescription = """
     You've been banned from **{0}** for **{1}**.
 """
+resultantEmbedDescription = """
+    **User:** {0} [{1}] \n\
+    **Reason:** {2}
+"""
