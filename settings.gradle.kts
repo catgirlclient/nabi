@@ -28,5 +28,5 @@ include(
     ":api",
     ":bot",
     ":common",
-    // ":dashboard"
+    ":dashboard"
 )

@@ -3,6 +3,7 @@
   "description": "The frontend dashboard for Nabi.",
   "version": "0.0.1",
   "license": "Polyform Shield License v1.0.0",
+  "type": "module",
   "engines": {
     "node": "20.13.1"
   },
@@ -12,13 +13,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.4.33"
+    "million": "^3.1.11",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.25.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.5",
-    "@unocss/vite": "^0.61.5",
     "@iconify/iconify": "^3.1.1",
-    "@iconify/vue": "^4.1.2",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-router-dom": "^5.3.3",
+    "@unocss/vite": "^0.61.5",
+    "@vitejs/plugin-react": "^4.3.1",
     "prettier": "^3.3.3",
     "sass": "^1.77.8",
     "typescript": "^5.4.5",

@@ -1,11 +1,16 @@
 {
-  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    "noImplicitAny": false,
-    "baseUrl": "src"
+    "allowSyntheticDefaultImports": true,
+    "composite": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext",
+    "jsx": "react",
   },
 
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "vite.config.ts", "vitest.config.ts", "uno.config.ts"]
 }
