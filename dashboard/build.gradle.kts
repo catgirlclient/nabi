@@ -10,8 +10,8 @@ repositories {
 }
 
 node {
-    version.set("20.13.1")
-    pnpmVersion.set("9.3.0")
+    version.set("20.16.0")
+    pnpmVersion.set("9.6.0")
     download.set(true)
 }
 
