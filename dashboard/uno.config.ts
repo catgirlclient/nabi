@@ -22,5 +22,8 @@ export default defineConfig({
         }),
         presetTypography()
     ],
-    transformers: [transformerDirectives(), transformerVariantGroup()]
+    transformers: [
+        transformerDirectives(),
+        transformerVariantGroup()
+    ]
 })

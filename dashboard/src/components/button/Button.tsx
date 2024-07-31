@@ -1,10 +1,13 @@
-import React, {useCallback} from "react";
+import React, {ReactNode, useCallback} from "react";
 
 interface ButtonProps {
+    children: ReactNode,
+    className?: string,
     onClick?: (
         event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>
     ) => void,
-    disabled?: Boolean
+    disabled?: boolean,
+    href?: string,
 }
 
 export function Button(props: ButtonProps) {

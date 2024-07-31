@@ -2,7 +2,7 @@
   "name": "dashboard",
   "description": "The frontend dashboard for Nabi.",
   "version": "0.0.1",
-  "license": "Polyform Shield License v1.0.0",
+  "license": "MIT 2.0",
   "type": "module",
   "engines": {
     "node": "20.16.0"
