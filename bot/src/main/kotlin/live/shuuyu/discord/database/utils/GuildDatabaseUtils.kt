@@ -18,7 +18,7 @@ class GuildDatabaseUtils(val database: NabiDatabaseCore) {
                 it[GuildSettingsTable.modLoggingConfig]?.value,
                 it[GuildSettingsTable.phishingConfig]?.value,
                 it[GuildSettingsTable.accountAgeConfig]?.value,
-                it[GuildSettingsTable.preconfiguredBanReason]
+                it[GuildSettingsTable.showPunishmentResultantMessage]
             )
         }.firstOrNull()
     }.await()

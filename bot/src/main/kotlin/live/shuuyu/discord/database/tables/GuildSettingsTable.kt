@@ -11,6 +11,6 @@ object GuildSettingsTable: LongIdTable() {
     val modLoggingConfig = optReference("moderation_config", ModLoggingTable, onDelete = ReferenceOption.CASCADE)
     val phishingConfig = optReference("phishing_config", PhishingTable, onDelete = ReferenceOption.CASCADE)
     val accountAgeConfig = optReference("account_age_config", AccountAgeTable, onDelete = ReferenceOption.CASCADE)
-    val preconfiguredBanReason = text("preconfigured_ban_reason").default("No reason provided.")
+    val showPunishmentResultantMessage = bool("show_punishment_resultant_message").default(true)
 }
 
