@@ -48,7 +48,7 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
             }
         }
 
-
+        blacklist(data)
     }
 
     private suspend fun blacklist(data: BlacklistData) {

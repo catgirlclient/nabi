@@ -61,10 +61,11 @@ class SlowmodeRemoveExecutor(
     }
 
     private suspend fun slowmodeRemove(data: SlowmodeRemoveData) {
-        val channel = data.channel as TextChannel
-        val executor = data.executor
+        val (channel, executor, guild, reason) = data
 
-        val modLogConfigId = database.guild.getGuildConfig(data.guild.id.value.toLong())?.moderationConfigId
+        val channelAsTextChannel = channel as TextChannel
+
+        val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
         val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
 
         try {
@@ -73,13 +74,13 @@ class SlowmodeRemoveExecutor(
 
                 rest.channel.createMessage(
                     channelIdToSnowflake,
-                    sendChannelLoggingMessage(channel, executor, data.reason, ModerationInteractionWrapper.ChannelModerationType.Slowmode_Remove)
+                    sendChannelLoggingMessage(channel, executor, reason, ModerationInteractionWrapper.ChannelModerationType.Slowmode_Remove)
                 )
             }
 
-            channel.edit {
-                rateLimitPerUser = 0.seconds
-                reason = data.reason
+            channelAsTextChannel.edit {
+                this.rateLimitPerUser = 0.seconds
+                this.reason = data.reason
             }
         } catch (e: RestRequestException) {
 
@@ -89,9 +90,7 @@ class SlowmodeRemoveExecutor(
     private suspend fun validate(data: SlowmodeRemoveData): List<SlowmodeInteractionCheck> {
         val check = mutableListOf<SlowmodeInteractionCheck>()
 
-        val channel = data.channel as TextChannel
-        val executor = data.executor
-        val guild = data.guild
+        val (channel, executor, guild, reason) = data
 
         when {
 
@@ -100,7 +99,7 @@ class SlowmodeRemoveExecutor(
         return check
     }
 
-    private suspend fun buildInteractionFailMessage(check: SlowmodeInteractionCheck, builder: MessageBuilder) {
+    private fun buildInteractionFailMessage(check: SlowmodeInteractionCheck, builder: MessageBuilder) {
         val (channel, executor, results) = check
 
         builder.apply {

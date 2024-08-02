@@ -54,10 +54,7 @@ class UnbanExecutor(
     }
 
     private suspend fun unban(data: UnbanData) {
-        val target = data.target
-        val executor = data.executor
-        val guild = data.guild
-        val reason = data.reason
+        val (target, executor, guild, reason) = data
 
         val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
         val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
@@ -73,18 +70,17 @@ class UnbanExecutor(
             }
 
             guild.unban(target.id, reason)
-
         } catch (e: RestRequestException) {
+            val errorMessage: MessageBuilder.() -> (Unit) = {
 
+            }
         }
     }
 
     private suspend fun validate(data: UnbanData): List<UnbanInteractionCheck> {
         val check = mutableListOf<UnbanInteractionCheck>()
 
-        val target = data.target
-        val executor = data.executor
-        val guild = data.guild
+        val (target, executor, guild, _) = data
 
         val targetAsMember = target.asMemberOrNull(guild.id)
 

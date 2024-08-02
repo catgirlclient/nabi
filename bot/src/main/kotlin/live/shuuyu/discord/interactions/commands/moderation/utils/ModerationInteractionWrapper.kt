@@ -59,6 +59,8 @@ interface ModerationInteractionWrapper {
         }
     }
 
+
+
     // Slowmode is different
     enum class ModerationType {
         Ban,

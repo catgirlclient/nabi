@@ -1,5 +1,6 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
+import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.ban
 import dev.kord.core.cache.data.GuildData
@@ -43,7 +44,6 @@ class BanExecutor(
             i18n.get("deleteMessageDurationOptionName"),
             i18n.get("deleteMessageDurationOptionDescription")
         )
-        val isEphemeral = optionalBoolean(i18n.get("isEphemeralOptionName"), i18n.get("isEphemeralOptionDescription"))
     }
 
     override val options = Options()
@@ -76,25 +76,13 @@ class BanExecutor(
             }
         }
 
-        val isEphemeral = args[options.isEphemeral] ?: database.guild.getGuildConfig(context.guildId.value.toLong())?.showPunishmentResultantMessage ?: true
-
-        if (isEphemeral) {
-            context.sendEphemeralMessage {
-                banUser(data, this)
-            }
-        } else {
-            context.sendMessage {
-                banUser(data, this )
-            }
+        context.sendMessage {
+            banUser(data, this)
         }
     }
 
-
     private suspend fun banUser(data: BanData, builder: MessageBuilder) {
-        val target = data.target
-        val executor = data.executor
-        val guild = data.guild
-        val reason = data.reason
+        val (target, executor, guild, reason, deleteMessageDuration) = data
 
         val resultantEmbed: MessageBuilder.() -> (Unit) = {
             embed {
@@ -126,7 +114,7 @@ class BanExecutor(
 
             guild.ban(target.id) {
                 this.reason = reason
-                this.deleteMessageDuration = data.deleteMessageDuration
+                this.deleteMessageDuration = deleteMessageDuration
             }
 
             builder.apply(resultantEmbed)
@@ -142,10 +130,7 @@ class BanExecutor(
     private suspend fun validate(data: BanData): List<BanInteractionCheck> {
         val check = mutableListOf<BanInteractionCheck>()
 
-        val target = data.target
-        val executor = data.executor
-        val guild = data.guild
-        val deleteMessageDuration = data.deleteMessageDuration
+        val (target, executor, guild, _, deleteMessageDuration) = data
 
         val nabiAsMember = kord.getSelf().asMember(guild.id)
         val targetAsMember = target.asMemberOrNull(guild.id) ?: target as? Member
@@ -164,6 +149,14 @@ class BanExecutor(
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
         when {
+            Permission.BanMembers !in nabiAsMember.getPermissions() -> check.add(
+                BanInteractionCheck(
+                    target,
+                    executor,
+                    BanInteractionResult.INSUFFICIENT_PERMISSIONS
+                )
+            )
+
             targetRolePosition >= nabiRolePosition -> check.add(
                 BanInteractionCheck(
                     target,
@@ -261,7 +254,7 @@ class BanExecutor(
         }
     }
 
-    private class BanData(
+    private data class BanData(
         val target: User,
         val executor: User,
         val guild: Guild,

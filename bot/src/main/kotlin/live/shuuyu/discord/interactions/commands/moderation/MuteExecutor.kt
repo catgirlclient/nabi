@@ -1,5 +1,6 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.edit
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
@@ -37,7 +38,7 @@ class MuteExecutor(
         if (context !is NabiGuildApplicationContext)
             return
 
-        context.deferChannelMessage()
+        context.deferEphemeralChannelMessage()
 
         val data = MuteData(
             args[options.user],
@@ -63,13 +64,24 @@ class MuteExecutor(
     }
 
     private suspend fun mute(data: MuteData) {
-        val guild = data.guild
-        val targetAsMember = data.target.asMember(guild.id)
-        val executorAsMember = data.executor.asMember(guild.id)
-        val reason = data.reason
-        val duration = data.duration
+        val (target, executor, guild, duration, reason) = data
+
+        val targetAsMember = target.asMember(guild.id)
+        val executorAsMember = executor.asMember(guild.id)
+
+        val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
+        val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
 
         try {
+            if (modLogConfig?.channelId != null && modLogConfig.logUserMutes) {
+                val channelIdToSnowflake = Snowflake(modLogConfig.channelId)
+
+                rest.channel.createMessage(
+                    channelIdToSnowflake,
+                    sendModerationLoggingMessage(target, executor, reason, ModerationInteractionWrapper.ModerationType.Mute)
+                )
+            }
+
             targetAsMember.edit {
                 this.communicationDisabledUntil = Clock.System.now().plus(duration)
                 this.reason = reason
@@ -82,15 +94,11 @@ class MuteExecutor(
     private suspend fun validate(data: MuteData): List<MuteInteractionCheck> {
         val check = mutableListOf<MuteInteractionCheck>()
 
-        val guild = data.guild
-        val target = data.target
-        val executor = data.executor
-        val duration = data.duration
-        val nabi = kord.getSelf()
+        val (target, executor, guild, duration, _) = data
 
-        val nabiAsMember = nabi as? Member ?: nabi.asMemberOrNull(guild.id)
-        val targetAsMember = target as? Member ?: target.asMemberOrNull(guild.id)
-        val executorAsMember = executor as? Member ?: executor.asMemberOrNull(guild.id)
+        val nabiAsMember = kord.getSelf().asMemberOrNull(guild.id) ?: kord.getSelf() as? Member
+        val targetAsMember = target.asMemberOrNull(guild.id) ?: target as? Member
+        val executorAsMember = executor.asMemberOrNull(guild.id) ?: executor as? Member
 
         val nabiRolePosition = guild.roles.filter { it.id in nabiAsMember!!.roleIds }
             .toList()
@@ -205,7 +213,7 @@ class MuteExecutor(
         }
     }
 
-    private class MuteData(
+    private data class MuteData(
         val target: User,
         val executor: User,
         val guild: Guild,

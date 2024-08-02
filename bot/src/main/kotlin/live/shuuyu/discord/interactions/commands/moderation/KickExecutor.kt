@@ -1,24 +1,31 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
+import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
+import dev.kord.rest.Image
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.request.RestRequestException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
+import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.discord.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.discord.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.discord.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.discord.utils.ColorUtils
 import live.shuuyu.discord.utils.MessageUtils
 import live.shuuyu.discord.utils.MessageUtils.createRespondEmbed
+import live.shuuyu.discord.utils.UserUtils.getUserAvatar
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
+import live.shuuyu.discordinteraktions.common.builder.message.embed
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
 
 class KickExecutor(
     nabi: NabiCore
@@ -36,7 +43,7 @@ class KickExecutor(
 
         val data = KickData(
             args[options.user],
-            context.sender  ,
+            context.sender,
             Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
             args[options.reason]
         )
@@ -52,12 +59,27 @@ class KickExecutor(
                 }
             }
         }
+
+        context.sendMessage {
+            kickUser(data, this)
+        }
     }
 
-    private suspend fun kick(data: KickData) {
-        val executor = data.executor
-        val target = data.target
-        val guild = data.guild
+    private suspend fun kickUser(data: KickData, builder: MessageBuilder) {
+        val (target, executor, guild, reason) = data
+
+        val resultantEmbed: MessageBuilder.() -> (Unit) = {
+            embed {
+                description = i18n.get("resultantEmbedDescription", mapOf(
+                    "0" to target.mention,
+                    "1" to target.globalName,
+                    "2" to reason
+                ))
+                thumbnailUrl = target.getUserAvatar(Image.Size.Size512)
+                color = ColorUtils.DEFAULT
+                timestamp = Clock.System.now()
+            }
+        }
 
         val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
         val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
@@ -66,11 +88,17 @@ class KickExecutor(
             if (modLogConfig?.channelId != null && modLogConfig.logUserKicks) {
                 val channelId = Snowflake(modLogConfig.channelId)
 
-                rest.channel.createMessage(channelId, createKickMessage())
+                rest.channel.createMessage(
+                    channelId,
+                    sendModerationLoggingMessage(target, executor, reason, ModerationInteractionWrapper.ModerationType.Kick)
+                )
             }
 
-            guild.kick(target.id, data.reason)
             MessageUtils.directMessageUser(target, rest, createKickMessage())
+
+            guild.kick(target.id, reason)
+
+            builder.apply(resultantEmbed)
         } catch (e: RestRequestException) {
             TODO("replace this with an actual error embed.")
         }
@@ -79,15 +107,17 @@ class KickExecutor(
     private suspend fun validate(data: KickData): List<KickInteractionCheck> {
         val check = mutableListOf<KickInteractionCheck>()
 
-        val executor = data.executor
-        val target = data.target
-        val guild = data.guild
+        val (target, executor, guild, _) = data
 
-        val nabiAsMember = kord.getSelf().asMember(guild.id)
-        val executorAsMember = executor.asMember(guild.id) // should NEVER be null
+        val nabiAsMember = kord.getSelf().asMemberOrNull(guild.id)
+        val executorAsMember = executor.asMemberOrNull(guild.id) // should NEVER be null
         val targetAsMember = target.asMemberOrNull(guild.id)
 
-        val executorRolePosition = guild.roles.filter { it.id in executorAsMember.roleIds }
+        val nabiRolePosition = guild.roles.filter { it.id in nabiAsMember!!.roleIds }
+            .toList()
+            .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
+
+        val executorRolePosition = guild.roles.filter { it.id in executorAsMember!!.roleIds }
             .toList()
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
@@ -96,6 +126,14 @@ class KickExecutor(
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
         when {
+            Permission.KickMembers !in nabiAsMember!!.getPermissions() -> check.add(
+                KickInteractionCheck(
+                    target,
+                    executor,
+                    KickInteractionResult.INSUFFICIENT_PERMISSIONS
+                )
+            )
+
             targetAsMember == null -> check.add(
                 KickInteractionCheck(
                     target,
@@ -104,11 +142,11 @@ class KickExecutor(
                 )
             )
 
-            targetAsMember.isOwner() -> check.add(
+            targetRolePosition >= nabiRolePosition -> check.add(
                 KickInteractionCheck(
                     target,
                     executor,
-                    KickInteractionResult.TARGET_IS_OWNER
+                    KickInteractionResult.INSUFFICIENT_PERMISSIONS
                 )
             )
 
@@ -117,6 +155,14 @@ class KickExecutor(
                     target,
                     executor,
                     KickInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER
+                )
+            )
+
+            targetAsMember.isOwner() -> check.add(
+                KickInteractionCheck(
+                    target,
+                    executor,
+                    KickInteractionResult.TARGET_IS_OWNER
                 )
             )
 
@@ -132,7 +178,7 @@ class KickExecutor(
         return check
     }
 
-    private suspend fun buildInteractionFailMessage(check: KickInteractionCheck, builder: MessageBuilder) {
+    private fun buildInteractionFailMessage(check: KickInteractionCheck, builder: MessageBuilder) {
         val (target, executor, results) = check
 
         builder.apply {

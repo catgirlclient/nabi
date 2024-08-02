@@ -1,5 +1,11 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
+import dev.kord.core.behavior.edit
+import dev.kord.core.cache.data.GuildData
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
+import dev.kord.core.entity.User
+import dev.kord.rest.request.RestRequestException
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.commands.moderation.utils.ModerationInteractionWrapper
@@ -26,10 +32,58 @@ class UnmuteExecutor(
             return
 
         context.deferEphemeralChannelMessage()
+
+        val data = UnmuteData(
+            args[options.user],
+            context.sender,
+            Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
+            args[options.reason]
+        )
     }
 
-    private enum class UnmuteInteractionResult {
+    private suspend fun unmuteUser(data: UnmuteData) {
+        val (target, executor, guild, reason) = data
 
+        val targetAsMember = target.asMemberOrNull(guild.id) ?: target as? Member
+        val executorAsMember = executor.asMemberOrNull(guild.id) ?: target as? Member
+
+        try {
+            targetAsMember?.edit {
+                this.reason = reason
+            }
+        } catch (e: RestRequestException) {
+
+        }
+    }
+
+    private suspend fun validate(data: UnmuteData): List<UnmuteInteractionCheck> {
+        val check = mutableListOf<UnmuteInteractionCheck>()
+
+        val (target, executor, guild, _) = data
+
+        when {
+
+        }
+
+        return check
+    }
+
+    private data class UnmuteData(
+        val target: User,
+        val executor: User,
+        val guild: Guild,
+        val reason: String?
+    )
+
+    private data class UnmuteInteractionCheck(
+        val target: User,
+        val executor: User,
+        val results: UnmuteInteractionResult
+    )
+
+    private enum class UnmuteInteractionResult {
+        INSUFFICIENT_PERMISSIONS,
+        USER_IS_NOT_MUTED,
         SUCCESS
     }
 }

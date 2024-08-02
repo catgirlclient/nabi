@@ -5,8 +5,6 @@ import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
-import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
-import dev.kord.rest.builder.message.embed
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
@@ -66,10 +64,7 @@ class WarnExecutor(
     }
 
     private suspend fun warn(data: WarnData) {
-        val target = data.target
-        val executor = data.executor
-        val guild = data.guild
-        val reason = data.reason
+        val (target, executor, guild, reason) = data
 
         val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
         val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
@@ -88,6 +83,12 @@ class WarnExecutor(
                 )
             }
 
+            MessageUtils.directMessageUser(
+                target,
+                rest,
+                sendModerationLoggingMessage(target, executor, reason, ModerationInteractionWrapper.ModerationType.Warn)
+            )
+
             WarnTable.insert {
                 it[this.userId] = target.id.value.toLong()
                 it[this.executorId] = executor.id.value.toLong()
@@ -95,8 +96,6 @@ class WarnExecutor(
                 it[this.reason] = reason
                 it[this.timestamp] = Clock.System.now().epochSeconds
             }
-
-            MessageUtils.directMessageUser(target, rest, directMessageUserEmbed())
         } catch (e: Throwable) {
 
         }
@@ -105,15 +104,13 @@ class WarnExecutor(
     private suspend fun validate(data: WarnData): List<WarnInteractionCheck> {
         val check = mutableListOf<WarnInteractionCheck>()
 
-        val target = data.target
-        val executor = data.executor
-        val guild = data.guild
+        val (target, executor, guild, _) = data
 
         val nabiAsMember = kord.getSelf().asMember(guild.id)
         val targetAsMember = target.asMemberOrNull(guild.id) ?: target as? Member
         val executorAsMember = executor.asMemberOrNull(guild.id) ?: executor as? Member
 
-        val nabiRolePosition = guild.roles.filter { it.id in nabiAsMember.roleIds }
+         val nabiRolePosition = guild.roles.filter { it.id in nabiAsMember.roleIds }
             .toList()
             .maxByOrNull { it.rawPosition }?.rawPosition ?: Int.MIN_VALUE
 
@@ -170,7 +167,7 @@ class WarnExecutor(
         return check
     }
 
-    private suspend fun buildInteractionFailMessage(check: WarnInteractionCheck, builder: MessageBuilder) {
+    private fun buildInteractionFailMessage(check: WarnInteractionCheck, builder: MessageBuilder) {
         val (target, executor, results) = check
 
         builder.apply {
@@ -181,14 +178,6 @@ class WarnExecutor(
                 WarnInteractionResult.TARGET_IS_SELF -> TODO()
                 WarnInteractionResult.SUCCESS -> TODO()
             }
-        }
-    }
-
-    private suspend fun directMessageUserEmbed(
-
-    ): UserMessageCreateBuilder.() -> (Unit) = {
-        embed {
-
         }
     }
 

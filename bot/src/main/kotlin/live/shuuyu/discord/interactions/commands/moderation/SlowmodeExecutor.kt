@@ -1,6 +1,7 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
 import dev.kord.common.entity.ChannelType
+import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.edit
 import dev.kord.core.cache.data.ChannelData
@@ -76,11 +77,9 @@ class SlowmodeExecutor(
     }
 
     private suspend fun slowmode(data: SlowmodeData) {
-        val channel = data.channel as TextChannel
-        val executor = data.executor
-        val duration = data.duration
-        val guild = data.guild
-        val reason = data.reason
+        val (channel, executor, guild, duration, reason) = data
+
+        val channelAsTextChannel = channel as TextChannel
 
         val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
         val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
@@ -95,7 +94,7 @@ class SlowmodeExecutor(
                 )
             }
 
-            channel.edit {
+            channelAsTextChannel.edit {
                 this.rateLimitPerUser = duration
                 this.reason = reason
             }
@@ -106,14 +105,22 @@ class SlowmodeExecutor(
         }
     }
 
-    private fun validate(data: SlowmodeData): List<SlowmodeInteractionCheck> {
+    private suspend fun validate(data: SlowmodeData): List<SlowmodeInteractionCheck> {
         val check = mutableListOf<SlowmodeInteractionCheck>()
 
-        val executor = data.executor
-        val channel = data.channel
-        val duration = data.duration
+        val (channel, executor, guild, duration, _) = data
+
+        val executorAsMember = executor.asMember(guild.id)
 
         when {
+            Permission.ManageChannels !in executorAsMember.getPermissions() -> check.add(
+                SlowmodeInteractionCheck(
+                    channel,
+                    executor,
+                    SlowmodeInteractionResult.INSUFFICIENT_PERMISSIONS
+                )
+            )
+
             duration !in 0.seconds..6.hours -> check.add(
                 SlowmodeInteractionCheck(
                     channel,
@@ -134,7 +141,7 @@ class SlowmodeExecutor(
         return check
     }
 
-    private suspend fun buildInteractionFailMessage(check: SlowmodeInteractionCheck, builder: MessageBuilder) {
+    private fun buildInteractionFailMessage(check: SlowmodeInteractionCheck, builder: MessageBuilder) {
         val (channel, executor, results) = check
 
         builder.apply {
