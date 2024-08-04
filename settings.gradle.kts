@@ -28,5 +28,6 @@ include(
     ":api",
     ":bot",
     ":common",
-    ":dashboard"
+    ":dashboard",
+    ":modules:i18n"
 )

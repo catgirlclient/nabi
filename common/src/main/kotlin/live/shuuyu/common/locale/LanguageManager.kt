@@ -12,6 +12,10 @@ import java.io.FileNotFoundException
 /**
  * @param path The location of the file. This should be a toml file.
  */
+@Deprecated(
+    message = "Moved to i18n module, should not be used in the future.",
+    level = DeprecationLevel.WARNING
+)
 class LanguageManager(private val path: String) {
 
     companion object {
@@ -28,6 +32,10 @@ class LanguageManager(private val path: String) {
             throw FileNotFoundException("File cannot be located in the sequestered location!")
     }
 
+    @Deprecated(
+        message = "Moved to i18n module, should not be used.",
+        level = DeprecationLevel.WARNING
+    )
     fun get(key: String, replaceWith: Map<String, Any?> = mapOf()): String {
         try {
             val file = File(path)
