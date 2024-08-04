@@ -3,6 +3,8 @@ package live.shuuyu.i18n.tasks
 import com.akuleshov7.ktoml.Toml
 import com.squareup.kotlinpoet.TypeSpec
 import live.shuuyu.i18n.ParserType
+import live.shuuyu.i18n.utils.FunSpecBuilder
+import live.shuuyu.i18n.utils.addFunction
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -27,7 +29,6 @@ public abstract class GenerateI18nTask: DefaultTask() {
 
     // Dumps all the given properties into this directory for usage
     @get:OutputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
     public abstract val outputDirectory: DirectoryProperty
 
     @TaskAction
@@ -63,24 +64,26 @@ public abstract class GenerateI18nTask: DefaultTask() {
         for ((key, value) in valkeys) {
             when(value) {
                 is List<*> -> {
+                    obj.addFunction(key) {
 
+                    }
                 }
 
                 else -> {
+                    obj.addFunction(key) {
 
+                    }
                 }
             }
         }
     }
 
-    /**
-    private fun buidValue(value: String, obj: TypeSpec.Builder) {
-        val nodes = MessagePatternUtil.buildMessageNode(value).contents.any { it is ArgNode }
+    private fun convertArgumentsToFunctionParameters(
+        arguments: List<String>,
+        parent: FunSpecBuilder
+    ): FunSpecBuilder {
 
-        if (nodes) {
-            obj.addFunction()
-        }
+
+        return parent
     }
-    */
-
 }

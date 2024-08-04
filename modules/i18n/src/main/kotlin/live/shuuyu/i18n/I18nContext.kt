@@ -2,11 +2,14 @@ package live.shuuyu.i18n
 
 import com.ibm.icu.text.MessageFormat
 import live.shuuyu.i18n.data.I18nData
+import org.slf4j.LoggerFactory
 
 public open class I18nContext(
     public val i18nData: I18nData
 ) {
-    private companion object;
+    private companion object {
+        val logger = LoggerFactory.getLogger("I18nContext")
+    }
 
     public fun get(key: String, vararg replaceWith: Any): String {
         try {
