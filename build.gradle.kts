@@ -1,7 +1,7 @@
-import live.shuuyu.plugins.project.Project
+import live.shuuyu.plugins.convention.project.Project
 
 plugins {
-    id("live.shuuyu.plugins.nabi")
+    id("live.shuuyu.plugins.module")
 }
 
 repositories {

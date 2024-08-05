@@ -4,6 +4,7 @@ import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
@@ -109,9 +110,9 @@ class KickExecutor(
 
         val (target, executor, guild, _) = data
 
-        val nabiAsMember = kord.getSelf().asMemberOrNull(guild.id)
-        val executorAsMember = executor.asMemberOrNull(guild.id) // should NEVER be null
-        val targetAsMember = target.asMemberOrNull(guild.id)
+        val nabiAsMember = kord.getSelf().asMemberOrNull(guild.id) ?: kord.getSelf() as? Member
+        val executorAsMember = executor.asMemberOrNull(guild.id) ?: executor as? Member
+        val targetAsMember = target.asMemberOrNull(guild.id) ?: target as? Member
 
         val nabiRolePosition = guild.roles.filter { it.id in nabiAsMember!!.roleIds }
             .toList()

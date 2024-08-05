@@ -16,5 +16,4 @@ object ZstdEncoder: ContentEncoder {
     override fun CoroutineScope.encode(source: ByteReadChannel): ByteReadChannel {
         return ZstdInputStream(source.toInputStream()).toByteReadChannel()
     }
-
 }

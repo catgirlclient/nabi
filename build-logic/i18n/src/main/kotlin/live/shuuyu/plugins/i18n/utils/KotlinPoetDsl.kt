@@ -1,4 +1,4 @@
-package live.shuuyu.i18n.utils
+package live.shuuyu.plugins.i18n.utils
 
 import com.squareup.kotlinpoet.*
 

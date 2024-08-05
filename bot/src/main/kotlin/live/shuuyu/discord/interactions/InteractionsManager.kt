@@ -4,7 +4,7 @@ import dev.kord.common.entity.Snowflake
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.interactions.commands.developer.NabiInfo
 import live.shuuyu.discord.interactions.commands.developer.declarator.BlacklistDeclarator
-import live.shuuyu.discord.interactions.commands.discord.ChannelInfo
+import live.shuuyu.discord.interactions.commands.discord.ChannelInfoExecutor
 import live.shuuyu.discord.interactions.commands.discord.GuildInfo
 import live.shuuyu.discord.interactions.commands.discord.RoleInfo
 import live.shuuyu.discord.interactions.commands.discord.declarators.UserAvatarUserDeclarator
@@ -18,7 +18,7 @@ class InteractionsManager(private val nabi: NabiCore) {
         manager.register(NabiInfo(nabi))
 
         // General Related Commands (Yes I wasted all of my user commands on this stuff don't ask)
-        manager.register(ChannelInfo(nabi))
+        manager.register(ChannelInfoExecutor(nabi))
         manager.register(GuildInfo(nabi))
         manager.register(UserSlashDeclarator(nabi))
         manager.register(UserInfoUserDeclarator(nabi)) // user

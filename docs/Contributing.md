@@ -1,5 +1,5 @@
 # Contributing
-Contributions are always welcomed by the Nabi team, although not required.
+Contributions are always welcomed by the Nabi team.
 
 ## Notes
 * We use Dragonfly as a drop in replacement for Redis, since it's more efficient and faster. If you'd like to replace it

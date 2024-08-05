@@ -15,7 +15,7 @@ import live.shuuyu.discordinteraktions.common.commands.options.ApplicationComman
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.discordinteraktions.common.commands.slashCommand
 
-class ChannelInfo(
+class ChannelInfoExecutor(
     nabi: NabiCore
 ): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/ChannelInfo.toml")), SlashCommandDeclarationWrapper {
     inner class Options: ApplicationCommandOptions() {
@@ -42,6 +42,6 @@ class ChannelInfo(
     }
 
     override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
-        executor = this@ChannelInfo
+        executor = this@ChannelInfoExecutor
     }
 }

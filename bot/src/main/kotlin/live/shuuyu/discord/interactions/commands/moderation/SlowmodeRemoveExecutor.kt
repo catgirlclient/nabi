@@ -1,5 +1,7 @@
 package live.shuuyu.discord.interactions.commands.moderation
 
+import dev.kord.common.entity.ChannelType
+import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.edit
 import dev.kord.core.cache.data.ChannelData
@@ -24,7 +26,14 @@ class SlowmodeRemoveExecutor(
     nabi: NabiCore
 ): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Slowmode.toml")), ModerationInteractionWrapper {
     inner class Options: ApplicationCommandOptions() {
-        val channel = optionalChannel(i18n.get("channelOptionName"), i18n.get("channelOptionDescription"))
+        val channel = optionalChannel(i18n.get("channelOptionName"), i18n.get("channelOptionDescription")) {
+            channelTypes = listOf(
+                ChannelType.GuildText,
+                ChannelType.GuildForum,
+                ChannelType.PrivateThread,
+                ChannelType.PublicGuildThread
+            )
+        }
         val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription")) {
             allowedLength = 0..512
         }
@@ -90,10 +99,27 @@ class SlowmodeRemoveExecutor(
     private suspend fun validate(data: SlowmodeRemoveData): List<SlowmodeInteractionCheck> {
         val check = mutableListOf<SlowmodeInteractionCheck>()
 
-        val (channel, executor, guild, reason) = data
+        val (channel, executor, guild, _) = data
+
+        val channelAsTextChannel = channel as TextChannel
+        val nabiAsMember = kord.getSelf().asMember(guild.id)
 
         when {
+            Permission.ManageChannels !in nabiAsMember.getPermissions() -> check.add(
+                SlowmodeInteractionCheck(
+                    channel,
+                    executor,
+                    SlowmodeRemoveInteractionResult.PERMISSION_MISSING
+                )
+            )
 
+            else -> check.add(
+                SlowmodeInteractionCheck(
+                    channel,
+                    executor,
+                    SlowmodeRemoveInteractionResult.SUCCESS
+                )
+            )
         }
 
         return check

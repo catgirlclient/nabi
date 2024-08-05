@@ -1,4 +1,4 @@
-package live.shuuyu.plugins
+package live.shuuyu.plugins.convention
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -8,6 +8,7 @@ import org.gradle.kotlin.dsl.maven
 import org.gradle.kotlin.dsl.repositories
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import live.shuuyu.plugins.convention.project.Project as NabiProject
 
 class NabiProjectModule: Plugin<Project> {
     override fun apply(target: Project) {
@@ -16,8 +17,8 @@ class NabiProjectModule: Plugin<Project> {
             pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
             val kotlinExtension = extensions.getByType<KotlinJvmProjectExtension>()
 
-            group = live.shuuyu.plugins.project.Project.GROUP
-            version = live.shuuyu.plugins.project.Project.VERSION
+            group = NabiProject.GROUP
+            version = NabiProject.VERSION
 
             repositories {
                 google()

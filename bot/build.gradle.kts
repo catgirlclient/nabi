@@ -1,5 +1,13 @@
+import live.shuuyu.plugins.i18n.utils.ParserType
+
 plugins {
-    id("live.shuuyu.plugins.nabi")
+    id("live.shuuyu.plugins.module")
+    id("live.shuuyu.plugins.i18n")
+}
+
+val i18n = tasks.register<GenerateI18nTask>("GenerateI18nTask") {
+    parserType.set(ParserType.Toml)
+    languageSourceFolder.set(file("../locale/"))
 }
 
 dependencies {

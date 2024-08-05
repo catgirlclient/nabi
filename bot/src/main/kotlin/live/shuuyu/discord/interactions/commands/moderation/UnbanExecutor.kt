@@ -50,10 +50,10 @@ class UnbanExecutor(
             }
         }
 
-        unban(data)
+        unbanUser(data)
     }
 
-    private suspend fun unban(data: UnbanData) {
+    private suspend fun unbanUser(data: UnbanData) {
         val (target, executor, guild, reason) = data
 
         val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId

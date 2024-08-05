@@ -1,10 +1,9 @@
-package live.shuuyu.i18n.tasks
-
 import com.akuleshov7.ktoml.Toml
+import com.ibm.icu.text.MessagePatternUtil
 import com.squareup.kotlinpoet.TypeSpec
-import live.shuuyu.i18n.ParserType
-import live.shuuyu.i18n.utils.FunSpecBuilder
-import live.shuuyu.i18n.utils.addFunction
+import live.shuuyu.plugins.i18n.utils.FunSpecBuilder
+import live.shuuyu.plugins.i18n.utils.ParserType
+import live.shuuyu.plugins.i18n.utils.addFunction
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -12,6 +11,7 @@ import org.gradle.api.tasks.*
 import org.gradle.work.InputChanges
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
 
 @CacheableTask
 public abstract class GenerateI18nTask: DefaultTask() {
@@ -79,10 +79,17 @@ public abstract class GenerateI18nTask: DefaultTask() {
     }
 
     private fun convertArgumentsToFunctionParameters(
-        arguments: List<String>,
+        node: MessagePatternUtil.ArgNode,
+        arguments: CopyOnWriteArrayList<String>,
         parent: FunSpecBuilder
     ): FunSpecBuilder {
+        if (arguments.contains(node.name)) {
+            return parent
+        }
 
+
+
+        arguments.add(node.name)
 
         return parent
     }

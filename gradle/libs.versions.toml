@@ -50,7 +50,6 @@ zstd = { module = "com.github.luben:zstd-jni", version.ref = "zstd" }
 kotlin-hocon = { module = "org.jetbrains.kotlinx:kotlinx-serialization-hocon", version.ref = "kotlin-serialization" }
 kotlin-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "kotlin-serialization"}
 
-
 # i18n
 icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet" }
@@ -118,5 +117,5 @@ ktor = [
 ]
 
 caching = ["caffeine-core", "lettuce"]
-logger = ["logback", "prometheus-httpserver"]
+logger = ["logback", "prometheus-httpserver", "slf4j-api", "slf4j-simple"]
 buildLogic = ["kotlin-plugin", "kotlin-serialization-plugin"]

@@ -1,5 +1,5 @@
 plugins {
-    id("live.shuuyu.plugins.nabi")
+    id("live.shuuyu.plugins.module")
 }
 
 dependencies {

@@ -1,4 +1,4 @@
-package live.shuuyu.i18n
+package live.shuuyu.plugins.i18n.utils
 
 public enum class ParserType {
     Json,

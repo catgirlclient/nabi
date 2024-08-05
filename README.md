@@ -17,7 +17,7 @@ A non-profit bot that specializes in ease of use, and versatility.
 > larger servers, so please keep that in mind when looking at the source code.
 
 With the notice out of the way, you will need the following: 
-* Java 17 (This is the minimum version, since we are using Java 15's API for webservers)
+* Java 21 (This is the minimum version, since we are using Java 15's API for webservers)
 * PostgreSQL (The database we use)
 * ~~An Interactions Endpoint~~ (We have removed webserver this for the time being. However, this will come back at a later date.)
 
@@ -28,21 +28,28 @@ Your file should look something like this:
 
 ```hocon
 {
-  token: "token"
-  applicationId = "app_id"
-  defaultGuild = "guild_id"
-  shards = 1 
-  publicKey = "public_key"
-  port = 12212
-  jdbcUsername = "db_username"
-  jdbcPassword = "db_password"
-  jdbcUrl = "db_url"
+  discord = {
+    token = "token"
+    applicationId = "app_id"
+    defaultGuildId = "default_guild"
+    shards = 10
+    defaultPrefix = "<3"
+    ownerIds = ["ownerId1", "ownerId2"]
+    publicKey = "public_key" // For webservers
+    port = 12212
+  }
   
-  // For Chat Commands
-  prefix = ["!", "?", "/"] // not added as of right now
-  
-  // For Developer Commands
-  owners = ["user_id"]
+  database = {
+    addresses = "postgres" // The postgres database you're targetting
+    username = "someone"
+    password = "passwordOfSomeone"
+  }
+
+  redis = {
+    address = ["address1", "address2"] // If you are not planning to shard, just have one.
+    username = "username"
+    password = "password"
+  }
   
   // Setting this to development will send all of the debug logs.
   // Set this to production if you don't want to see it.

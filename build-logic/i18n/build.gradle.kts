@@ -2,6 +2,15 @@ plugins {
     `kotlin-dsl`
 }
 
+gradlePlugin {
+    plugins {
+        create("i18n") {
+            id = "live.shuuyu.plugins.i18n"
+            implementationClass = "live.shuuyu.plugins.i18n.I18nPlugin"
+        }
+    }
+}
+
 kotlin {
     explicitApi()
     compilerOptions {
