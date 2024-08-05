@@ -1,5 +1,9 @@
-<h1 align="center">Nabi 🦋</h1>
-A non-profit bot that specializes in ease of use, and versatility.
+<h1 style="text-align: center">
+    Nabi 🦋
+</h1>
+<h5 style="text-align: center">
+    Nabi is a powerful Discord bot specifically made for the purpose of modernity and simplicity made with Kotlin.
+</h5>
 
 ## Features
 * Automoderation via events
@@ -17,7 +21,7 @@ A non-profit bot that specializes in ease of use, and versatility.
 > larger servers, so please keep that in mind when looking at the source code.
 
 With the notice out of the way, you will need the following: 
-* Java 21 (This is the minimum version, since we are using Java 15's API for webservers)
+* Java 17 (This is the minimum version, since we are using Java 15's API for webservers)
 * PostgreSQL (The database we use)
 * ~~An Interactions Endpoint~~ (We have removed webserver this for the time being. However, this will come back at a later date.)
 
@@ -34,7 +38,7 @@ Your file should look something like this:
     defaultGuildId = "default_guild"
     shards = 10
     defaultPrefix = "<3"
-    ownerIds = ["ownerId1", "ownerId2"]
+    ownerIds = ["ownerId1", "ownerId2"] // For developer commands
     publicKey = "public_key" // For webservers
     port = 12212
   }
@@ -57,7 +61,7 @@ Your file should look something like this:
 }
 ```
 
-Once you've filled out all the required information, relaunch your bot. Your bot should be running perfectly from then-on.
+Once you've filled out all the required information, relaunch your bot.
 
 ___
 <p style="text-align: center">
