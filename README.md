@@ -65,5 +65,5 @@ Once you've filled out all the required information, relaunch your bot.
 
 ___
 <h5 style="text-align: center">
-    Copyright (c) 2024 CatgirlClient & Shuuyu. Nabi is licensed under the PolyForm Shield License 1.0.0 unless otherwise stated. All rights reserved.
+    Copyright (c) 2024 CatgirlClient & yujin. Nabi is licensed under the PolyForm Shield License 1.0.0 unless otherwise stated. All rights reserved.
 </h5>
