@@ -64,6 +64,6 @@ Your file should look something like this:
 Once you've filled out all the required information, relaunch your bot.
 
 ___
-<h5 style="text-align: center">
+<h4 style="text-align: center">
     Copyright (c) 2024 CatgirlClient & yujin. Nabi is licensed under the PolyForm Shield License 1.0.0 unless otherwise stated. All rights reserved.
-</h5>
+</h4>

@@ -16,6 +16,5 @@ dependencyResolutionManagement {
 rootProject.name = "build-logic"
 
 include(
-    ":convention",
-    ":i18n"
+    ":convention"
 )

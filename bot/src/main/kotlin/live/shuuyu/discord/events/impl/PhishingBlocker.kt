@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import live.shuuyu.common.encoding.zstd
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discord.NabiCore
 import live.shuuyu.discord.database.tables.WarnTable
@@ -70,7 +69,6 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
 
         private val client = HttpClient(OkHttp) {
             install(ContentEncoding) {
-                zstd(1.0f)
                 deflate(1.0f)
                 gzip(0.9f)
                 identity(1.0f)

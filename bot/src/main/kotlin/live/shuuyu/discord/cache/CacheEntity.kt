@@ -12,5 +12,7 @@ class CacheEntity(val nabi: NabiCore) {
     private val kord = nabi.kord
     private val cache = nabi.cache
 
+    private fun getGuild() {
 
+    }
 }

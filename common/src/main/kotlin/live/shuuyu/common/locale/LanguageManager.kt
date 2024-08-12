@@ -16,7 +16,7 @@ import java.io.FileNotFoundException
     message = "Moved to i18n module, should not be used in the future.",
     level = DeprecationLevel.WARNING
 )
-class LanguageManager(private val path: String) {
+class  LanguageManager(private val path: String) {
 
     companion object {
         private val ktoml = Toml(
