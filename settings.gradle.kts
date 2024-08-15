@@ -27,6 +27,9 @@ rootProject.name = "nabi"
 include(
     ":api",
     ":bot",
+    ":bot:database",
+    ":bot:gateway",
+    ":bot:serializable-data",
     ":common",
     ":dashboard"
 )

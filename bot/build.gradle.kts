@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.bundles.kotlin)
     implementation(libs.bundles.discord)
     implementation(libs.bundles.database)
     implementation(libs.bundles.parsers)
