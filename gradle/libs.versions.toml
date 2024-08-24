@@ -2,6 +2,7 @@
 caffeine = "3.1.8"
 exposed = "0.52.0"
 hikari = "5.1.0"
+i18n = "0.0.6-SNAPSHOT"
 icu4j = "75.1"
 interaktions = "0.1.1"
 jda = "5.0.1"
@@ -57,7 +58,6 @@ kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet" }
 ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
 ktoml-file = { module = "com.akuleshov7:ktoml-file", version.ref = "ktoml" }
-
 
 # ktor
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }

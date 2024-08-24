@@ -11,6 +11,7 @@ pluginManagement {
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://repo.perfectdreams.net/")
     }
 }
 

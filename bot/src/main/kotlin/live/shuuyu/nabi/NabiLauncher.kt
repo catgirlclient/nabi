@@ -8,11 +8,12 @@ import live.shuuyu.nabi.utils.config.DatabaseConfig
 import live.shuuyu.nabi.utils.config.DiscordConfig
 import live.shuuyu.nabi.utils.config.NabiConfig
 import live.shuuyu.nabi.utils.config.RedisConfig
+import java.io.File
 
 object NabiLauncher {
     @JvmStatic
     fun main(args: Array<String>) {
-        val result = ParserUtils.readOrWriteConfig<NabiConfig>("nabi.conf")
+        val result = ParserUtils.readOrWriteConfig<NabiConfig>(File("nabi-config.toml"))
 
         val config = NabiConfig(
             DiscordConfig(

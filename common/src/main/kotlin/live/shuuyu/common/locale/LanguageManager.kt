@@ -16,9 +16,9 @@ import java.io.FileNotFoundException
     message = "Moved to i18n module, should not be used in the future.",
     level = DeprecationLevel.WARNING
 )
-class  LanguageManager(private val path: String) {
+public class LanguageManager(private val path: String) {
 
-    companion object {
+    public companion object {
         private val ktoml = Toml(
             inputConfig = TomlInputConfig(
                 allowEmptyToml = false
@@ -36,7 +36,7 @@ class  LanguageManager(private val path: String) {
         message = "Moved to i18n module, should not be used.",
         level = DeprecationLevel.WARNING
     )
-    fun get(key: String, replaceWith: Map<String, Any?> = mapOf()): String {
+    public fun get(key: String, replaceWith: Map<String, Any?> = mapOf()): String {
         try {
             val file = File(path)
             val decodedFile = ktoml.decodeFromString<LanguageType>(file.readText())

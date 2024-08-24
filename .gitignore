@@ -129,4 +129,5 @@ crashlytics-build.properties
 fabric.properties
 
 nabi.conf
+nabi-config.toml
 postgres.env
