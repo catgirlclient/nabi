@@ -11,44 +11,42 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import live.shuuyu.plugins.convention.project.Project as NabiProject
 
 class NabiProjectModule: Plugin<Project> {
-    override fun apply(target: Project) {
-        with(target) {
-            pluginManager.apply("org.jetbrains.kotlin.jvm")
-            pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
-            val kotlinExtension = extensions.getByType<KotlinJvmProjectExtension>()
+    override fun apply(target: Project): Unit = with(target) {
+        pluginManager.apply("org.jetbrains.kotlin.jvm")
+        pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
+        val kotlinExtension = extensions.getByType<KotlinJvmProjectExtension>()
 
-            group = NabiProject.GROUP
-            version = NabiProject.VERSION
+        group = NabiProject.GROUP
+        version = NabiProject.VERSION
 
-            repositories {
-                google()
-                mavenLocal()
-                mavenCentral()
-                gradlePluginPortal()
-                maven("https://maven.shuyu.me/releases")
-                maven("https://oss.sonatype.org/content/repositories/snapshots")
+        repositories {
+            google()
+            mavenLocal()
+            mavenCentral()
+            gradlePluginPortal()
+            maven("https://maven.shuyu.me/releases")
+            maven("https://oss.sonatype.org/content/repositories/snapshots")
+        }
+
+        kotlinExtension.apply {
+            jvmToolchain(17) // Minimum (LTS) Java version we support
+
+            compilerOptions {
+                progressiveMode.set(true)
+                freeCompilerArgs.add("-Xdont-warn-on-error-suppression")
             }
 
-            kotlinExtension.apply {
-                jvmToolchain(17) // Minimum (LTS) Java version we support
-
-                compilerOptions {
-                    progressiveMode.set(true)
-                    freeCompilerArgs.add("-Xdont-warn-on-error-suppression")
-                }
-
-                sourceSets.all {
-                    languageSettings {
-                        optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                        optIn("kotlin.experimental.ExperimentalTypeInference")
-                    }
+            sourceSets.all {
+                languageSettings {
+                    optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                    optIn("kotlin.experimental.ExperimentalTypeInference")
                 }
             }
+        }
 
-            tasks.apply {
-                withType<Test>().configureEach {
-                    useJUnitPlatform()
-                }
+        tasks.apply {
+            withType<Test>().configureEach {
+                useJUnitPlatform()
             }
         }
     }

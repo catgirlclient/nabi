@@ -1,8 +1,10 @@
 package live.shuuyu.nabi.cache
 
-import dev.kord.common.entity.*
+import dev.kord.common.entity.DiscordChannel
+import dev.kord.common.entity.DiscordGuildMember
+import dev.kord.common.entity.DiscordUser
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.cache.data.ChannelData
-import dev.kord.core.cache.data.GuildData
 import dev.kord.core.cache.data.UserData
 import dev.kord.core.cache.data.toData
 import dev.kord.core.entity.Guild
@@ -23,20 +25,9 @@ class CacheEntity(val nabi: NabiCore) {
     }
 
     private val kord = nabi.kord
+    private val rest = nabi.rest
     private val cache = nabi.cache
     private val mutex = Mutex()
-
-    suspend fun createGuildCache(guild: DiscordGuild) = mutex.withLock {
-
-    }
-
-    suspend fun getGuildCache(guildId: Snowflake): Guild = mutex.withLock {
-        val cachedGuildData = cache.transaction {
-            decodeFromBinary<GuildData>(hget("", guildId.toString()))
-        }
-
-        return Guild(cachedGuildData, kord)
-    }
 
     suspend fun removeGuildCache(guildId: Snowflake) = mutex.withLock(guildId) {
         cache.transaction {

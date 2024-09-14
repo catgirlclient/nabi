@@ -11,7 +11,8 @@ pluginManagement {
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
-        maven("https://repo.perfectdreams.net/")
+        maven("https://maven.shuyu.me/releases")
+        maven("https://maven.shuyu.me/snapshots")
     }
 }
 
@@ -19,6 +20,7 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         maven("https://maven.shuyu.me/releases")
+        maven("https://maven.shuyu.me/snapshots")
         maven("https://oss.sonatype.org/content/repositories/snapshots")
     }
 }
@@ -30,7 +32,8 @@ include(
     ":bot",
     ":bot:database",
     ":bot:gateway",
-    ":bot:serializable-data",
     ":common",
-    ":dashboard"
+    ":dashboard",
+    ":subprojects:cache",
+    ":subprojects:database"
 )
