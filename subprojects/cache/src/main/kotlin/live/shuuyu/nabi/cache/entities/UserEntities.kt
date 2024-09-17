@@ -1,8 +1,10 @@
 package live.shuuyu.nabi.cache.entities
 
+import dev.kord.common.entity.DiscordUser
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.core.cache.data.UserData
+import dev.kord.core.cache.data.toData
 import dev.kord.core.entity.User
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -10,13 +12,14 @@ import live.shuuyu.nabi.cache.utils.GuildKeys
 import live.shuuyu.nabi.cache.utils.UserKeys
 import org.redisson.api.RedissonClient
 
-
 class UserEntities (
     client: RedissonClient,
     val kord: Kord
 ) {
-    private val parentMap = client.getMap<Snowflake, UserData>("nabi:user")
+    val parentMap = client.getMap<Snowflake, UserData>("nabi:user")
     private val mutex = Mutex()
+
+    fun contains(userId: Snowflake): Boolean = parentMap.contains(userId)
 
     suspend fun get(userId: Snowflake): User? = mutex.withLock(UserKeys(userId)) {
         val cachedData = parentMap[userId] ?: return null
@@ -24,13 +27,17 @@ class UserEntities (
         return User(cachedData, kord)
     }
 
-    suspend fun set(map: Map<Snowflake, UserData>) {
-        parentMap.putAll(map)
+    suspend fun set(user: DiscordUser): User {
+        val data = user.toData()
+
+        parentMap[user.id] = data
+
+        return User(data, kord)
     }
 
-    suspend fun delete(userId: Snowflake) = mutex.withLock(GuildKeys(userId)) {
-        val cachedData = parentMap[userId] ?: return null
-
-        parentMap.deleteAsync()
+    suspend fun remove(userId: Snowflake) = mutex.withLock(GuildKeys(userId)) {
+        parentMap.remove(userId)
     }
+
+    suspend fun clear() = parentMap.clear()
 }

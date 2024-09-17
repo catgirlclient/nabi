@@ -8,5 +8,7 @@ object GuildSettingsTable: LongIdTable() {
     val accountAgeSettings = optReference("account_age", AccountAgeSettingsTable, onDelete = ReferenceOption.CASCADE)
     val loggingSettings = optReference("logging_settings", LoggingSettingsTable, onDelete =  ReferenceOption.CASCADE)
     val phishingSettings = optReference("phishing_settings", PhishingSettingsTable, onDelete = ReferenceOption.CASCADE)
+    val welcomeSettings = optReference("welcome_settings", WelcomeChannelSettingsTable, onDelete = ReferenceOption.CASCADE)
     val showPunishmentMessage = bool("show_punishment_message").default(true)
+    val directMessageUser = bool("direct_message_user").default(true)
 }

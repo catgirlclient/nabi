@@ -1,3 +1,11 @@
+# Note on the Polyform Shield License 1.0.0
+Nabi is currently licensed under the Polyform Shield License 1.0.0. However,
+when Nabi reaches the stable version (>=1.0.0), all prior and future code will
+be exclusively licensed under the GNU AGPL-3.0 License, making this project
+open-sourced. By contributing to Nabi during the trial period, you consent to
+relicensing your commit to the GNU AGPL-3.0 License after a stable version
+has been implemented.
+
 8# PolyForm Shield License 1.0.0
 
 <https://polyformproject.org/licenses/shield/1.0.0>

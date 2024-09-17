@@ -30,10 +30,10 @@ rootProject.name = "nabi"
 include(
     ":api",
     ":bot",
-    ":bot:database",
     ":bot:gateway",
     ":common",
     ":dashboard",
     ":subprojects:cache",
-    ":subprojects:database"
+    ":subprojects:database",
+    ":subprojects:entities"
 )

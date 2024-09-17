@@ -14,6 +14,10 @@ val generate = tasks.register<GenerateI18nFileTask>("generateI18nFileTasks") {
 }
 
 dependencies {
+    // TODO: Possibly fatjar this?
+    implementation(project(":subprojects:cache"))
+    implementation(project(":subprojects:database"))
+
     implementation(libs.bundles.kotlin)
     implementation(libs.bundles.discord)
     implementation(libs.bundles.database)
