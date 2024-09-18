@@ -8,13 +8,14 @@ import dev.kord.core.entity.channel.Channel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import live.shuuyu.nabi.cache.utils.ChannelKeys
+import org.redisson.api.RLocalCachedMap
 import org.redisson.api.RedissonClient
 
 class ChannelEntities (
     client: RedissonClient,
     val kord: Kord
-) {
-    val parentMap = client.getMap<Snowflake, ChannelData>("nabi:channel")
+): CacheEntitiesHandler<Snowflake, ChannelData>("nabi:channel") {
+    override val parentMap: RLocalCachedMap<Snowflake, ChannelData> = client.getLocalCachedMap(options)
     private val mutex = Mutex()
 
     suspend fun get(channelId: Snowflake): Channel? = mutex.withLock(ChannelKeys(channelId)) {

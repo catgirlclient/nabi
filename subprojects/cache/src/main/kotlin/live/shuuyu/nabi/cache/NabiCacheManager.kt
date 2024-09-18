@@ -6,6 +6,7 @@ import kotlinx.coroutines.sync.Mutex
 import live.shuuyu.nabi.cache.entities.*
 import org.redisson.Redisson
 import org.redisson.api.RedissonClient
+import org.redisson.codec.SnappyCodecV2
 import org.redisson.config.Config
 
 class NabiCacheManager(val config: NabiCacheConfig, kord: Kord) {
@@ -16,7 +17,7 @@ class NabiCacheManager(val config: NabiCacheConfig, kord: Kord) {
         val mutex = Mutex()
         lateinit var client: RedissonClient
 
-        fun initialization(
+        fun initialize(
             addresses: List<String>,
             username: String,
             password: String
@@ -32,7 +33,9 @@ class NabiCacheManager(val config: NabiCacheConfig, kord: Kord) {
             cluster.retryAttempts = 10
             cluster.isKeepAlive = true
 
-            return Redisson.create(config)
+            return Redisson.create(config.also {
+                it.codec = SnappyCodecV2()
+            })
         }
     }
 

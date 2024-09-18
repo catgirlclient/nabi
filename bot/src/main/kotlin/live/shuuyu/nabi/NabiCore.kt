@@ -77,7 +77,7 @@ class NabiCore(
         database.createMissingSchemaAndColumns()
         manager.registerGlobalApplicationCommands()
         manager.registerGuildApplicationCommands(config.discord.defaultGuildId)
-        cache.connect()
+        NabiCacheManager.initialize(config.redis.addresses, config.redis.username, config.redis.password)
 
         gatewayManager.gateways.forEach { (shardId, gateway) ->
             gateway.installDiscordInteraKTions(interaktions)
@@ -110,7 +110,6 @@ class NabiCore(
         }
 
         shutdownHook()
-        cache.redisShutdownHook()
     }
 
     private suspend fun launchEventProcesses(context: EventContext) {

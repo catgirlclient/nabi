@@ -9,16 +9,18 @@ import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import live.shuuyu.nabi.cache.utils.MemberKeys
+import org.redisson.api.RLocalCachedMap
 import org.redisson.api.RedissonClient
 
 class MemberEntities (
     val client: RedissonClient,
     val kord: Kord
-) {
-    val parentMap = client.getMap<Snowflake, MemberData>("nabi:member")
+): CacheEntitiesHandler<Snowflake, MemberData>("nabi:member") {
+    override val parentMap: RLocalCachedMap<Snowflake, MemberData> = client.getLocalCachedMap(options)
     private val mutex = Mutex()
 
-    suspend fun get(userId: Snowflake, guildId: Snowflake): Member? = mutex.withLock {
+    suspend fun get(userId: Snowflake): Member? = mutex.withLock(MemberKeys(userId)) {
         val cachedData = parentMap[userId] ?: return null
         val userData = UserEntities(client, kord).parentMap[userId] ?: return null // THIS SHOULD NOT RETURN NULL
 

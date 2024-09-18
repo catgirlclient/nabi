@@ -10,13 +10,14 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import live.shuuyu.nabi.cache.utils.GuildKeys
 import live.shuuyu.nabi.cache.utils.UserKeys
+import org.redisson.api.RLocalCachedMap
 import org.redisson.api.RedissonClient
 
 class UserEntities (
     client: RedissonClient,
     val kord: Kord
-) {
-    val parentMap = client.getMap<Snowflake, UserData>("nabi:user")
+): CacheEntitiesHandler<Snowflake, UserData>("nabi:cache") {
+    override val parentMap: RLocalCachedMap<Snowflake, UserData> = client.getLocalCachedMap(options)
     private val mutex = Mutex()
 
     fun contains(userId: Snowflake): Boolean = parentMap.contains(userId)

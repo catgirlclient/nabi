@@ -11,14 +11,14 @@ import dev.kord.core.entity.Guild
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import live.shuuyu.nabi.cache.utils.GuildKeys
-import org.redisson.api.RMap
+import org.redisson.api.RLocalCachedMap
 import org.redisson.api.RedissonClient
 
 class GuildEntities (
     val client: RedissonClient,
     val kord: Kord
-) {
-    val parentMap: RMap<Snowflake, GuildData> = client.getMap("nabi:guild")
+): CacheEntitiesHandler<Snowflake, GuildData>("nabi:guild") {
+    override val parentMap: RLocalCachedMap<Snowflake, GuildData> = client.getLocalCachedMap(options)
     private val mutex = Mutex()
     var roles = mutableMapOf<Snowflake, RoleData>()
     var channels = mutableMapOf<Snowflake, ChannelData>()
