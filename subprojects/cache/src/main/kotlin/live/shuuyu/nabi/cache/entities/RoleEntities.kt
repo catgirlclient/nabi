@@ -33,5 +33,5 @@ class RoleEntities (
         return Role(data, kord)
     }
 
-    suspend fun delete(roleId: Snowflake) = parentMap.remove(roleId)
+    suspend fun remove(roleId: Snowflake) = parentMap.remove(roleId)
 }

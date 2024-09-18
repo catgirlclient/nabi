@@ -32,7 +32,5 @@ class ChannelEntities (
         return Channel.from(data, kord)
     }
 
-    suspend fun delete(channelId: Snowflake) {
-
-    }
+    suspend fun remove(channelId: Snowflake) = parentMap.remove(channelId)
 }

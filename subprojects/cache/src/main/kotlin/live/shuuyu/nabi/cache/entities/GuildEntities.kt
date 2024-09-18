@@ -38,5 +38,5 @@ class GuildEntities (
         return Guild(data, kord)
     }
 
-    suspend fun delete(guildId: Snowflake) = parentMap.remove(guildId)
+    suspend fun remove(guildId: Snowflake) = parentMap.remove(guildId)
 }
