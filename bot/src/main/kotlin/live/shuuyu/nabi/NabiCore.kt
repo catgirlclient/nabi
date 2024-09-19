@@ -29,7 +29,6 @@ import kotlin.time.measureTimedValue
 class NabiCore(
     val gatewayManager: NabiGatewayManager,
     val config: NabiConfig,
-    val cache: NabiCacheManager,
     val database: NabiDatabaseCore
 ) {
     companion object {

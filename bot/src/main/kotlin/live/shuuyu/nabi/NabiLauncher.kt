@@ -2,7 +2,6 @@ package live.shuuyu.nabi
 
 import dev.kord.gateway.DefaultGateway
 import live.shuuyu.common.utils.ParserUtils
-import live.shuuyu.nabi.cache.NabiCacheManager
 import live.shuuyu.nabi.database.NabiDatabaseCore
 import live.shuuyu.nabi.utils.config.DatabaseConfig
 import live.shuuyu.nabi.utils.config.DiscordConfig
@@ -43,10 +42,9 @@ object NabiLauncher {
         val gateways = (0..config.discord.shards).associateWith { DefaultGateway {  } }
 
         val gatewayManager = NabiGatewayManager(config.discord.shards, gateways)
-        val cacheManager = NabiCacheManager(config.redis)
         val databaseManager = NabiDatabaseCore(config.database)
 
-        val nabi = NabiCore(gatewayManager, config, cacheManager, databaseManager)
+        val nabi = NabiCore(gatewayManager, config, databaseManager)
 
         nabi.initialize()
     }
