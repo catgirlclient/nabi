@@ -48,10 +48,6 @@ class MemberModule(nabi: NabiCore): AbstractEventModule(nabi) {
 
         val getGuildConfig = database.guild.getGuildConfig(guildId.value.toLong()) ?: return EventResult.Continue
 
-        nabi.cache.transaction {
-
-        }
-
         try {
             when(type) {
                 JoinType.Join -> {
