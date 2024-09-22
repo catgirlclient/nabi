@@ -12,7 +12,6 @@ kotlin {
         apiVersion.set(KotlinVersion.KOTLIN_2_0)
         languageVersion.set(KotlinVersion.KOTLIN_2_0)
         progressiveMode = true
-        freeCompilerArgs.add("-Xdont-warn-on-error-suppression")
     }
 }
 
@@ -29,4 +28,5 @@ dependencies {
     implementation(libs.bundles.kotlin)
     implementation(libs.bundles.i18n)
     implementation(libs.kotlin.poet)
+    implementation(libs.bundles.jackson)
 }

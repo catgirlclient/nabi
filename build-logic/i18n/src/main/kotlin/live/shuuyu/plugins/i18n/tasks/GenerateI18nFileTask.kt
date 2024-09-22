@@ -1,6 +1,11 @@
 package live.shuuyu.plugins.i18n.tasks
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.toml.TomlFactory
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.ibm.icu.text.MessagePatternUtil
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
@@ -11,7 +16,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.internal.extensions.stdlib.capitalized
 import java.io.File
-import kotlin.reflect.KClass
 
 @CacheableTask
 public abstract class GenerateI18nFileTask: DefaultTask() {
@@ -40,6 +44,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
         outputDirectory.mkdirs()
 
         println(files)
+
         for (file in files) {
             createFile(generatedPackageName.get(), file.name.capitalized().stripSuffix(parser)) {
                 addFileComment(
@@ -55,10 +60,32 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
 
     private fun generateKotlinObject(file: File, parser: ParserType): TypeSpec {
         return createObject(file.name.capitalized().stripSuffix(parser)) {
-            val contents = getParser(file, parser)
+            val contents = load(file, parser)
 
             for ((key, value) in contents) {
+                when (value) {
+                    is Map<*, *> -> {
+                        this.addType(
+                            generateKotlinObject(file, parser)
+                        )
+                    }
 
+                    is List<*> -> {
+                        convertToKotlin(
+                            key,
+                            value.joinToString("."),
+                            ClassName("live.shuuyu.i18n.data", "I18nListData")
+                        )
+                    }
+
+                    is String -> {
+                        convertToKotlin(
+                            key,
+                            value,
+                            ClassName("live.shuuyu.i18n.data", "I18nStringData")
+                        )
+                    }
+                }
             }
         }
     }
@@ -66,27 +93,61 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
     private fun convertToKotlin(
         key: String,
         value: String,
-        clazz: KClass<*>
+        clazz: ClassName
     ) {
         val args = MessagePatternUtil.buildMessageNode(value)
         val checkIfArgs = args.contents.any { it is MessagePatternUtil.ArgNode }
 
         if (checkIfArgs) {
-            createKotlinFunction(name, clazz)
+            createKotlinFunction(key.capitalized(), clazz, args, key, value)
         } else {
-            createKotlinProperty(name, clazz)
+            createKotlinProperty(key.capitalized(), clazz)
         }
     }
 
-    private fun createKotlinFunction(name: String, clazz: KClass<*>): FunSpec {
+    /**
+     * This should fetch the string associated with the value, so it should go from
+     * I18nStringData -> I18nContext().get
+     */
+    private fun createKotlinFunction(
+        name: String,
+        clazz: ClassName,
+        nodes: MessagePatternUtil.MessageNode,
+        key: String,
+        value: String
+    ): FunSpec {
+        val arguments = mutableSetOf<String>()
+
         return createFunction(name) {
+            for (node in nodes.contents) {
+                if (node is MessagePatternUtil.ArgNode) {
+                    this.addParameter(node.name, Any::class)
+                }
+            }
+
+            createCodeBlock {
+                add("${clazz.simpleName}($key,")
+                add("mutableMapOf(")
+                apply {
+                    for (argument in arguments) {
+                        add("%S to $argument", argument)
+                    }
+                }
+                add(")")
+                add(")")
+            }
+
             returns(clazz)
         }
     }
 
-    private fun createKotlinProperty(name: String, clazz: KClass<*>): PropertySpec {
-        return createProperty(name, clazz) {
+    private fun createKotlinProperty(key: String, clazz: ClassName): PropertySpec {
+        return createProperty(key.capitalized(), clazz) {
+            val codeBlock = createCodeBlock {
+                add("${clazz.simpleName}($key)")
+            }
 
+            initializer(codeBlock)
         }
     }
 
@@ -100,7 +161,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
         val fileList = mutableListOf<File>()
         val files = directory.listFiles()
 
-        for (file in files) {
+        for (file in files!!) {
             if (file.isFile) {
                 fileList.add(file)
             } else if (file.isDirectory) {
@@ -111,12 +172,12 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
         return fileList
     }
 
-    private fun getParser(file: File, parser: ParserType): Map<String, Any> {
-        val map = mutableMapOf<String, Any>()
-
-        org.gradle.internal.impldep.org.yaml.snakeyaml.Yaml().load<Map<String, Any>>(file.readText())
-
-        return map
+    private fun load(file: File, parser: ParserType): Map<String, Any> {
+        return when(parser) {
+            ParserType.Json -> ObjectMapper().readValue(file, object: TypeReference<Map<String, Any>>() {})
+            ParserType.Yaml -> ObjectMapper(YAMLFactory()).readValue(file, object: TypeReference<Map<String, Any>>() {})
+            ParserType.Toml -> ObjectMapper(TomlFactory()).readValue(file, object: TypeReference<Map<String, Any>>() {})
+        }
     }
 
     // KotlinPoet hates suffixes apparently

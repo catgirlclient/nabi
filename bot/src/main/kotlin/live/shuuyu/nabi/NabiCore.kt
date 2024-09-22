@@ -15,6 +15,8 @@ import dev.kord.rest.service.RestClient
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.*
 import live.shuuyu.discordinteraktions.common.DiscordInteraKTions
+import live.shuuyu.discordinteraktions.common.commands.MessageCommandDeclaration
+import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclaration
 import live.shuuyu.discordinteraktions.platforms.kord.installDiscordInteraKTions
 import live.shuuyu.nabi.cache.NabiCacheManager
 import live.shuuyu.nabi.database.NabiDatabaseCore
@@ -67,7 +69,9 @@ class NabiCore(
     2. It's better if we do this before initializing to prevent issues from coming up.
      */
     fun preInitialization() = runBlocking {
-        val slashCommandCount = interaktions.manager.applicationCommandsDeclarations.count()
+        val slashCommandCount = interaktions.manager.applicationCommandsDeclarations.filterIsInstance<SlashCommandDeclaration>().size
+        val messageCommandCount = interaktions.manager.applicationCommandsDeclarations.filterIsInstance<MessageCommandDeclaration>().size
+
     }
 
     @OptIn(PrivilegedIntent::class)

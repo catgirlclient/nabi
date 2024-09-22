@@ -3,7 +3,6 @@ Nabi uses all the listed dependencies.
 
 ## Caching
 * [Caffeine](https://github.com/kordlib/cache/tree/main/caffeine) - Short term caching
-* [Lettuce](https://github.com/redis/lettuce)
 * [DragonflyDB](https://github.com/dragonflydb/dragonfly) - Long term caching
 
 ## Compression

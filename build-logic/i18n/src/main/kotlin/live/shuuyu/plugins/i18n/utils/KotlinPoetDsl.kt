@@ -103,6 +103,13 @@ internal fun createProperty(
     builder: PropertySpecBuilder
 ): PropertySpec = PropertySpec.builder(name, clazz).apply(builder).build()
 
+internal fun createProperty(
+    name: String,
+    className: ClassName,
+    builder: PropertySpecBuilder
+): PropertySpec = PropertySpec.builder(name, className).apply(builder).build()
+
+
 /**
  * Creates a Kotlin [Object].
  *

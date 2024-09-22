@@ -1,8 +1,8 @@
-package live.shuuyu.common.locale
+package live.shuuyu.i18n
 
 import com.ibm.icu.text.MessageFormat
-import live.shuuyu.common.locale.data.I18nListData
-import live.shuuyu.common.locale.data.I18nStringData
+import live.shuuyu.i18n.data.I18nListData
+import live.shuuyu.i18n.data.I18nStringData
 
 public class I18nContext(private val data: I18nData) {
     /**
@@ -84,7 +84,6 @@ public class I18nContext(private val data: I18nData) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
         return listOf()
     }
 

@@ -1,4 +1,4 @@
-package live.shuuyu.common.locale
+package live.shuuyu.i18n
 
 import kotlinx.serialization.Serializable
 
