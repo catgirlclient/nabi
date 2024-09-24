@@ -55,7 +55,7 @@ public class LanguageManager(private val path: String) {
     fun getList(key: String, replaceWith: Map<String, Any?>): List<String> {
         try {
             val file = File(path)
-            val decodedFile = ktoml.decodeFromString<LanguageType>(file.readText())
+            val decodedFile = ktoml.decodeFromString<live.shuuyu.common.locale.data.LanguageType>(file.readText())
 
             val content = decodedFile.listString[key] ?: logger.error("Failed to fetch list correlated to the key: $key")
 

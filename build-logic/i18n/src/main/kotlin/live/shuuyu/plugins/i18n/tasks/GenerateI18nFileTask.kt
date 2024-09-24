@@ -53,35 +53,36 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                     """.trimIndent()
                 )
 
-                addType(generateKotlinObject(file, parser))
+                val obj = generateKotlinObject(file.name.capitalized(), load(file, parser))
+
+                addType(obj)
             }.writeTo(outputDirectory)
         }
     }
 
-    private fun generateKotlinObject(file: File, parser: ParserType): TypeSpec {
-        return createObject(file.name.capitalized().stripSuffix(parser)) {
-            val contents = load(file, parser)
-
+    @Suppress("Unchecked_Cast")
+    private fun generateKotlinObject(name: String, contents: Map<String, Any>): TypeSpec {
+        return createObject(name.capitalized().stripSuffix(parserType.get())) {
             for ((key, value) in contents) {
                 when (value) {
                     is Map<*, *> -> {
                         this.addType(
-                            generateKotlinObject(file, parser)
+                            generateKotlinObject(key, value as Map<String, Any>)
                         )
                     }
 
                     is List<*> -> {
                         convertToKotlin(
                             key,
-                            value.joinToString("."),
+                            value.joinToString("\n"),
                             ClassName("live.shuuyu.i18n.data", "I18nListData")
                         )
                     }
 
-                    is String -> {
+                    else -> {
                         convertToKotlin(
                             key,
-                            value,
+                            value as String,
                             ClassName("live.shuuyu.i18n.data", "I18nStringData")
                         )
                     }
@@ -99,7 +100,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
         val checkIfArgs = args.contents.any { it is MessagePatternUtil.ArgNode }
 
         if (checkIfArgs) {
-            createKotlinFunction(key.capitalized(), clazz, args, key, value)
+            createKotlinFunction(key.capitalized(), clazz, args, key)
         } else {
             createKotlinProperty(key.capitalized(), clazz)
         }
@@ -114,7 +115,6 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
         clazz: ClassName,
         nodes: MessagePatternUtil.MessageNode,
         key: String,
-        value: String
     ): FunSpec {
         val arguments = mutableSetOf<String>()
 
@@ -126,7 +126,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
             }
 
             createCodeBlock {
-                add("${clazz.simpleName}($key,")
+                add("${clazz.simpleName}($key, ")
                 add("mutableMapOf(")
                 apply {
                     for (argument in arguments) {
@@ -144,7 +144,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
     private fun createKotlinProperty(key: String, clazz: ClassName): PropertySpec {
         return createProperty(key.capitalized(), clazz) {
             val codeBlock = createCodeBlock {
-                add("${clazz.simpleName}($key)")
+                add("${clazz.simpleName}($key, emptyMap())")
             }
 
             initializer(codeBlock)

@@ -1,0 +1,3 @@
+[ban]
+name = "Ban"
+description = "Bans the specified user from the current guild."
