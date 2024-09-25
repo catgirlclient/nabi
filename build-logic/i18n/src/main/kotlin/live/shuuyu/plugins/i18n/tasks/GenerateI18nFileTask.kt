@@ -53,19 +53,19 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                     """.trimIndent()
                 )
 
-                addType(generateKotlinObject(file.name.capitalized().stripSuffix(parser), load(file, parser)))
+                addType(generateKotlinObject(file.name.capitalized().stripSuffix(parser), load(file, parser), listOf()))
             }.writeTo(outputDirectory)
         }
     }
 
     @Suppress("Unchecked_Cast")
-    private fun generateKotlinObject(name: String, contents: Map<String, Any>): TypeSpec {
+    private fun generateKotlinObject(name: String, contents: Map<String, Any>, children: List<String>): TypeSpec {
         return createObject(name.capitalized().stripSuffix(parserType.get())) {
             for ((key, value) in contents) {
                 when (value) {
                     is Map<*, *> -> {
                         this.addType(
-                            generateKotlinObject(key, value as Map<String, Any>)
+                            generateKotlinObject(key, value as Map<String, Any>, children.toMutableList().apply { this.add(key) })
                         )
                     }
 
@@ -74,6 +74,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                             key,
                             value.joinToString("\n"),
                             ClassName("live.shuuyu.i18n.data", "I18nListData"),
+                            children.joinToString(".") + "." + key,
                             this
                         )
                     }
@@ -83,6 +84,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                             key,
                             value as String,
                             ClassName("live.shuuyu.i18n.data", "I18nStringData"),
+                            children.joinToString(".") + "." + key,
                             this
                         )
                     }
@@ -95,15 +97,16 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
         key: String,
         value: String,
         clazz: ClassName,
+        fullKey: String,
         parent: TypeSpec.Builder
     ) {
         val args = MessagePatternUtil.buildMessageNode(value)
         val checkIfArgs = args.contents.any { it is MessagePatternUtil.ArgNode }
 
         if (checkIfArgs) {
-            parent.addFunction(createKotlinFunction(key, clazz, args))
+            parent.addFunction(createKotlinFunction(key, clazz, fullKey, args))
         } else {
-            parent.addProperty(createKotlinProperty(key, clazz))
+            parent.addProperty(createKotlinProperty(key, clazz, fullKey))
         }
     }
 
@@ -114,6 +117,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
     private fun createKotlinFunction(
         key: String,
         clazz: ClassName,
+        fullKey: String,
         nodes: MessagePatternUtil.MessageNode,
     ): FunSpec {
         val arguments = mutableSetOf<String>()
@@ -127,7 +131,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
             }
 
             val block = createCodeBlock {
-                add("return ${clazz.simpleName}(\"${key}\", ")
+                add("return ${clazz.simpleName}(\"${fullKey}\", ")
                 add("mutableMapOf(")
                 apply {
                     for (argument in arguments) {
@@ -144,10 +148,10 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
         }
     }
 
-    private fun createKotlinProperty(key: String, clazz: ClassName): PropertySpec {
+    private fun createKotlinProperty(key: String, clazz: ClassName, fullKey: String): PropertySpec {
         return createProperty(key.capitalized(), clazz) {
             val codeBlock = createCodeBlock {
-                add("${clazz.simpleName}(\"${key}\", emptyMap())")
+                add("${clazz.simpleName}(\"${fullKey}\", emptyMap())")
             }
 
             initializer(codeBlock)
@@ -190,9 +194,5 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
             this.removeSuffix(".yaml")
         }
         ParserType.Toml -> this.removeSuffix(".toml")
-    }
-
-    private fun joinKeys(   ) {
-
     }
 }

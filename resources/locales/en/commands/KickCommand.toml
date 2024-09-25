@@ -1,0 +1,6 @@
+[command]
+name = "kick"
+description = "Kicks the specified user from your current guild."
+
+[error]
+userIsNull = "The user you've specified seems to not be in the server."
