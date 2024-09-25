@@ -53,9 +53,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                     """.trimIndent()
                 )
 
-                val obj = generateKotlinObject(file.name.capitalized(), load(file, parser))
-
-                addType(obj)
+                addType(generateKotlinObject(file.name.capitalized().stripSuffix(parser), load(file, parser)))
             }.writeTo(outputDirectory)
         }
     }
@@ -75,7 +73,8 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                         convertToKotlin(
                             key,
                             value.joinToString("\n"),
-                            ClassName("live.shuuyu.i18n.data", "I18nListData")
+                            ClassName("live.shuuyu.i18n.data", "I18nListData"),
+                            this
                         )
                     }
 
@@ -83,7 +82,8 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                         convertToKotlin(
                             key,
                             value as String,
-                            ClassName("live.shuuyu.i18n.data", "I18nStringData")
+                            ClassName("live.shuuyu.i18n.data", "I18nStringData"),
+                            this
                         )
                     }
                 }
@@ -94,15 +94,16 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
     private fun convertToKotlin(
         key: String,
         value: String,
-        clazz: ClassName
+        clazz: ClassName,
+        parent: TypeSpec.Builder
     ) {
         val args = MessagePatternUtil.buildMessageNode(value)
         val checkIfArgs = args.contents.any { it is MessagePatternUtil.ArgNode }
 
         if (checkIfArgs) {
-            createKotlinFunction(key.capitalized(), clazz, args, key)
+            parent.addFunction(createKotlinFunction(key, clazz, args))
         } else {
-            createKotlinProperty(key.capitalized(), clazz)
+            parent.addProperty(createKotlinProperty(key, clazz))
         }
     }
 
@@ -111,22 +112,22 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
      * I18nStringData -> I18nContext().get
      */
     private fun createKotlinFunction(
-        name: String,
+        key: String,
         clazz: ClassName,
         nodes: MessagePatternUtil.MessageNode,
-        key: String,
     ): FunSpec {
         val arguments = mutableSetOf<String>()
 
-        return createFunction(name) {
+        return createFunction(key.capitalized()) {
             for (node in nodes.contents) {
                 if (node is MessagePatternUtil.ArgNode) {
+                    arguments.add(node.name)
                     this.addParameter(node.name, Any::class)
                 }
             }
 
-            createCodeBlock {
-                add("${clazz.simpleName}($key, ")
+            val block = createCodeBlock {
+                add("return ${clazz.simpleName}(\"${key}\", ")
                 add("mutableMapOf(")
                 apply {
                     for (argument in arguments) {
@@ -137,6 +138,8 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                 add(")")
             }
 
+            this.addCode(block)
+
             returns(clazz)
         }
     }
@@ -144,7 +147,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
     private fun createKotlinProperty(key: String, clazz: ClassName): PropertySpec {
         return createProperty(key.capitalized(), clazz) {
             val codeBlock = createCodeBlock {
-                add("${clazz.simpleName}($key, emptyMap())")
+                add("${clazz.simpleName}(\"${key}\", emptyMap())")
             }
 
             initializer(codeBlock)
@@ -156,16 +159,15 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
      *
      * @since 0.0.1
      */
-    @Synchronized
     private fun getFiles(directory: File): List<File> {
         val fileList = mutableListOf<File>()
         val files = directory.listFiles()
 
-        for (file in files!!) {
+        for (file in files) {
             if (file.isFile) {
                 fileList.add(file)
             } else if (file.isDirectory) {
-                getFiles(file)
+                fileList.addAll(getFiles(file.absoluteFile))
             }
         }
 
@@ -188,5 +190,9 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
             this.removeSuffix(".yaml")
         }
         ParserType.Toml -> this.removeSuffix(".toml")
+    }
+
+    private fun joinKeys(   ) {
+
     }
 }

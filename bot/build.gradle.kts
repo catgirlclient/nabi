@@ -8,8 +8,8 @@ plugins {
 
 val generate = tasks.register<GenerateI18nFileTask>("generateI18nFileTasks") {
     parserType.set(ParserType.Toml)
-    languageInputDirectory.set(file("../resources/locales/en"))
-    languageOutputDirectory.set(file("${project.buildDir}/generated/locale"))
+    languageInputDirectory.set(file("../resources/locales/en/"))
+    languageOutputDirectory.set(file("${project.buildDir}/generated/locale/"))
     generatedPackageName.set("live.shuuyu.nabi.i18n")
 }
 
@@ -17,6 +17,7 @@ dependencies {
     // TODO: Possibly fatjar this?
     implementation(project(":subprojects:cache"))
     implementation(project(":subprojects:database"))
+    implementation(project(":common"))
 
     implementation(libs.bundles.kotlin)
     implementation(libs.bundles.discord)
@@ -25,7 +26,6 @@ dependencies {
     implementation(libs.bundles.logger)
     implementation(libs.bundles.caching)
     implementation(libs.kotlin.protobuf)
-    implementation(project(":common"))
     implementation(libs.bundles.ktor)
 }
 
@@ -35,7 +35,7 @@ sourceSets.main {
 
 tasks {
     processResources {
-        from("../locale/")
+        from("../resources/locales/en/")
     }
 
     test {
