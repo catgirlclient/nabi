@@ -15,6 +15,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.internal.extensions.stdlib.capitalized
+import org.gradle.internal.extensions.stdlib.toDefaultLowerCase
 import java.io.File
 
 @CacheableTask
@@ -53,7 +54,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                     """.trimIndent()
                 )
 
-                addType(generateKotlinObject(file.name.capitalized().stripSuffix(parser), load(file, parser), listOf()))
+                addType(generateKotlinObject(file.name, load(file, parser), listOf()))
             }.writeTo(outputDirectory)
         }
     }
@@ -65,7 +66,13 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                 when (value) {
                     is Map<*, *> -> {
                         this.addType(
-                            generateKotlinObject(key, value as Map<String, Any>, children.toMutableList().apply { this.add(key) })
+                            generateKotlinObject(
+                                key,
+                                value as Map<String, Any>,
+                                (children + name.toDefaultLowerCase().stripSuffix(parserType.get())).toMutableList().apply {
+                                    this.add(key)
+                                }
+                            )
                         )
                     }
 
@@ -74,7 +81,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                             key,
                             value.joinToString("\n"),
                             ClassName("live.shuuyu.i18n.data", "I18nListData"),
-                            children.joinToString(".") + "." + key,
+                            (children + key).joinToString("."),
                             this
                         )
                     }
@@ -84,7 +91,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                             key,
                             value as String,
                             ClassName("live.shuuyu.i18n.data", "I18nStringData"),
-                            children.joinToString(".") + "." + key,
+                            (children + key).joinToString("."),
                             this
                         )
                     }
@@ -163,6 +170,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
      *
      * @since 0.0.1
      */
+    @Synchronized
     private fun getFiles(directory: File): List<File> {
         val fileList = mutableListOf<File>()
         val files = directory.listFiles()

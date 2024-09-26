@@ -1,0 +1,10 @@
+[command]
+name = "kick"
+description = "Kicks the specified user from your current guild."
+userOptionName = "user"
+userOptionDescription = "The user you want to kick."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason this user is being kicked."
+
+[error]
+userIsNull = "The user you've specified seems to not be in the server."

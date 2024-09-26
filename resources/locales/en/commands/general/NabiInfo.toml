@@ -1,0 +1,5 @@
+[command]
+name = "info"
+description = "Displays all information in relation to Nabi"
+
+[embed]

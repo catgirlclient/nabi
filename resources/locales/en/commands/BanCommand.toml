@@ -1,9 +1,0 @@
-[command]
-name = "Ban"
-description = "Bans the specified user from the current guild."
-
-[error]
-permissionIsMissing = """
-    Nabi is currently missing the `BAN_MEMBERS` permission. Please check if Nabi has the required permissions
-    to execute the commands, and try again.
-"""
