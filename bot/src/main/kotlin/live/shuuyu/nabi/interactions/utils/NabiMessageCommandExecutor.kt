@@ -8,6 +8,7 @@ import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
 import live.shuuyu.discordinteraktions.common.commands.MessageCommandExecutor
 import live.shuuyu.discordinteraktions.common.entities.messages.Message
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 
 abstract class NabiMessageCommandExecutor(
@@ -34,6 +35,7 @@ abstract class NabiMessageCommandExecutor(
         targetMessage: Message
     ) {
         val ctx = handleCommandContext(nabi, context)
+        var i18nCtx: I18nContext? = null
 
         try {
             execute(ctx, targetMessage)

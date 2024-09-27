@@ -8,6 +8,7 @@ import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
 import live.shuuyu.discordinteraktions.common.commands.SlashCommandExecutor
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 
 abstract class NabiSlashCommandExecutor(
@@ -34,6 +35,7 @@ abstract class NabiSlashCommandExecutor(
         args: SlashCommandArguments
     ) {
         val ctx = handleCommandContext(nabi, context)
+        var i18nCtx: I18nContext? = null
 
         try {
             execute(ctx, args)

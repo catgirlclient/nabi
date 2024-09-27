@@ -73,7 +73,7 @@ interface NabiCommandHandler {
         context: ApplicationCommandContext,
         exception: Throwable
     ) {
-        when(exception) {
+        when (exception) {
             is PublicCommandException -> context.sendPublicMessage(exception.builder)
             is EphemeralCommandException -> context.sendEphemeralMessage(exception.builder)
         }

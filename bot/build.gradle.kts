@@ -22,6 +22,7 @@ dependencies {
     implementation(libs.bundles.kotlin)
     implementation(libs.bundles.discord)
     implementation(libs.bundles.database)
+    implementation(libs.bundles.jackson)
     implementation(libs.bundles.parsers)
     implementation(libs.bundles.logger)
     implementation(libs.bundles.caching)
