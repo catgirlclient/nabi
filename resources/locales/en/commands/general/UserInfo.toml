@@ -1,0 +1,19 @@
+[command]
+name = "user"
+description = "Provides information on the sequestered user."
+userOptionName = "user"
+userOptionDescription = "The user you want to target. Defaults to you if no user is provided."
+
+[embed]
+userFieldTitle = "» User Information"
+userFieldDescription = """
+    • **Mention:** {mention} \n\
+    • **User ID:** {userId} \n\
+    • **Join Date:** {joinDate}
+"""
+memberFieldTitle = "» Member Information"
+memberFieldDescription = """
+    • **Name:** {name} \n\
+    • **Guild Join Date:** {joinDate} \n\
+"""
+roleFieldTitle = "» Roles ({roleCount})"

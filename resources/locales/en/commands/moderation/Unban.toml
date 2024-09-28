@@ -1,0 +1,19 @@
+[command]
+name = "unban"
+description = "Unbans the sequestered user from your current server."
+userOptionName = "user"
+userOptionDescription = "The user you want to unban."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why this user is being unbanned."
+
+[error]
+permissionIsMissing = """
+    Nabi is currently missing the `BAN_MEMBERS` permission. Please check if Nabi has the required permissions
+    to execute the commands, and try again.
+"""
+targetRoleEqualOrHigher = """
+    You can't ban this member due to having equal to or lower permissions compared to the target. Please make sure
+    your permissions are higher than the target, and try again.
+"""
+targetIsNotBanned = "This user is not banned from this guild!"
+targetIsNabi = "You couldn't get rid of me in the first place :))))))"

@@ -3,3 +3,17 @@ name = "info"
 description = "Displays all information in relation to Nabi"
 
 [embed]
+systemFieldName = "» System Information"
+systemFieldDescription = """
+    • **Operating System:** {osName} ({osArch}; {osVersion}) \n\
+    • **RAM Usage:** {freeMemory}/{totalMemory} [{maxMemory}] \n\
+    • **Java Version:** {javaVersion} \n\
+    • **Java Distributor:** {javaDistributor} \n\
+    • **Kotlin Version:** {kotlinVersion}
+"""
+gatewayFieldName = "» Gateway Information"
+gatewayFieldDescription = """
+    • **Gateway Ping:** {gatewayPing} ms \n\
+    • **Shards Launched This Session:** {shardInt} \n\
+    • **Session Limit:** {shardsLeft}/{totalShards}
+"""

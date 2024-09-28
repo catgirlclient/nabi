@@ -1,0 +1,13 @@
+[command]
+name = "role"
+description = "Provides information on the sequestered role."
+roleOptionName = "role"
+roleOptionDescription = "The role you want to target."
+
+[embed]
+roleEmbedDescription = """
+    • **Mention:** {mention}
+    • **ID:** {roleId}
+    • **Creation Date:** {creationDate}
+    • **Role Color:** ({red}, {green}, {blue}) ``{hex}``
+"""

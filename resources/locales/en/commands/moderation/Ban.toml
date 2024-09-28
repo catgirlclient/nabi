@@ -18,8 +18,18 @@ targetRoleEqualOrHigher = """
     your permissions are higher than the target, and try again.
 """
 deleteMessageDuration = """
-    You cannot delete messages which are outside of the range of 0 seconds and 7 days. Please reconfigure
+    You can't delete messages which are outside of the range of 0 seconds and 7 days. Please reconfigure
     your duration and try again. (Note: This follows the ISO-8601 format!)
 """
 targetIsOwner = "You can't ban the owner of the server!"
+targetIsNabi = "HEY >:("
 targetIsSelf = "You can't ban yourself!"
+
+[embed]
+punishmentDescription = "You've been banned from **{guildName}** for **{reason}**."
+resultantTitle = "User Banned"
+resultantDescription = """
+    **Member:** {member} \n\
+    **Action:** {action} \n\
+    **Reason:** {reason}
+"""

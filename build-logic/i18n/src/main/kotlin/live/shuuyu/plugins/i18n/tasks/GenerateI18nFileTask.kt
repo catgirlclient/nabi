@@ -143,6 +143,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                 apply {
                     for (argument in arguments) {
                         add("%S to $argument", argument)
+                        add(", ")
                     }
                 }
                 add(")")
