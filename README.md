@@ -1,4 +1,4 @@
-<h1 style="text-align: center">Nabi 🦋</h1>
+<h1 align="center">Nabi 🦋</h1>
 
 ## Purpose
 Nabi was made with the purpose of being completely free and accessable for servers. Most bots require you to pay money 
