@@ -1,5 +1,7 @@
 <h1 align="center">Nabi 🦋</h1>
-[Terms of Service](docs/TERMS_OF_SERVICE.md) | [Privacy Policy](PRIVACY_POLICY.md)
+<p align="center">
+    Because butterflies were meant to fly~
+</p>
 
 ## Purpose
 Nabi was made with the purpose of being completely free and accessable for servers. Most bots require you to pay money 
