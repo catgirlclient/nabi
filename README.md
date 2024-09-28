@@ -1,15 +1,15 @@
-<h1 style="text-align: center">
-    Nabi 🦋
-</h1>
-<h5 style="text-align: center">
-    Nabi is a powerful Discord bot specifically made for the purpose of modernity and simplicity made with Kotlin.
-</h5>
+<h1 style="text-align: center">Nabi 🦋</h1>
+<p style="text-align: center">Butterflies were always made to fly~</p>
+<p style="text-align: center">[Terms of Service](docs/TERMS_OF_SERVICE.md) | [Privacy Policy](docs/PRIVACY_POLICY)</p>
 
-## Features
-* Automoderation via events
-* Useful Slash Commands and Chat Commands
-* An actually good permissions system
-* Completely free (Looking at you Mee6)
+## Purpose
+Nabi was made with the purpose of being completely free and accessable for servers. Most bots require you to pay money 
+in order to use their more advanced features. However, most servers cannot afford these features in other bots, so 
+Nabi was made! 
+
+Nabi is completely free, featuring no microtransactions or other paid features.
+
+
 
 ___
 <h4 style="text-align: center">
