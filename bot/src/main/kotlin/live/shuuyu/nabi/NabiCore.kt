@@ -24,6 +24,7 @@ import live.shuuyu.nabi.events.EventContext
 import live.shuuyu.nabi.events.EventResult
 import live.shuuyu.nabi.events.impl.*
 import live.shuuyu.nabi.interactions.InteractionsManager
+import live.shuuyu.nabi.metrics.NabiMetricsManager
 import live.shuuyu.nabi.utils.config.NabiConfig
 import kotlin.concurrent.thread
 import kotlin.time.measureTimedValue
@@ -31,7 +32,9 @@ import kotlin.time.measureTimedValue
 class NabiCore(
     val gatewayManager: NabiGatewayManager,
     val config: NabiConfig,
-    val database: NabiDatabaseCore
+    val cache: NabiCacheManager,
+    val database: NabiDatabaseCore,
+    val metrics: NabiMetricsManager
 ) {
     companion object {
         val logger = KotlinLogging.logger("Nabi")
@@ -80,7 +83,8 @@ class NabiCore(
         database.createMissingSchemaAndColumns()
         manager.registerGlobalApplicationCommands()
         manager.registerGuildApplicationCommands(config.discord.defaultGuildId)
-        NabiCacheManager.initialize(config.redis.addresses, config.redis.username, config.redis.password)
+        cache.initialize(kord)
+        metrics.start()
 
         gatewayManager.gateways.forEach { (shardId, gateway) ->
             gateway.installDiscordInteraKTions(interaktions)
