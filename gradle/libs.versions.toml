@@ -8,7 +8,6 @@ jackson = "2.17.2"
 jda = "5.1.0"
 kotlin = "2.0.20"
 ktor = "2.3.12"
-logback = "1.4.12"
 kaml = "0.60.0"
 kord = "0.15.0-SNAPSHOT"
 kotlin-coroutines = "1.9.0"
@@ -16,9 +15,8 @@ kotlin-serialization = "1.7.3"
 kotlin-poet = "1.18.1"
 ktoml = "0.5.2"
 postgresql = "42.7.3"
-prometheus = "0.16.0"
+prometheus = "1.3.1"
 redisson = "3.36.0"
-scylladb = "4.18.0.1"
 slf4j = "2.0.16"
 zstd = "1.5.6-3"
 
@@ -43,11 +41,6 @@ exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "e
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
-
-# Database-Future
-scylladb-core = { module = "com.scylladb:java-driver-core", version.ref = "scylladb" }
-scylladb-builder = { module = "com.scylladb:java-driver-query-builder", version.ref = "scylladb" }
-scylladb-mapper = { module = "com.scylladb:java-driver-mapper-runtime", version.ref = "scylladb" }
 
 # Caching
 caffeine-core = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
@@ -79,11 +72,13 @@ ktor-server = { module = "io.ktor:ktor-server", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 
+# Prometheus
+prometheus-core = { module = "io.prometheus:prometheus-metrics-core", version.ref = "prometheus" }
+prometheus-httpserver = { module = "io.prometheus:prometheus-metrics-exporter-httpserver", version.ref = "prometheus" }
+
 # Logger
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
-logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-prometheus-httpserver = { module = "io.prometheus:simpleclient_httpserver", version.ref = "prometheus" }
 
 # plugins for build-logic
 kotlin-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -111,17 +106,16 @@ database = [
     "exposed-kotlin-datetime"
 ]
 
-database-future = [
-    "scylladb-core",
-    "scylladb-builder",
-    "scylladb-mapper"
-]
+i18n = ["icu4j", "kaml", "kotlin-poet", "ktoml-core", "ktoml-file"]
 
 jackson = ["jackson-core", "jackson-properties", "jackson-toml", "jackson-yaml"]
 
 parsers = ["zstd", "kotlin-protobuf"]
 
-i18n = ["icu4j", "kaml", "kotlin-poet", "ktoml-core", "ktoml-file"]
+prometheus = [
+    "prometheus-core",
+    "prometheus-httpserver"
+]
 
 ktor = [
     "ktor-http",
@@ -134,5 +128,5 @@ ktor = [
 ]
 
 caching = ["caffeine-core", "redisson"]
-logger = ["logback", "prometheus-httpserver", "slf4j-api", "slf4j-simple"]
+logger = ["slf4j-api", "slf4j-simple"]
 buildLogic = ["kotlin-plugin", "kotlin-serialization-plugin"]

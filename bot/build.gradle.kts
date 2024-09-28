@@ -17,6 +17,7 @@ dependencies {
     // TODO: Possibly fatjar this?
     implementation(project(":subprojects:cache"))
     implementation(project(":subprojects:database"))
+    implementation(project(":subprojects:metrics"))
     implementation(project(":common"))
 
     implementation(libs.bundles.kotlin)

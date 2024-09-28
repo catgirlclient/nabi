@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
  * @param port The port of the webserver. This is for HTTP interactions.
  */
 @Serializable
-data class DiscordConfig(
+data class NabiDiscordConfig(
     val token: String,
     val applicationId: Snowflake,
     val defaultGuildId: Snowflake,

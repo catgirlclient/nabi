@@ -39,5 +39,6 @@ include(
     ":dashboard",
     ":subprojects:cache",
     ":subprojects:database",
-    ":subprojects:entities"
+    ":subprojects:entities",
+    ":subprojects:metrics"
 )

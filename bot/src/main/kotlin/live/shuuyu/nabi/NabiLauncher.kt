@@ -2,11 +2,12 @@ package live.shuuyu.nabi
 
 import dev.kord.gateway.DefaultGateway
 import live.shuuyu.common.utils.ParserUtils
+import live.shuuyu.nabi.cache.NabiCacheConfig
 import live.shuuyu.nabi.database.NabiDatabaseCore
+import live.shuuyu.nabi.metrics.NabiMetricsConfig
 import live.shuuyu.nabi.utils.config.DatabaseConfig
-import live.shuuyu.nabi.utils.config.DiscordConfig
 import live.shuuyu.nabi.utils.config.NabiConfig
-import live.shuuyu.nabi.utils.config.RedisConfig
+import live.shuuyu.nabi.utils.config.NabiDiscordConfig
 import java.io.File
 
 object NabiLauncher {
@@ -15,7 +16,7 @@ object NabiLauncher {
         val result = ParserUtils.readOrWriteConfig<NabiConfig>(File("nabi-config.toml"))
 
         val config = NabiConfig(
-            DiscordConfig(
+            NabiDiscordConfig(
                 result.discord.token,
                 result.discord.applicationId,
                 result.discord.defaultGuildId,
@@ -30,11 +31,14 @@ object NabiLauncher {
                 result.database.username,
                 result.database.password
             ),
-            RedisConfig(
-                result.redis.addresses,
-                result.redis.port,
-                result.redis.username,
-                result.redis.password
+            NabiCacheConfig(
+                result.cache.addresses,
+                result.cache.port,
+                result.cache.username,
+                result.cache.password
+            ),
+            NabiMetricsConfig(
+                result.metrics.port
             )
         )
 

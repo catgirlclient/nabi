@@ -7,5 +7,4 @@ dependencies {
     implementation(libs.kord.core)
     implementation(libs.bundles.kotlin)
     implementation(libs.bundles.database)
-    implementation(libs.bundles.database.future)
 }
