@@ -1,0 +1,11 @@
+[string]
+sendModerationLoggingMessageDescription = """
+    **User:** {0} - {1} \n\
+    **Executor:** {2} - {3} \n\
+    **Reason:** {4}
+"""
+sendChannelLoggingMessageDescription = """
+    **Channel:** {0} - {1} \n\
+    **Executor:** {2} - {3} \n\
+    **Reason:** {4}
+"""

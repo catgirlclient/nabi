@@ -1,0 +1,35 @@
+[command]
+name = "ban"
+description = "Bans the specified user from the current guild."
+userOptionName = "user"
+userOptionDescription = "The user you want to ban."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why this user is being banned."
+durationOptionName = "duration"
+durationOptionDescription = "Deletes the messages of the user within the given time interval."
+
+[error]
+permissionIsMissing = """
+    Nabi is currently missing the `BAN_MEMBERS` permission. Please check if Nabi has the required permissions
+    to execute the commands, and try again.
+"""
+targetRoleEqualOrHigher = """
+    You can't ban this member due to having equal to or lower permissions compared to the target. Please make sure
+    your permissions are higher than the target, and try again.
+"""
+deleteMessageDuration = """
+    You can't delete messages which are outside of the range of 0 seconds and 7 days. Please reconfigure
+    your duration and try again. (Note: This follows the ISO-8601 format!)
+"""
+targetIsOwner = "You can't ban the owner of the server!"
+targetIsNabi = "HEY >:("
+targetIsSelf = "You can't ban yourself!"
+
+[embed]
+punishmentDescription = "You've been banned from **{guildName}** for **{reason}**."
+resultantTitle = "User Banned"
+resultantDescription = """
+    **Member:** {member} \n\
+    **Action:** {action} \n\
+    **Reason:** {reason}
+"""

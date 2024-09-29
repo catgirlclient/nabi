@@ -1,0 +1,16 @@
+[command]
+name = "blacklist"
+description = "Blacklists a user from Nabi's services."
+userOptionName = "user"
+userOptionDescription = "The user you want to blacklist."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why this user is being blacklisted."
+
+[error]
+executorIsNotDeveloper = """
+    You cannot execute this command as you're not a certified developer. If you believe this is an issue,
+    please contact the owner of the bot on our Discord server.
+"""
+targetIsSelf = "You can't blacklist yourself!"
+targetIsNabi = "YOU CAN'T DO THAT >:("
+targetIsDeveloper = "You can't blacklist this user as they're a certified developer."

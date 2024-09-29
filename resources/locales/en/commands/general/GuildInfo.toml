@@ -1,0 +1,18 @@
+[command]
+name = "guild"
+description = "Provides information on the sequestered guild/server."
+guildOptionName = "guild"
+guildOptionDescription = "The guild you want to look up. Defaults to your current guild if a value is not provided."
+
+[error]
+guildNotFound = "There doesn't seem to be a guild with the id: **{guildId}**."
+
+[embed]
+guildInfoFieldTitle = "» Guild Information"
+guildInfoFieldDescription = """
+    • **ID:** {guildId}
+    • **Owner:** {mentionOwner}
+    • **Creation Date:** {createDate}
+    • **Member Count:** {onlineMembers}/{totalMembers}
+"""
+roleFieldTitle = "» Roles ({roleCount})"

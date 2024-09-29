@@ -1,0 +1,26 @@
+[command]
+name = "slowmode"
+description = "Ratelimits the given channel, increasing/decreasing the intervals of which messages can be sent."
+channelOptionName = "channel"
+channelOptionDescription = "The channel you want to target."
+
+[error]
+permissionIsMissing = """
+    Nabi is currently missing the `MANAGE_CHANNELS` permission. Please check if Nabi has the required permissions
+    to execute the commands, and try again.
+"""
+durationOutsideRange = """
+    Your given duration is outside of the range of 0 seconds and 6 hours. Please reconfigure your duration
+    and try again. (Note: This follows the ISO-8601 format!)
+"""
+invalidChannelFormat = "You can't slow the messages in this type of channel!"
+
+[embed]
+successTitle = "Channel Ratelimited"
+successDescription = """
+    The channel has been successfully ratelimited. \n\
+
+    • **Channel:** {channelMention} ``{channelId}`` \n\
+    • **Ratelimit Duration:** {duration} \n\
+    • **Reason:** {reason}
+"""

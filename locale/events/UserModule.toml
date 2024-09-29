@@ -1,0 +1,2 @@
+[string]
+accountAgeReason = "User does not meet the threshold configured in the account age module: {0}"

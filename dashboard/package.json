@@ -2,23 +2,35 @@
   "name": "dashboard",
   "description": "The frontend dashboard for Nabi.",
   "version": "0.0.1",
-  "license": "Polyform Shield License v1.0.0",
+  "license": "MIT 2.0",
+  "type": "module",
   "engines": {
-    "node": "20.13.1"
+    "node": "20.16.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "astro": "^4.10.2",
-    "unocss": "^0.61.0",
-    "sass": "^1.77.5"
+    "million": "^3.1.11",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.25.1"
   },
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "@iconify/iconify": "^3.1.1",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-router-dom": "^5.3.3",
+    "@unocss/vite": "^0.61.5",
+    "@vitejs/plugin-react": "^4.3.1",
+    "prettier": "^3.3.3",
+    "sass": "^1.77.8",
+    "typescript": "^5.4.5",
+    "unocss": "^0.61.5",
+    "vite": "^5.3.4",
+    "vitest": "^2.0.3"
   }
 }

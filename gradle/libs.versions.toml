@@ -1,20 +1,23 @@
 [versions]
-caching = "0.4.0"
-exposed = "0.51.1"
+caffeine = "3.1.8"
+exposed = "0.52.0"
 hikari = "5.1.0"
 icu4j = "75.1"
-interaktions = "0.0.22-SNAPSHOT"
-jda = "5.0.0-beta.23"
-kotlin = "2.0.0"
-ktor = "2.3.11"
-logback = "1.4.12"
+interaktions = "0.1.1"
+jackson = "2.17.2"
+jda = "5.1.0"
+kotlin = "2.0.20"
+ktor = "2.3.12"
+kaml = "0.60.0"
 kord = "0.15.0-SNAPSHOT"
-kotlin-coroutines = "1.9.0-RC"
-kotlin-serialization = "1.6.3"
-ktoml = "0.5.1"
+kotlin-coroutines = "1.9.0"
+kotlin-serialization = "1.7.3"
+kotlin-poet = "1.18.1"
+ktoml = "0.5.2"
 postgresql = "42.7.3"
-prometheus = "0.16.0"
-redisson = "3.31.0"
+prometheus = "1.3.1"
+redisson = "3.36.0"
+slf4j = "2.0.16"
 zstd = "1.5.6-3"
 
 [libraries]
@@ -28,8 +31,8 @@ kord-common = { module = "dev.kord:kord-core", version.ref = "kord" }
 kord-core = { module = "dev.kord:kord-core", version.ref = "kord" }
 kord-gateway = { module = "dev.kord:kord-gateway", version.ref = "kord" }
 kord-rest = { module = "dev.kord:kord-rest", version.ref = "kord" }
-interaktions-gateway = { module = "com.github.catgirlclient.DiscordInteraKTions:gateway-kord", version.ref = "interaktions" }
-interaktions-webserver = { module = "com.github.catgirlclient.DiscordInteraKTions:webserver-ktor-kord", version.ref = "interaktions" }
+interaktions-gateway = { module = "live.shuuyu.discordinteraktions:gateway-kord", version.ref = "interaktions" }
+interaktions-webserver = { module = "live.shuuyu.discordinteraktions:webserver-ktor-kord", version.ref = "interaktions" }
 
 # Database
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
@@ -40,36 +43,49 @@ exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "e
 exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
 
 # Caching
-cache-api = { module = "dev.kord.cache:cache-api", version.ref = "caching" }
-cache-map = { module = "dev.kord.cache:cache-map", version.ref = "caching" }
+caffeine-core = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 redisson = { module = "org.redisson:redisson", version.ref = "redisson" }
 
-# Config/Locale Purposes
-kotlin-hocon = { module = "org.jetbrains.kotlinx:kotlinx-serialization-hocon", version.ref = "kotlin-serialization" }
+# Serialization for i18n
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-properties = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-properties", version.ref = "jackson" }
+jackson-toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
+jackson-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+
+# encoding/decoding purposes
+zstd = { module = "com.github.luben:zstd-jni", version.ref = "zstd" }
+kotlin-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "kotlin-serialization" }
+
+# i18n
+icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
+kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
+kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet" }
 ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
 ktoml-file = { module = "com.akuleshov7:ktoml-file", version.ref = "ktoml" }
-icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 
-# Encoding/Decoding
-zstd = { module = "com.github.luben:zstd-jni", version.ref = "zstd" }
+# ktor
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
-ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor"}
+ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp-jvm", version.ref = "ktor" }
+ktor-server = { module = "io.ktor:ktor-server", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 
+# Prometheus
+prometheus-core = { module = "io.prometheus:prometheus-metrics-core", version.ref = "prometheus" }
+prometheus-httpserver = { module = "io.prometheus:prometheus-metrics-exporter-httpserver", version.ref = "prometheus" }
+
 # Logger
-logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-prometheus-httpserver = { module = "io.prometheus:simpleclient_httpserver", version.ref = "prometheus" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 
 # plugins for build-logic
 kotlin-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 [bundles]
-kotlin = [
-    "kotlin-serialization-core",
-    "kotlin-coroutines-core"
-]
+kotlin = ["kotlin-serialization-core", "kotlin-coroutines-core"]
 
 discord = [
     "jda",
@@ -90,33 +106,27 @@ database = [
     "exposed-kotlin-datetime"
 ]
 
-parsers = [
-    "kotlin-hocon",
-    "ktoml-core",
-    "ktoml-file",
-    "icu4j"
-]
+i18n = ["icu4j", "kaml", "kotlin-poet", "ktoml-core", "ktoml-file"]
 
-ktor = [
-    "zstd",
-    "ktor-http",
-    "ktor-client-encoding",
-    "ktor-client-core",
-    "ktor-utils"
-]
+jackson = ["jackson-core", "jackson-properties", "jackson-toml", "jackson-yaml"]
 
-caching = [
-    "cache-api",
-    "cache-map",
-    "redisson"
-]
+parsers = ["zstd", "kotlin-protobuf"]
 
-logger = [
-    "logback",
+prometheus = [
+    "prometheus-core",
     "prometheus-httpserver"
 ]
 
-buildLogic = [
-    "kotlin-plugin",
-    "kotlin-serialization-plugin"
+ktor = [
+    "ktor-http",
+    "ktor-client-encoding",
+    "ktor-client-core",
+    "ktor-client-okhttp",
+    "ktor-server",
+    "ktor-server-netty",
+    "ktor-utils"
 ]
+
+caching = ["caffeine-core", "redisson"]
+logger = ["slf4j-api", "slf4j-simple"]
+buildLogic = ["kotlin-plugin", "kotlin-serialization-plugin"]

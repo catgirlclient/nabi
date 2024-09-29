@@ -1,6 +1,9 @@
 [string]
 name = "user"
 description = "Looks up the sequestered user's information."
+nameUserDeclarator = "User Information"
+userOptionName = "user"
+userOptionDescription = "The user you want to look up."
 embedEasterEggName = "I have an easter egg!"
 embedUserField = """
     **Mention:** {0} \n\
@@ -14,5 +17,5 @@ embedMemberField = """
 secretKeyYujin = "I'm cute <3"
 secretKeyLily = "gg"
 secretKeyNicky = "(secretly a catgirl)"
-secretKeyJaminul = "Please give Skyblock coins ty"
+secretKeyJaminul = "Please give Skyblock coins and Hyperions ty"
 secretKeyMeph = "Spooky"

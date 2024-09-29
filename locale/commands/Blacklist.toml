@@ -1,0 +1,20 @@
+[string]
+name = "blacklist"
+description = "Blacklists a user from using Nabi."
+userOptionName = "user"
+userOptionDescription = "The user to blacklist."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why this user is being blacklisted."
+executorIsNotDeveloper = """
+    You are not a developer. Therefore, you will not be able to use this command.
+"""
+targetIsDeveloper = """
+    Trying to blacklist a developer is a bold move. Just make sure they don't try to blacklist you.
+"""
+targetIsSelf = """
+    Please don't leave me :(
+"""
+directMessageDescription = """
+    You've been blacklisted from the usage of Nabi. All services in relation to Nabi will cease.\n\
+    If you want to appeal, please forward your request to our [Discord Server](https://discord.gg/42da8JWwKa).
+"""

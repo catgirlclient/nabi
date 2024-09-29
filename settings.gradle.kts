@@ -11,22 +11,34 @@ pluginManagement {
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
-        maven("https://jitpack.io")
+        maven("https://maven.shuyu.me/releases")
+        maven("https://maven.shuyu.me/snapshots")
     }
 }
 
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-        maven("https://jitpack.io")
+        maven("https://maven.shuyu.me/releases")
+        maven("https://maven.shuyu.me/snapshots")
         maven("https://oss.sonatype.org/content/repositories/snapshots")
     }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 rootProject.name = "nabi"
 
 include(
+    ":api",
     ":bot",
+    ":bot:gateway",
     ":common",
-    // ":dashboard"
+    ":dashboard",
+    ":subprojects:cache",
+    ":subprojects:database",
+    ":subprojects:entities",
+    ":subprojects:metrics"
 )

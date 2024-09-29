@@ -1,7 +1,7 @@
-import live.shuuyu.plugins.project.Project
+import live.shuuyu.plugins.convention.project.Project
 
 plugins {
-    id("live.shuuyu.plugins.nabi")
+    id("live.shuuyu.plugins.module")
 }
 
 repositories {
@@ -9,7 +9,7 @@ repositories {
 }
 
 tasks.wrapper {
-    gradleVersion = "8.8"
+    gradleVersion = "8.10.1"
     distributionType = Wrapper.DistributionType.ALL
 }
 

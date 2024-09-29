@@ -12,9 +12,13 @@ import java.io.FileNotFoundException
 /**
  * @param path The location of the file. This should be a toml file.
  */
-class LanguageManager(private val path: String) {
+@Deprecated(
+    message = "Moved to i18n module, should not be used in the future.",
+    level = DeprecationLevel.WARNING
+)
+public class LanguageManager(private val path: String) {
 
-    companion object {
+    public companion object {
         private val ktoml = Toml(
             inputConfig = TomlInputConfig(
                 allowEmptyToml = false
@@ -28,7 +32,11 @@ class LanguageManager(private val path: String) {
             throw FileNotFoundException("File cannot be located in the sequestered location!")
     }
 
-    fun get(key: String, replaceWith: Map<String, Any?> = mapOf()): String {
+    @Deprecated(
+        message = "Moved to i18n module, should not be used.",
+        level = DeprecationLevel.WARNING
+    )
+    public fun get(key: String, replaceWith: Map<String, Any?> = mapOf()): String {
         try {
             val file = File(path)
             val decodedFile = ktoml.decodeFromString<LanguageType>(file.readText())
@@ -47,7 +55,7 @@ class LanguageManager(private val path: String) {
     fun getList(key: String, replaceWith: Map<String, Any?>): List<String> {
         try {
             val file = File(path)
-            val decodedFile = ktoml.decodeFromString<LanguageType>(file.readText())
+            val decodedFile = ktoml.decodeFromString<live.shuuyu.common.locale.data.LanguageType>(file.readText())
 
             val content = decodedFile.listString[key] ?: logger.error("Failed to fetch list correlated to the key: $key")
 

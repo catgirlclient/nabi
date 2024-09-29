@@ -1,35 +1,31 @@
 package live.shuuyu.common.utils
 
-import com.typesafe.config.ConfigFactory
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.hocon.Hocon
-import kotlinx.serialization.hocon.decodeFromConfig
+import com.akuleshov7.ktoml.Toml
+import kotlinx.serialization.decodeFromString
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import kotlin.system.exitProcess
 
-object ParserUtils {
+public object ParserUtils {
+    public val toml: Toml = Toml()
 
     /**
-     * Reads the provided *.conf file. Decoding is handled through [Hocon]. If the file does not exist, the file
+     * Reads the provided *.toml file. Decoding is handled through [Toml]. If the file does not exist, the file
      * will return as null.
      *
-     * @param file The file [Hocon] reads from.
+     * @param file The file [Toml] reads from.
      */
-    @OptIn(ExperimentalSerializationApi::class)
-    inline fun <reified T> readConfig(file: File): T? {
+    public inline fun <reified T> readConfig(file: File): T? {
         if (!file.exists())
             return null
 
-        return Hocon.decodeFromConfig(ConfigFactory.parseFile(file).resolve())
+        return toml.decodeFromString<T>(file.readText(Charsets.UTF_8))
     }
 
-    inline fun <reified T> readOrWriteConfig(name: String): T = readConfig<T>(File(name)) ?: run {
-        val file = File(name)
-
+    public inline fun <reified T> readOrWriteConfig(file: File): T = readConfig<T>(file) ?: run {
         if (!file.exists()) {
-            val input = javaClass.getResourceAsStream("/$name")!!
+            val input = javaClass.getResourceAsStream("/${file.name}")!!
 
             file.createNewFile()
             Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING)

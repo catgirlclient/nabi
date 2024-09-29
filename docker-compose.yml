@@ -10,9 +10,10 @@ services:
     env_file:
       - postgres.env
 
-  nabi-cachegrand:
-    image: cachegrand/cachegrand-server:latest
-    container_name: "nabi-cachegrand"
+  nabi-dragonflydb:
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    pull_policy: 'always'
+    container_name: "nabi-dragonfly"
     restart: always
     ports:
-      - "6379"
+      - "6380:6379"

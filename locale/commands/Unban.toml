@@ -1,0 +1,5 @@
+[string]
+name = "unban"
+description = "Unbans the specified user in the guild you're in."
+userOptionName = "user"
+userOptionDescription = "The user you want to unban."

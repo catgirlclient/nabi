@@ -1,0 +1,19 @@
+[command]
+name = "kick"
+description = "Kicks the specified user from your current guild."
+userOptionName = "user"
+userOptionDescription = "The user you want to kick."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason this user is being kicked."
+
+[error]
+permissionIsMissing = """
+    Nabi is currently missing the `KICK_MEMBERS` permission. Please check if Nabi has the required permissions
+    to execute the commands, and try again.
+"""
+targetIsNull = "The user you've specified seems to not be in the server!"
+targetIsOwner = "You can't kick the owner of this server!"
+targetIsNabi = "CEASE >:("
+targetIsSelf = "You can't kick yourself!"
+
+[embed]
