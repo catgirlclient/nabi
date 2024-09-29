@@ -10,9 +10,13 @@ You may contact Nabi's developers with the following resources:
 * [Discord](https://discord.gg/42da8JWwKa)
 
 ## Age Elligibility
-You must be at least 13 years or older to use Nabi and her services, or have permission from a parent or guardian. If you 
-are under the age of 13, we have the right to terminate you from our services in compliance with the Children Online Privacy
-Protection Act (COPPA), as well as violating Discord's Terms of Service.
+You must be at least 13 years or older to use Nabi and her services, or have explicit permission from your parent or guardian. 
+If you are under the age of 13, we have the right to terminate you from our services in compliance with the 
+Children Online Privacy Protection Act (COPPA), as well as violating Discord's Terms of Service. We kindly request you to 
+not use any of Nabi's services if so. 
+
+Nabi, and her developers respectively, have the right to terminate your usage of her services if you are under the age 
+of 13.
 
 ## Privacy
 Nabi and her developers take your privacy seriously. **Nabi will only collect data that she deems necessary.** This includes:
