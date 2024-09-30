@@ -4,7 +4,8 @@ when Nabi reaches the stable version (>=1.0.0), all prior and future code will
 be exclusively licensed under the GNU AGPL-3.0 License, making this project
 open-sourced. By contributing to Nabi during the trial period, you consent to
 relicensing your commit to the GNU AGPL-3.0 License after a stable version
-has been implemented.
+has been implemented. Any commits made after 0.1.0 will be licensed under the
+GNU AGPL-3.0 License.
 
 8# PolyForm Shield License 1.0.0
 
