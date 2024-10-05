@@ -47,21 +47,21 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
         println(files)
 
         for (file in files) {
-            createFile(generatedPackageName.get(), file.name.capitalized().stripSuffix(parser)) {
+            createFile(generatedPackageName.get(), file.nameWithoutExtension.capitalized()) {
                 addFileComment(
                     """
                     THIS IS AN AUTOMATICALLY GENERATED FILE FROM THE PLUGIN `live.shuuyu.plugins.i18n`. DO NOT DELETE OR MODIFY!
                     """.trimIndent()
                 )
 
-                addType(generateKotlinObject(file.name, load(file, parser), listOf()))
+                addType(generateKotlinObject(file.nameWithoutExtension, load(file, parser), listOf()))
             }.writeTo(outputDirectory)
         }
     }
 
     @Suppress("Unchecked_Cast")
     private fun generateKotlinObject(name: String, contents: Map<String, Any>, children: List<String>): TypeSpec {
-        return createObject(name.capitalized().stripSuffix(parserType.get())) {
+        return createObject(name.capitalized()) {
             for ((key, value) in contents) {
                 when (value) {
                     is Map<*, *> -> {
@@ -69,7 +69,7 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
                             generateKotlinObject(
                                 key,
                                 value as Map<String, Any>,
-                                (children + name.toDefaultLowerCase().stripSuffix(parserType.get())).toMutableList().apply {
+                                (children + name.toDefaultLowerCase()).toMutableList().apply {
                                     this.add(key)
                                 }
                             )
@@ -174,7 +174,10 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
     @Synchronized
     private fun getFiles(directory: File): List<File> {
         val fileList = mutableListOf<File>()
-        val files = directory.listFiles()
+        // Exclude languages to prevent it from being picked up in detection.
+        val files = directory.listFiles().filter {
+            it.nameWithoutExtension != "Language"
+        }
 
         for (file in files) {
             if (file.isFile) {
@@ -193,15 +196,5 @@ public abstract class GenerateI18nFileTask: DefaultTask() {
             ParserType.Yaml -> ObjectMapper(YAMLFactory()).readValue(file, object: TypeReference<Map<String, Any>>() {})
             ParserType.Toml -> ObjectMapper(TomlFactory()).readValue(file, object: TypeReference<Map<String, Any>>() {})
         }
-    }
-
-    // KotlinPoet hates suffixes apparently
-    private fun String.stripSuffix(parser: ParserType) = when(parser) {
-        ParserType.Json -> this.removeSuffix(".json")
-        ParserType.Yaml -> {
-            this.removeSuffix(".yml")
-            this.removeSuffix(".yaml")
-        }
-        ParserType.Toml -> this.removeSuffix(".toml")
     }
 }
