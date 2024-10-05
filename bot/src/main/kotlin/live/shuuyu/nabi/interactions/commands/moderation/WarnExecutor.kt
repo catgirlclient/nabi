@@ -85,7 +85,7 @@ class WarnExecutor(
 
             MessageUtils.directMessageUser(
                 target,
-                rest,
+                nabi,
                 sendModerationLoggingMessage(target, executor, reason, ModerationInteractionWrapper.ModerationType.Warn)
             )
 

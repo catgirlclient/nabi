@@ -95,7 +95,7 @@ class KickExecutor(
                 )
             }
 
-            MessageUtils.directMessageUser(target, rest, createKickMessage())
+            MessageUtils.directMessageUser(target, nabi, createKickMessage())
 
             guild.kick(target.id, reason)
 

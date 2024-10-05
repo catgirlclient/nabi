@@ -6,8 +6,6 @@ import dev.kord.core.Kord
 import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.entity.channel.Channel
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import live.shuuyu.nabi.cache.utils.ChannelKeys
 import org.redisson.api.RLocalCachedMap
 import org.redisson.api.RedissonClient
 
@@ -18,10 +16,12 @@ class ChannelEntities (
     override val parentMap: RLocalCachedMap<Snowflake, ChannelData> = client.getLocalCachedMap(options)
     private val mutex = Mutex()
 
-    suspend fun get(channelId: Snowflake): Channel? = mutex.withLock(ChannelKeys(channelId)) {
-        val cachedData = parentMap[channelId] ?: return null
+    fun contains(channelId: Snowflake): Boolean = parentMap.contains(channelId)
 
-        return Channel.from(cachedData, kord)
+    operator fun get(channelId: Snowflake): Channel? {
+        val cachedChannelData = parentMap[channelId] ?: return null
+
+        return Channel.from(cachedChannelData, kord)
     }
 
     suspend fun set(channel: DiscordChannel): Channel {

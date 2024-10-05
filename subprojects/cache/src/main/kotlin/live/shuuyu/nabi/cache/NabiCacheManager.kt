@@ -16,6 +16,7 @@ class NabiCacheManager(val config: NabiCacheConfig) {
         val mutex = Mutex()
     }
     lateinit var client: RedissonClient
+    // We will initialize kord before the bot starts, no need to do this when the service starts.
     lateinit var kord: Kord
 
     val channels = ChannelEntities(client, kord)

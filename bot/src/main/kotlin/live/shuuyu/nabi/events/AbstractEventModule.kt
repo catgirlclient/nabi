@@ -6,6 +6,7 @@ import live.shuuyu.nabi.NabiCore
 abstract class AbstractEventModule(val nabi: NabiCore) {
     val kord = nabi.kord
     val rest = nabi.rest
+    val cache = nabi.cache
     val database = nabi.database
     val logger = KotlinLogging.logger {}
 

@@ -3,14 +3,12 @@ package live.shuuyu.nabi.cache.entities
 import dev.kord.common.entity.DiscordGuild
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
-import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.cache.data.GuildData
-import dev.kord.core.cache.data.MemberData
-import dev.kord.core.cache.data.RoleData
 import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
+import dev.kord.core.entity.Role
+import dev.kord.core.entity.channel.Channel
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import live.shuuyu.nabi.cache.utils.GuildKeys
 import org.redisson.api.RLocalCachedMap
 import org.redisson.api.RedissonClient
 
@@ -19,15 +17,23 @@ class GuildEntities (
     val kord: Kord
 ): CacheEntitiesHandler<Snowflake, GuildData>("nabi:guild") {
     override val parentMap: RLocalCachedMap<Snowflake, GuildData> = client.getLocalCachedMap(options)
-    private val mutex = Mutex()
-    var roles = mutableMapOf<Snowflake, RoleData>()
-    var channels = mutableMapOf<Snowflake, ChannelData>()
-    var members = mutableMapOf<Snowflake, MemberData>()
+    val mutex = Mutex()
+    var roles = mutableMapOf<Snowflake, Role>()
+    var channels = mutableMapOf<Snowflake, Channel>()
+    var members = mutableMapOf<Snowflake, Member>()
 
-    suspend fun get(guildId: Snowflake): Guild? = mutex.withLock(GuildKeys(guildId)) {
+    operator fun get(guildId: Snowflake): Guild? {
         val cachedData = parentMap[guildId] ?: return null
 
         return Guild(cachedData, kord)
+    }
+
+    operator fun set(guildId: Snowflake, guild: DiscordGuild): Guild {
+        val data = GuildData.from(guild)
+        parentMap[guild.id] = data
+
+
+        return Guild(data, kord)
     }
 
     suspend fun set(guild: DiscordGuild): Guild {

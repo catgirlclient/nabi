@@ -7,30 +7,39 @@ import dev.kord.rest.builder.message.embed
 import dev.kord.rest.json.request.DMCreateRequest
 import dev.kord.rest.json.request.MultipartMessageCreateRequest
 import dev.kord.rest.request.RestRequestException
-import dev.kord.rest.service.RestClient
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.Clock
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.builder.message.embed
+import live.shuuyu.nabi.NabiCore
 
 object MessageUtils {
+    val logger = KotlinLogging.logger {  }
+
     suspend fun directMessageUser(
         user: User,
-        rest: RestClient,
+        nabi: NabiCore,
         builder: MultipartMessageCreateRequest
     ) {
+        val rest = nabi.rest
+        val dmChannelId = nabi.cache.channels[user.getDmChannel().id]?.id  ?: nabi.rest.user.createDM(DMCreateRequest(user.id)).id
         try {
-            val dmChannel = rest.user.createDM(DMCreateRequest(user.id))
-            rest.channel.createMessage(dmChannel.id, builder)
+            rest.channel.createMessage(dmChannelId, builder)
         } catch (e: RestRequestException) {
+            logger.debug(e) {
+                "Failed to send direct message to the user, most likely because the user has their direct messages closed"
+            }
 
+            // It most likely is someone who doesn't exist, let's just delete it from the cache.
+            nabi.cache.channels.remove(dmChannelId)
         }
     }
 
     suspend fun directMessageUser(
         user: User,
-        rest: RestClient,
+        nabi: NabiCore,
         builder: UserMessageCreateBuilder.() -> (Unit)
-    ) = directMessageUser(user, rest, UserMessageCreateBuilder().apply(builder).toRequest())
+    ) = directMessageUser(user, nabi, UserMessageCreateBuilder().apply(builder).toRequest())
 
     fun createDirectMessageEmbed(
         title: String,

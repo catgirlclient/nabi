@@ -71,20 +71,29 @@ class NabiCore(
     1. We cannot register more than 100 slash commands, 5 user commands, and 5 message commands
     2. It's better if we do this before initializing to prevent issues from coming up.
      */
-    fun preInitialization() = runBlocking {
+    private fun preInitialization() = runBlocking {
         val slashCommandCount = interaktions.manager.applicationCommandsDeclarations.filterIsInstance<SlashCommandDeclaration>().size
         val messageCommandCount = interaktions.manager.applicationCommandsDeclarations.filterIsInstance<MessageCommandDeclaration>().size
 
+        logger.info { "Running pre-initialization tasks, this may take a while..." }
+
+        require(slashCommandCount > 100) {
+            "Registered slash command count is more than 100! Exiting the process....  "
+        }
     }
 
     @OptIn(PrivilegedIntent::class)
     fun initialize() = runBlocking {
+        // Initialize all of our microservices before the bot starts to prevent issues from arrising
+        preInitialization()
         database.initialize()
         database.createMissingSchemaAndColumns()
         manager.registerGlobalApplicationCommands()
         manager.registerGuildApplicationCommands(config.discord.defaultGuildId)
         cache.initialize(kord)
         metrics.start()
+
+        logger.info { "Initializing all Gateway instances of Nabi..." }
 
         gatewayManager.gateways.forEach { (shardId, gateway) ->
             gateway.installDiscordInteraKTions(interaktions)

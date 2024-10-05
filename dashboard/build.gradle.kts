@@ -2,7 +2,7 @@ import com.github.gradle.node.pnpm.task.PnpmTask
 
 plugins {
     kotlin("jvm")
-    id("com.github.node-gradle.node") version "7.0.2"
+    id("com.github.node-gradle.node") version "7.1.0"
 }
 
 repositories {
@@ -10,7 +10,7 @@ repositories {
 }
 
 node {
-    version.set("20.16.0")
+    version.set("22.9.0")
     pnpmVersion.set("9.11.0")
     download.set(true)
 }

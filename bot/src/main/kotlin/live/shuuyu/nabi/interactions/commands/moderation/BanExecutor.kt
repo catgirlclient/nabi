@@ -110,7 +110,7 @@ class BanExecutor(
                 )
             }
 
-            MessageUtils.directMessageUser(target, rest, createDirectMessageEmbed(guild, reason))
+            MessageUtils.directMessageUser(target, nabi, createDirectMessageEmbed(guild, reason))
 
             guild.ban(target.id) {
                 this.reason = reason

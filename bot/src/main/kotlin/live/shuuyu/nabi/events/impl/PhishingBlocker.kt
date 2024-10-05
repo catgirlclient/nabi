@@ -1,6 +1,5 @@
 package live.shuuyu.nabi.events.impl
 
-import com.github.luben.zstd.Zstd
 import dev.kord.common.entity.DiscordUser
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.ban
@@ -89,8 +88,6 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
                 agent = "Nabi-Phishing-Blocker"
             }
         }
-
-        private val zstd = Zstd()
     }
 
     // There may be multiple suspicious links in the same message
