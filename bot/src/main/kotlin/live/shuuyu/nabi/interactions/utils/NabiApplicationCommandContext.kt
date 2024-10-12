@@ -6,6 +6,7 @@ import dev.kord.core.entity.User
 import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
 import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandDeclaration
 import live.shuuyu.discordinteraktions.common.interactions.InteractionData
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 
 open class NabiApplicationCommandContext(
@@ -14,8 +15,17 @@ open class NabiApplicationCommandContext(
     channelId: Snowflake,
     interactionData: InteractionData,
     discordInteraction: DiscordInteraction,
+    i18nContext: I18nContext,
     override val interaction: ApplicationCommandContext
-): NabiInteractionContext(nabi, sender, channelId, interactionData, discordInteraction, interaction) {
+): NabiInteractionContext(
+    nabi,
+    sender,
+    channelId,
+    interactionData,
+    discordInteraction,
+    i18nContext,
+    interaction
+) {
     val applicationCommandDeclaration: ApplicationCommandDeclaration
         get() = interaction.applicationCommandDeclaration
 }

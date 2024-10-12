@@ -5,17 +5,19 @@ import dev.kord.gateway.Event
 import dev.kord.gateway.Gateway
 import dev.kord.gateway.GatewayConfiguration
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 
-class NabiGateway(
-    override val coroutineContext: CoroutineContext,
-    override val ping: StateFlow<Duration?>
-) : Gateway {
-    override val events = MutableSharedFlow<Event>()
+class NabiCustomGateway : Gateway {
+    override val coroutineContext: CoroutineContext = SupervisorJob() + Dispatchers.Default
+    override val events: SharedFlow<Event> = MutableSharedFlow()
+    override val ping: StateFlow<Duration?> = MutableStateFlow(null)
 
     override suspend fun start(configuration: GatewayConfiguration) = withContext(Dispatchers.Default) {
         
@@ -27,6 +29,10 @@ class NabiGateway(
 
     override suspend fun send(command: Command) {
         TODO("Not yet implemented")
+    }
+    
+    suspend fun restart() {
+
     }
 
     override suspend fun stop() {

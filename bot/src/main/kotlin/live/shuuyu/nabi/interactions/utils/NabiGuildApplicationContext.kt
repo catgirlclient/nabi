@@ -6,6 +6,7 @@ import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
 import live.shuuyu.discordinteraktions.common.commands.GuildApplicationCommandContext
 import live.shuuyu.discordinteraktions.common.interactions.InteractionData
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 
 class NabiGuildApplicationContext(
@@ -14,9 +15,18 @@ class NabiGuildApplicationContext(
     channelId: Snowflake,
     interactionData: InteractionData,
     discordInteraction: DiscordInteraction,
+    i18nContext: I18nContext,
     val guildId: Snowflake,
     val member: Member,
     override val interaction: GuildApplicationCommandContext
-): NabiApplicationCommandContext(nabi, sender, channelId, interactionData, discordInteraction, interaction) {
+): NabiApplicationCommandContext(
+    nabi,
+    sender,
+    channelId,
+    interactionData,
+    discordInteraction,
+    i18nContext,
+    interaction
+) {
     val appPermissions = interaction.appPermissions
 }

@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
 import live.shuuyu.discordinteraktions.common.commands.UserCommandExecutor
-import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 
 abstract class NabiUserCommandExecutor(
@@ -36,8 +35,8 @@ abstract class NabiUserCommandExecutor(
         targetUser: User,
         targetMember: Member?
     ) {
-        val ctx = handleCommandContext(nabi, context)
-        var i18nCtx: I18nContext? = null
+        val i18nContext = nabi.language.getI18nContext(null)
+        val ctx = handleCommandContext(nabi, context, i18nContext)
 
         try {
             execute(ctx, targetUser, targetMember)

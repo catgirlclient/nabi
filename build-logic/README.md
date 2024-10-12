@@ -6,5 +6,5 @@ apply some form of these scripts.
 - [`live.shuuyu.plugins.nabi`](convention/src/main/kotlin/live/shuuyu/plugins/convention/NabiProjectModule.kt):
   Configures the Kotlin options
 
-- [`live.shuuyu.plugins.i18n`](i18n/src/main/kotlin/live/shuuyu/plugins/i18n/I18nPlugin.kt):
+- [`live.shuuyu.plugins.i18n`](i18n/src/main/kotlin/live/shuuyu/plugins/i18n/I18nExtensionModule.kt):
   Configures the I18n module. The I18n module will collect all keys and convert them into properties and functions.

@@ -26,6 +26,7 @@ import live.shuuyu.nabi.events.impl.*
 import live.shuuyu.nabi.interactions.InteractionsManager
 import live.shuuyu.nabi.metrics.NabiMetricsManager
 import live.shuuyu.nabi.utils.config.NabiConfig
+import live.shuuyu.nabi.utils.i18n.LanguageManager
 import kotlin.concurrent.thread
 import kotlin.time.measureTimedValue
 
@@ -64,6 +65,8 @@ class NabiCore(
         PhishingBlocker(this),
         UserModule(this)
     )
+
+    val language = LanguageManager.load()
 
     /*
     We need to do this for 2 main reasons.
