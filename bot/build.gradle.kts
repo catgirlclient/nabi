@@ -36,7 +36,7 @@ dependencies {
     implementation(libs.bundles.i18n)
     implementation(libs.bundles.ktor)
 
-    shadowTest(libs.bundles.test)
+    shadowTest(libs.bundles.test) // Shadow all tests in order to avoid conflicts
 }
 
 sourceSets.main {
@@ -49,7 +49,9 @@ tasks {
         archiveClassifier.set("")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowTest)
-        exclude("LICENSE.txt")
+
+        exclude("**/LICENSE.txt", "**/LICENSE", "**/LICENSE.md")
+        mergeServiceFiles()
     }
 
     processResources {

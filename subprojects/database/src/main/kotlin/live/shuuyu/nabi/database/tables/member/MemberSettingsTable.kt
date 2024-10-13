@@ -1,9 +1,10 @@
 package live.shuuyu.nabi.database.tables.member
 
 import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.sql.Column
 
-object MemberSettingsTable: LongIdTable() {
-    val userId = long("user_id").index()
-    val guildId = long("guild_id")
-    val exp = long("exp").default(0L).index()
+public object MemberSettingsTable: LongIdTable() {
+    public val userId: Column<Long> = long("user_id").index()
+    public val guildId: Column<Long> = long("guild_id")
+    public val exp: Column<Long> = long("exp").default(0L).index()
 }

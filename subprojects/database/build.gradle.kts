@@ -4,11 +4,13 @@ plugins {
 
 description = "The database in which Nabi's data is stored in."
 
+kotlin {
+    explicitApi()
+}
+
 dependencies {
     api(project(":common"))
 
-    implementation(libs.kord.common)
-    implementation(libs.kord.core)
     implementation(libs.bundles.kotlin)
     implementation(libs.bundles.database)
 }

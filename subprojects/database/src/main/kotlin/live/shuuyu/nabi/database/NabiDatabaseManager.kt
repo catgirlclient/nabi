@@ -4,17 +4,19 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory
 import com.zaxxer.hikari.util.IsolationLevel
+import kotlinx.coroutines.sync.Mutex
 import live.shuuyu.nabi.database.tables.guild.GuildSettingsTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
-class NabiDatabaseManager(val config: NabiDatabaseConfig) {
-    companion object {
-        const val DRIVER_CLASS_NAME = "org.postgresql.Driver"
+public class NabiDatabaseManager(private val config: NabiDatabaseConfig) {
+    public companion object {
+        private val mutex = Mutex()
+        private const val DRIVER_CLASS_NAME = "org.postgresql.Driver"
 
-        fun initialize(
+        public fun initialize(
             jdbcAddress: String,
             jdbcUsername: String,
             jdbcPassword: String
@@ -34,7 +36,7 @@ class NabiDatabaseManager(val config: NabiDatabaseConfig) {
         )
     }
 
-    suspend fun createMissingTablesAndColums() = newSuspendedTransaction {
+    public suspend fun createMissingTablesAndColums(): Unit = newSuspendedTransaction {
         SchemaUtils.createMissingTablesAndColumns(
             GuildSettingsTable
         )
