@@ -2,9 +2,19 @@ plugins {
     id("live.shuuyu.plugins.module")
 }
 
+description = "The database in which Nabi's data is stored in."
+
+kotlin {
+    explicitApi()
+}
+
 dependencies {
-    implementation(libs.kord.common)
-    implementation(libs.kord.core)
+    api(project(":common"))
+
     implementation(libs.bundles.kotlin)
     implementation(libs.bundles.database)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

@@ -13,7 +13,9 @@ class NabiAPIManager(private val config: NabiAPIConfig) {
             install(Compression)
 
             routing {
+                get("/servers/{id}/config") {
 
+                }
             }
         }
 

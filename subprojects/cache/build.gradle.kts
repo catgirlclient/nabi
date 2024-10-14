@@ -2,6 +2,8 @@ plugins {
     id("live.shuuyu.plugins.module")
 }
 
+description = "Caches all sequestered information in Nabi to improve performance!"
+
 dependencies {
     api(project(":common"))
     implementation(libs.kord.common)

@@ -11,6 +11,7 @@ import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWr
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import live.shuuyu.nabi.NabiCore
+import live.shuuyu.nabi.i18n.NabiInfo
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.nabi.utils.ColorUtils
@@ -30,27 +31,27 @@ class NabiInfo(
             embed {
                 title = "Nabi"
                 field {
-                    name = "» System Information"
-                    value = i18n.get("embedBodySystemInformation", mapOf(
-                        "0" to os.name,
-                        "1" to os.arch,
-                        "2" to os.version,
-                        "3" to runtime.freeMemory().formatBytes(),
-                        "4" to runtime.totalMemory().formatBytes(),
-                        "5" to runtime.maxMemory().formatBytes(),
-                        "6" to System.getProperty("java.version"),
-                        "7" to System.getProperty("java.vendor"),
-                        "8" to KotlinVersion.CURRENT
+                    name = context.i18nContext.get(NabiInfo.Embed.SystemFieldName)
+                    value = context.i18nContext.get(NabiInfo.Embed.SystemFieldDescription(
+                        os.name,
+                        os.arch,
+                        os.version,
+                        runtime.freeMemory().formatBytes(),
+                        runtime.totalMemory().formatBytes(),
+                        runtime.maxMemory().formatBytes(),
+                        System.getProperty("java.version"),
+                        System.getProperty("java.vendor"),
+                        KotlinVersion.CURRENT
                     ))
                 }
 
                 field {
-                    name = "» Sharding Information"
-                    value = i18n.get("embedBodyGatewayInformation", mapOf(
-                        "0" to kord.gateway.averagePing?.inWholeMilliseconds,
-                        "1" to gatewayInfo.shards,
-                        "2" to gatewayInfo.sessionStartLimit.remaining,
-                        "3" to gatewayInfo.sessionStartLimit.total
+                    name = context.i18nContext.get(NabiInfo.Embed.GatewayFieldName)
+                    value = context.i18nContext.get(NabiInfo.Embed.GatewayFieldDescription(
+                        kord.gateway.averagePing?.inWholeMilliseconds!!,
+                        gatewayInfo.shards,
+                        gatewayInfo.sessionStartLimit.remaining,
+                        gatewayInfo.sessionStartLimit.total
                     ))
                 }
 

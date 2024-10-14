@@ -2,16 +2,18 @@ import com.github.gradle.node.pnpm.task.PnpmTask
 
 plugins {
     kotlin("jvm")
-    id("com.github.node-gradle.node") version "7.0.2"
+    id("com.github.node-gradle.node") version "7.1.0"
 }
+
+description = "The frontend website for Nabi and all of her correlating services."
 
 repositories {
     mavenCentral() // BECAUSE APPARENTLY IT DOESN'T APPLY FROM DEPENDENCY RESOLUTION MANAGER
 }
 
 node {
-    version.set("20.16.0")
-    pnpmVersion.set("9.11.0")
+    version.set("22.9.0")
+    pnpmVersion.set("9.12.1")
     download.set(true)
 }
 

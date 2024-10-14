@@ -74,12 +74,14 @@ class SlowmodeRemoveExecutor(
 
         val channelAsTextChannel = channel as TextChannel
 
-        val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
-        val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
+        val modLogConfigId = database.guild.getGuildSettingsConfig(guild.id.value.toLong())?.loggingConfigId
+        val modLogConfig = database.guild.getLoggingSettingsConfig(modLogConfigId)
 
         try {
-            if (modLogConfig?.channelId != null && modLogConfig.logChannelSlowmode) {
-                val channelIdToSnowflake = Snowflake(modLogConfig.channelId)
+            val loggingChannelId = modLogConfig?.channelId
+
+            if (loggingChannelId != null && modLogConfig.logChannelSlowmodes) {
+                val channelIdToSnowflake = Snowflake(loggingChannelId)
 
                 rest.channel.createMessage(
                     channelIdToSnowflake,

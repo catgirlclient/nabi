@@ -19,13 +19,14 @@ import live.shuuyu.discordinteraktions.common.commands.MessageCommandDeclaration
 import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclaration
 import live.shuuyu.discordinteraktions.platforms.kord.installDiscordInteraKTions
 import live.shuuyu.nabi.cache.NabiCacheManager
-import live.shuuyu.nabi.database.NabiDatabaseCore
+import live.shuuyu.nabi.database.NabiDatabaseManager
 import live.shuuyu.nabi.events.EventContext
 import live.shuuyu.nabi.events.EventResult
 import live.shuuyu.nabi.events.impl.*
 import live.shuuyu.nabi.interactions.InteractionsManager
 import live.shuuyu.nabi.metrics.NabiMetricsManager
 import live.shuuyu.nabi.utils.config.NabiConfig
+import live.shuuyu.nabi.utils.i18n.LanguageManager
 import kotlin.concurrent.thread
 import kotlin.time.measureTimedValue
 
@@ -33,7 +34,7 @@ class NabiCore(
     val gatewayManager: NabiGatewayManager,
     val config: NabiConfig,
     val cache: NabiCacheManager,
-    val database: NabiDatabaseCore,
+    val database: NabiDatabaseManager,
     val metrics: NabiMetricsManager
 ) {
     companion object {
@@ -65,26 +66,37 @@ class NabiCore(
         UserModule(this)
     )
 
+    val language = LanguageManager.load()
+
     /*
     We need to do this for 2 main reasons.
 
     1. We cannot register more than 100 slash commands, 5 user commands, and 5 message commands
     2. It's better if we do this before initializing to prevent issues from coming up.
      */
-    fun preInitialization() = runBlocking {
+    private fun preInitialization() = runBlocking {
         val slashCommandCount = interaktions.manager.applicationCommandsDeclarations.filterIsInstance<SlashCommandDeclaration>().size
         val messageCommandCount = interaktions.manager.applicationCommandsDeclarations.filterIsInstance<MessageCommandDeclaration>().size
 
+        logger.info { "Running pre-initialization tasks, this may take a while..." }
+
+        require(slashCommandCount > 100) {
+            "Registered slash command count is more than 100! Exiting the process....  "
+        }
     }
 
     @OptIn(PrivilegedIntent::class)
     fun initialize() = runBlocking {
+        // Initialize all of our microservices before the bot starts to prevent issues from arrising
+        preInitialization()
         database.initialize()
-        database.createMissingSchemaAndColumns()
+        database.createMissingTablesAndColums()
         manager.registerGlobalApplicationCommands()
         manager.registerGuildApplicationCommands(config.discord.defaultGuildId)
         cache.initialize(kord)
         metrics.start()
+
+        logger.info { "Initializing all Gateway instances of Nabi..." }
 
         gatewayManager.gateways.forEach { (shardId, gateway) ->
             gateway.installDiscordInteraKTions(interaktions)

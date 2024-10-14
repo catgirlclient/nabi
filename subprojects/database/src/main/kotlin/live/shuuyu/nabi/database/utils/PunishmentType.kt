@@ -1,5 +1,5 @@
 package live.shuuyu.nabi.database.utils
 
-enum class PunishmentType {
-    None, Warn, Mute, Kick, Ban
+public enum class PunishmentType {
+    None, Warn, Mute, Kick, SoftBan, Ban
 }

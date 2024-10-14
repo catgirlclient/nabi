@@ -5,11 +5,12 @@ import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.nabi.NabiCore
-import live.shuuyu.nabi.database.tables.BlacklistedUserTable
+import live.shuuyu.nabi.database.tables.user.BlacklistedUserTable
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 
 class BlacklistRemove(
     nabi: NabiCore
@@ -29,7 +30,7 @@ class BlacklistRemove(
         val target = data.target
         val executor = data.executor
 
-        database.asyncSuspendableTransaction {
+        suspendedTransactionAsync {
             BlacklistedUserTable.deleteWhere {
                 userId eq target.id.value.toLong()
             }

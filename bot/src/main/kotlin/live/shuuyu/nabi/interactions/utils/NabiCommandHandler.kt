@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
 import live.shuuyu.discordinteraktions.common.commands.GuildApplicationCommandContext
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 
 interface NabiCommandHandler {
@@ -34,7 +35,7 @@ interface NabiCommandHandler {
         }
 
         suspend fun handleBlacklistedGuild(nabi: NabiCore, guild: Guild): Boolean {
-            val isGuildBanned = nabi.database.guild.getGuildConfig(guild.id.value.toLong())
+            val isGuildBanned = nabi.database.guild.getGuildSettingsConfig(guild.id.value.toLong())
 
             when {
 
@@ -46,7 +47,8 @@ interface NabiCommandHandler {
 
     fun handleCommandContext(
         nabi: NabiCore,
-        context: ApplicationCommandContext
+        context: ApplicationCommandContext,
+        i18nContext: I18nContext,
     ) = if (context is GuildApplicationCommandContext) {
         NabiGuildApplicationContext(
             nabi,
@@ -54,6 +56,7 @@ interface NabiCommandHandler {
             context.channelId,
             context.interactionData,
             context.discordInteraction,
+            i18nContext,
             context.guildId,
             context.member,
             context
@@ -65,6 +68,7 @@ interface NabiCommandHandler {
             context.channelId,
             context.interactionData,
             context.discordInteraction,
+            i18nContext,
             context
         )
     }

@@ -56,12 +56,14 @@ class UnbanExecutor(
     private suspend fun unbanUser(data: UnbanData) {
         val (target, executor, guild, reason) = data
 
-        val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
-        val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
+        val modLogConfigId = database.guild.getGuildSettingsConfig(guild.id.value.toLong())?.loggingConfigId
+        val modLogConfig = database.guild.getLoggingSettingsConfig(modLogConfigId)
 
         try {
-            if (modLogConfig?.channelId != null && modLogConfig.logUserUnbans) {
-                val channelIdToSnowflake = Snowflake(modLogConfig.channelId)
+            val loggingChannelId = modLogConfig?.channelId
+
+            if (loggingChannelId != null && modLogConfig.logUserUnbans) {
+                val channelIdToSnowflake = Snowflake(loggingChannelId)
 
                 rest.channel.createMessage(
                     channelIdToSnowflake,

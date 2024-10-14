@@ -1,11 +1,14 @@
 # Contributing
 Contributions are always welcomed by the Nabi team.
 
-## Notes
-* We use Dragonfly as a drop in replacement for Redis, since it's more efficient and faster. If you'd like to replace it
-  with something like [Cachegrand](https://github.com/danielealbano/cachegrand/tree/main) or 
-  [Redis](https://github.com/redis/redis), feel free to do so.
-* By default, the environment loaded will be ``DEVELOPMENT``. This means that Nabi will use the Discord Gateway API. If you
-  want to test Nabi's webserver capabilities, please use ``DEVELOPMENT_WEBSERVER``.
-* Please do not make any workarounds if the issue relates to Discord InteraKTions or Kord. It's recommended to open a 
-  pull request related to the fix in the aforementioned repository.
+## Building and Running Nabi
+Nabi requires the following dependencies:
+
+* Java 17 (Discord InteraKTions require it for webserver based interactions.)
+* Redis/Any Redis compatible in memory database (Required by [`subprojects/cache`](../subprojects/cache))
+* PostgreSQL (Required by [`subprojects/database`](../subprojects/database), though you can swap this out.)
+* An HTTP server (*Optional*, although if you want other users to access Nabi's servers and websites, you'll need to specify this.)
+
+## Important Contributors
+* yujin - Primary owner of Nabi and maintainer of all of her services.
+* my-name-is-jeff - Some idiot

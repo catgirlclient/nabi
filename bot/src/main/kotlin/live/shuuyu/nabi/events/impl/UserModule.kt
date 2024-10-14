@@ -33,8 +33,8 @@ class UserModule(nabi: NabiCore): AbstractEventModule(nabi) {
                 val guildId = event.member.guildId
                 val guild = Guild(GuildData.from(rest.guild.getGuild(guildId)), kord)
 
-                val accountAgeConfigId = database.guild.getGuildConfig(guildId.value.toLong())?.accountAgeConfigId
-                val accountAgeConfig = database.guild.getAccountAgeConfig(accountAgeConfigId) ?: return EventResult.Continue
+                val accountAgeConfigId = database.guild.getGuildSettingsConfig(guildId.value.toLong())?.accountAgeConfigId
+                val accountAgeConfig = database.guild.getAccountAgeSettingsConfig(accountAgeConfigId) ?: return EventResult.Continue
 
                 val userAccountAge = user.id.timestamp.epochSeconds
                 val requiredAccountAge = accountAgeConfig.minAccountAge

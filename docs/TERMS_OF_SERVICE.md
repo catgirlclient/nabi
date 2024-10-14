@@ -29,6 +29,15 @@ Nabi and her developers take your privacy seriously. **Nabi will only collect da
 
 See (../docs/PRIVACY_POLICY.md) for more information.
 
+## Legal
+> [!NOTE]
+> This currently only applies to code licensed under the GNU AGPL License. Code licensed under the current Polyform Shield
+> 1.0.0 License specifically state that you cannot compete, meaning that you cannot profiteer off of the work of Nabi
+> and her developers.
+
+Nabi and her developers require you to specify the license if you utilize any form of our source code in your project. Nabi
+is intentionally open-source to an extent to encourage people to develop upon the bot. 
+
 ## Noncompete & License Compliance
 Nabi was purely made source available for both security, transparency, and being completely free. We understand that 
 users may be reluctant to adopt Nabi and her services due to a lack of transparency, thus opening her source code for 
