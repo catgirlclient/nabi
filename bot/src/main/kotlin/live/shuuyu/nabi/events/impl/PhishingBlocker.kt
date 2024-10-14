@@ -36,14 +36,15 @@ import kotlinx.serialization.modules.SerializersModule
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
 import live.shuuyu.nabi.NabiCore
-import live.shuuyu.nabi.database.tables.WarnTable
-import live.shuuyu.nabi.database.tables.utils.PunishmentType
+import live.shuuyu.nabi.database.tables.member.WarnTable
+import live.shuuyu.nabi.database.utils.PunishmentType
 import live.shuuyu.nabi.events.AbstractEventModule
 import live.shuuyu.nabi.events.EventContext
 import live.shuuyu.nabi.events.EventResult
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.MemberUtils.getMemberAvatar
 import live.shuuyu.nabi.utils.UserUtils.getUserAvatar
+import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.jetbrains.exposed.sql.upsert
 import kotlin.time.Duration.Companion.seconds
 
@@ -129,8 +130,8 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
         val message = Message(MessageData.from(rest.channel.getMessage(channelId, messageId)), kord)
         val targetAsMember = target.asMember(guild.id)
 
-        val guildPhishingConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.phishingConfigId
-        val phishingConfig = database.guild.getPhishingConfig(guildPhishingConfigId) ?: return EventResult.Continue
+        val guildPhishingConfigId = database.guild.getGuildSettingsConfig(guild.id.value.toLong())?.phishingConfigId ?: return EventResult.Continue
+        val phishingConfig = database.guild.getPhishingSettingsConfig(guildPhishingConfigId) ?: return EventResult.Continue
         val punishmentReason = i18n.get("phishingReason", mapOf("0" to urlRegex.find(message.content)?.value))
 
         // Return if the phishing module isn't enabled, the user is a bot (We can't ban bots), or the list of sus links is empty.
@@ -138,9 +139,11 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
             return EventResult.Continue
 
         try {
-            if (phishingConfig.channelId != null && phishingConfig.sendMessageToChannel) {
+            val targetChannelId = phishingConfig.channelId
+
+            if (targetChannelId != null && phishingConfig.sendMessageToChannel) {
                 rest.channel.createMessage(
-                    Snowflake(phishingConfig.channelId),
+                    Snowflake(targetChannelId),
                     createPhishingLoggingMessage(targetAsMember, phishingConfig.punishmentType)
                 )
             }
@@ -152,7 +155,7 @@ class PhishingBlocker(nabi: NabiCore): AbstractEventModule(nabi) {
             when (phishingConfig.punishmentType) {
                 PunishmentType.None -> return EventResult.Continue
                 PunishmentType.Warn -> {
-                    database.asyncSuspendableTransaction {
+                    suspendedTransactionAsync {
                         val selfId = kord.getSelf().id.value.toLong() // apparently not in a suspenable function????
 
                         WarnTable.upsert {

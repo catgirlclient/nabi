@@ -1,5 +1,6 @@
 package live.shuuyu.nabi.database.manager
 
+import live.shuuyu.nabi.database.NabiDatabaseManager
 import live.shuuyu.nabi.database.config.user.BlacklistedUserConfig
 import live.shuuyu.nabi.database.config.user.UserSettingsConfig
 import live.shuuyu.nabi.database.tables.user.BlacklistedUserTable
@@ -7,14 +8,14 @@ import live.shuuyu.nabi.database.tables.user.UserSettingsTable
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 
-public object UserManager {
+public class UserManager(database: NabiDatabaseManager) {
     public suspend fun getUserSettings(
         userId: Long
     ): UserSettingsConfig? = suspendedTransactionAsync {
         UserSettingsTable.selectAll().where {
             UserSettingsTable.userId eq userId
         }.limit(1).map {
-            UserSettingsConfig (
+            UserSettingsConfig(
                 it[UserSettingsTable.userId],
                 it[UserSettingsTable.exp]
             )
@@ -27,7 +28,7 @@ public object UserManager {
         BlacklistedUserTable.selectAll().where {
             BlacklistedUserTable.userId eq userId
         }.limit(1).map {
-            BlacklistedUserConfig (
+            BlacklistedUserConfig(
                 it[BlacklistedUserTable.userId],
                 it[BlacklistedUserTable.developerId],
                 it[BlacklistedUserTable.reason],

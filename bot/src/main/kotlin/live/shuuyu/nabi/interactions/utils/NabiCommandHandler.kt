@@ -35,7 +35,7 @@ interface NabiCommandHandler {
         }
 
         suspend fun handleBlacklistedGuild(nabi: NabiCore, guild: Guild): Boolean {
-            val isGuildBanned = nabi.database.guild.getGuildConfig(guild.id.value.toLong())
+            val isGuildBanned = nabi.database.guild.getGuildSettingsConfig(guild.id.value.toLong())
 
             when {
 

@@ -7,7 +7,13 @@ import kotlin.time.Duration.Companion.days
 
 public object PhishingSettingsTable: LongIdTable() {
     public val enabled: Column<Boolean> = bool("enabled").default(false)
-    public val punishmentType: Column<PunishmentType> = enumerationByName("punishment_type", 4, PunishmentType::class).default(PunishmentType.Kick)
+    public val channelId: Column<Long?> = long("channel_Id").nullable()
+
+    /**
+     * This will send it to the channel of which the message it has been sent, not the logging channel.
+     */
+    public val sendMessageToChannel: Column<Boolean> = bool("send_message_to_user")
+    public val punishmentType: Column<PunishmentType> = enumerationByName("punishment_type", 5, PunishmentType::class).default(PunishmentType.Kick)
     public val defaultMuteDuration: Column<Long> = long("default_mute_duration").default(1.days.inWholeDays)
 
     /**

@@ -9,12 +9,13 @@ import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.nabi.NabiCore
-import live.shuuyu.nabi.database.tables.BlacklistedUserTable
+import live.shuuyu.nabi.database.tables.user.BlacklistedUserTable
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.MessageUtils
+import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.jetbrains.exposed.sql.upsert
 
 class  Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Blacklist.toml")) {
@@ -57,11 +58,11 @@ class  Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager
         val reason = data.reason
 
         try {
-            database.asyncSuspendableTransaction {
+            suspendedTransactionAsync {
                 BlacklistedUserTable.upsert {
                     it[this.userId] = target.id.value.toLong()
+                    it[this.developerId] = executor.id.value.toLong()
                     it[this.reason] = reason
-                    it[this.ownerId] = executor.id.value.toLong()
                     it[this.timestamp] = Clock.System.now().epochSeconds
                 }
             }.await()

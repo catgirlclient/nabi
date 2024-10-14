@@ -7,6 +7,7 @@ public object LoggingSettingsTable: LongIdTable() {
     public val enabled: Column<Boolean> = bool("enabled").default(false)
     public val channelId: Column<Long?> = long("channel_id").nullable().index()
     public val logUserBans: Column<Boolean> = bool("log_user_bans").default(false)
+    public val logUserUnbans: Column<Boolean> = bool("log_user_unbans").default(false)
     public val logUserKicks: Column<Boolean> = bool("log_user_kicks").default(false)
     public val logUserMutes: Column<Boolean> = bool("log_user_mutes").default(false)
     public val logUserUnmutes: Column<Boolean> = bool("log_user_unmutes").default(false)

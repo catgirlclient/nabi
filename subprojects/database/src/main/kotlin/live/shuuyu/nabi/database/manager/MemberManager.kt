@@ -1,12 +1,13 @@
 package live.shuuyu.nabi.database.manager
 
+import live.shuuyu.nabi.database.NabiDatabaseManager
 import live.shuuyu.nabi.database.config.member.MemberSettingsConfig
 import live.shuuyu.nabi.database.tables.member.MemberSettingsTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 
-public object MemberManager {
+public class MemberManager(database: NabiDatabaseManager) {
     public suspend fun getMemberSettingsConfig(
         userId: Long,
         guildId: Long

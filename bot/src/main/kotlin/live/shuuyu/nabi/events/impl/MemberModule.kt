@@ -46,19 +46,19 @@ class MemberModule(nabi: NabiCore): AbstractEventModule(nabi) {
         val user = User(user.toData(), kord)
         val guild = Guild(GuildData.from(rest.guild.getGuild(guildId)), kord)
 
-        val getGuildConfig = database.guild.getGuildConfig(guildId.value.toLong()) ?: return EventResult.Continue
+        val getGuildConfig = database.guild.getGuildSettingsConfig(guildId.value.toLong()) ?: return EventResult.Continue
 
         try {
             when(type) {
                 JoinType.Join -> {
-                    val welcomeConfigId = getGuildConfig.leaveConfigId ?: return EventResult.Continue
-                    val welcomeChannelId = database.guild.getWelcomeChannelConfig(welcomeConfigId)?.channelId ?: return EventResult.Continue
+                    val welcomeConfigId = getGuildConfig.leaveChannelConfigId ?: return EventResult.Continue
+                    val welcomeChannelId = database.guild.getWelcomeChannelSettingsConfig(welcomeConfigId)?.channelId ?: return EventResult.Continue
 
                     rest.channel.createMessage(Snowflake(welcomeChannelId), createGuildMessage(user, type))
                 }
                 JoinType.Leave -> {
-                    val leaveConfigId = getGuildConfig.leaveConfigId ?: return EventResult.Continue
-                    val leaveChannelId = database.guild.getLeaveChannelConfig(leaveConfigId)?.channelId ?: return EventResult.Continue
+                    val leaveConfigId = getGuildConfig.leaveChannelConfigId ?: return EventResult.Continue
+                    val leaveChannelId = database.guild.getLeaveChannelSettingsConfig(leaveConfigId)?.channelId ?: return EventResult.Continue
 
                     rest.channel.createMessage(Snowflake(leaveChannelId), createGuildMessage(user, type))
                 }

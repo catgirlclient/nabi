@@ -1,13 +1,14 @@
 package live.shuuyu.nabi.database.manager
 
+import live.shuuyu.nabi.database.NabiDatabaseManager
 import live.shuuyu.nabi.database.config.guild.*
 import live.shuuyu.nabi.database.tables.guild.*
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 
-public object GuildManager {
+public class GuildManager(database: NabiDatabaseManager){
     public suspend fun getAccountAgeSettingsConfig(
-        accountAgeSettingsId: Long
+        accountAgeSettingsId: Long?
     ): AccountAgeSettingsConfig? = suspendedTransactionAsync {
         AccountAgeSettingsTable.selectAll().where {
             AccountAgeSettingsTable.id eq accountAgeSettingsId
@@ -41,7 +42,7 @@ public object GuildManager {
     }.await()
 
     public suspend fun getLeaveChannelSettingsConfig(
-        leaveChannelConfigId: Long
+        leaveChannelConfigId: Long?
     ): LeaveChannelSettingsConfig? = suspendedTransactionAsync {
         LeaveChannelSettingsTable.selectAll().where {
             LeaveChannelSettingsTable.id eq leaveChannelConfigId
@@ -54,7 +55,7 @@ public object GuildManager {
     }.await()
 
     public suspend fun getLoggingSettingsConfig(
-        loggingConfigId: Long
+        loggingConfigId: Long?
     ): LoggingSettingsConfig? = suspendedTransactionAsync {
         LoggingSettingsTable.selectAll().where {
             LoggingSettingsTable.id eq loggingConfigId
@@ -63,6 +64,7 @@ public object GuildManager {
                 it[LoggingSettingsTable.enabled],
                 it[LoggingSettingsTable.channelId],
                 it[LoggingSettingsTable.logUserBans],
+                it[LoggingSettingsTable.logUserUnbans],
                 it[LoggingSettingsTable.logUserKicks],
                 it[LoggingSettingsTable.logUserMutes],
                 it[LoggingSettingsTable.logUserUnmutes],
@@ -76,13 +78,15 @@ public object GuildManager {
     }.await()
 
     public suspend fun getPhishingSettingsConfig(
-        phishingSettingsConfigId: Long
+        phishingSettingsConfigId: Long?
     ): PhishingSettingsConfig? = suspendedTransactionAsync {
         PhishingSettingsTable.selectAll().where {
             PhishingSettingsTable.id eq phishingSettingsConfigId
         }.limit(1).map {
             PhishingSettingsConfig (
                 it[PhishingSettingsTable.enabled],
+                it[PhishingSettingsTable.channelId],
+                it[PhishingSettingsTable.sendMessageToChannel],
                 it[PhishingSettingsTable.punishmentType],
                 it[PhishingSettingsTable.defaultMuteDuration],
                 it[PhishingSettingsTable.whitelistedChannels]
@@ -91,7 +95,7 @@ public object GuildManager {
     }.await()
 
     public suspend fun getWelcomeChannelSettingsConfig(
-        welcomeChannelConfigId: Long
+        welcomeChannelConfigId: Long?
     ): WelcomeChannelSettingsConfig? = suspendedTransactionAsync {
         WelcomeChannelSettingsTable.selectAll().where {
             WelcomeChannelSettingsTable.id eq welcomeChannelConfigId

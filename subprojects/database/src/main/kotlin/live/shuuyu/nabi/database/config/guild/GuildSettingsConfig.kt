@@ -11,8 +11,8 @@ public data class GuildSettingsConfig (
     public val accountAgeConfigId: Long?,
     public val loggingConfigId: Long?,
     public val phishingConfigId: Long?,
-    public val welcomeChannelConfig: Long?,
-    public val leaveChannelConfig: Long?,
+    public val welcomeChannelConfigId: Long?,
+    public val leaveChannelConfigId: Long?,
     public val showPunishmentMessage: Boolean,
     public val directMessageUser: Boolean
 )

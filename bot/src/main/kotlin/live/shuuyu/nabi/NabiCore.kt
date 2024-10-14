@@ -19,7 +19,7 @@ import live.shuuyu.discordinteraktions.common.commands.MessageCommandDeclaration
 import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclaration
 import live.shuuyu.discordinteraktions.platforms.kord.installDiscordInteraKTions
 import live.shuuyu.nabi.cache.NabiCacheManager
-import live.shuuyu.nabi.database.NabiDatabaseCore
+import live.shuuyu.nabi.database.NabiDatabaseManager
 import live.shuuyu.nabi.events.EventContext
 import live.shuuyu.nabi.events.EventResult
 import live.shuuyu.nabi.events.impl.*
@@ -34,7 +34,7 @@ class NabiCore(
     val gatewayManager: NabiGatewayManager,
     val config: NabiConfig,
     val cache: NabiCacheManager,
-    val database: NabiDatabaseCore,
+    val database: NabiDatabaseManager,
     val metrics: NabiMetricsManager
 ) {
     companion object {
@@ -90,7 +90,7 @@ class NabiCore(
         // Initialize all of our microservices before the bot starts to prevent issues from arrising
         preInitialization()
         database.initialize()
-        database.createMissingSchemaAndColumns()
+        database.createMissingTablesAndColums()
         manager.registerGlobalApplicationCommands()
         manager.registerGuildApplicationCommands(config.discord.defaultGuildId)
         cache.initialize(kord)

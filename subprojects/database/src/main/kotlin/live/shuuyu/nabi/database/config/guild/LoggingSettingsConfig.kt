@@ -7,6 +7,7 @@ public data class LoggingSettingsConfig (
     public val enabled: Boolean,
     public val channelId: Long?,
     public val logUserBans: Boolean,
+    public val logUserUnbans: Boolean,
     public val logUserKicks: Boolean,
     public val logUserMutes: Boolean,
     public val logUserUnmutes: Boolean,

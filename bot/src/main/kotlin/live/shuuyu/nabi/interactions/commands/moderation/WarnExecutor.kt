@@ -13,7 +13,7 @@ import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.nabi.NabiCore
-import live.shuuyu.nabi.database.tables.WarnTable
+import live.shuuyu.nabi.database.tables.member.WarnTable
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
@@ -66,16 +66,18 @@ class WarnExecutor(
     private suspend fun warn(data: WarnData) {
         val (target, executor, guild, reason) = data
 
-        val modLogConfigId = database.guild.getGuildConfig(guild.id.value.toLong())?.moderationConfigId
-        val modLogConfig = database.guild.getModLoggingConfig(modLogConfigId)
+        val modLogConfigId = database.guild.getGuildSettingsConfig(guild.id.value.toLong())?.loggingConfigId
+        val modLogConfig = database.guild.getLoggingSettingsConfig(modLogConfigId)
 
         val warnCount = WarnTable.selectAll().where {
             (WarnTable.guildId eq guild.id.value.toLong()) and (WarnTable.id eq target.id.value.toLong())
         }.count().toInt()
 
         try {
-            if (modLogConfig?.channelId != null && modLogConfig.logUserUnbans) {
-                val channelIdToSnowflake = Snowflake(modLogConfig.channelId)
+            val loggingChannelId = modLogConfig?.channelId
+
+            if (loggingChannelId != null && modLogConfig.logUserUnbans) {
+                val channelIdToSnowflake = Snowflake(loggingChannelId)
 
                 rest.channel.createMessage(
                     channelIdToSnowflake,
