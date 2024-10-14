@@ -1,7 +1,7 @@
 # Nabi's Terms of Service
 **Last Updated: 19/9/2024**
 
-By using any services in relation to Nabi, you agree to both the [Discord Terms and Services]() and 
+By using any services in relation to Nabi, you agree to both the [Discord Terms and Services](https://discord.com/terms) and 
 our related terms of service. You agree that breaking any terms will result in complete termination of your ability to use
 any services related to Nabi. You may also be blacklisted from any services from Nabi at any time for no given reason by 
 the discression of the developers.
@@ -29,31 +29,11 @@ Nabi and her developers take your privacy seriously. **Nabi will only collect da
 
 See (../docs/PRIVACY_POLICY.md) for more information.
 
-## Legal
-> [!NOTE]
-> This currently only applies to code licensed under the GNU AGPL License. Code licensed under the current Polyform Shield
-> 1.0.0 License specifically state that you cannot compete, meaning that you cannot profiteer off of the work of Nabi
-> and her developers.
-
-Nabi and her developers require you to specify the license if you utilize any form of our source code in your project. Nabi
-is intentionally open-source to an extent to encourage people to develop upon the bot. 
-
-## Noncompete & License Compliance
-Nabi was purely made source available for both security, transparency, and being completely free. We understand that 
-users may be reluctant to adopt Nabi and her services due to a lack of transparency, thus opening her source code for 
-people to analyze.
-
-For any and all services of Nabi's license which are labeled under the Polyform Shield 1.0.0 license or any non-compete 
-related licenses, you agree to not compete with her services, and agree to not profiteer off of the work from her developers.
-You agree to follow the license of whatever the subproject/project is licensed under. You are to assume projects without
-any given/provided licenses are All Rights Reserved (ARR), and thus fall under our jurisdiction. Failure to comply may 
-result in the possible invokation of the Digital Millenium Copyright Act (DMCA).
-
-> [!NOTE]
-> This agreement will change when Nabi enters a stable release, instead using AGPL-3.0 for her license. This will only 
-> apply to her bot, not any other related components. We will remove the noncompete term once AGPL-3.0 or another license
-> is pushed.
+## Legal and License Compliance
+We license all code under the [``:api``](../api), [``:bot``](../bot), and [``:subprojects``](../subprojects) directory under the 
+GNU AGPL-3.0 License, while every other project would be licensed under the MIT License. We kindly emplore developers who
+use our code to please follow the license stated, as we are a non-profit organization.
 
 ## Access & Noncompliance
-You agree to not harm any and all services in relation to Nabi, and agree that your ability to use Nabi may be removed at
-any time.
+You agree to not harm any and all services in relation to Nabi, and agree that your ability to use Nabi and her service
+may be revoked at any time.
