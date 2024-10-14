@@ -13,5 +13,5 @@ open sourced initiative, making it so anyone can see and utilize portions of our
 
 ___
 <h4 style="text-align: center">
-    Copyright (c) 2024 CatgirlClient & yujin. Nabi is licensed under the PolyForm Shield License 1.0.0 unless otherwise stated. All rights reserved.
+    Copyright (c) 2024 CatgirlClient & yujin. Nabi is licensed under the GNU AGPL-3.0 License unless otherwise stated. All rights reserved.
 </h4>
