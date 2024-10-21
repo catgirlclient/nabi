@@ -1,5 +1,6 @@
 package live.shuuyu.nabi.interactions.commands.moderation.utils
 
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.Channel
 import dev.kord.core.entity.effectiveName
@@ -9,11 +10,23 @@ import dev.kord.rest.builder.message.embed
 import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
+import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.utils.UserUtils.getUserAvatar
 
 interface ModerationInteractionWrapper {
     private companion object {
         val i18n = LanguageManager("./locale/utils/ModerationInteractionWrapper.toml")
+    }
+
+    suspend fun fetchGuild(nabi: NabiCore, guildId: Snowflake) {
+        val cachedGuild = nabi.cache.guilds.get(guildId)
+
+
+    }
+
+    suspend fun fetchUser(nabi: NabiCore, userId: Snowflake) {
+        val cachedUser = nabi.cache.users.get(userId)
+
     }
 
     suspend fun sendModerationLoggingMessage(
@@ -58,8 +71,6 @@ interface ModerationInteractionWrapper {
             timestamp = Clock.System.now()
         }
     }
-
-
 
     // Slowmode is different
     enum class ModerationType {

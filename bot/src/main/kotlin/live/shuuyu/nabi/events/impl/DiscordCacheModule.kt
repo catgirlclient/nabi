@@ -15,7 +15,7 @@ class DiscordCacheModule(nabi: NabiCore): AbstractEventModule(nabi) {
             is GuildCreate -> {
                 val guild = event.guild
 
-                cache.guilds[guild.id]
+                cache.guilds.get(guild.id)
             }
 
             is GuildDelete -> {

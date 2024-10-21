@@ -1,9 +1,9 @@
 package live.shuuyu.nabi.cache.entities
 
-import org.redisson.api.RLocalCachedMap
+import org.redisson.api.RLocalCachedMapReactive
 import org.redisson.api.options.LocalCachedMapOptions
 
-abstract class CacheEntitiesHandler<K, V>(val name: String) {
+abstract class CacheEntitiesHandler<K, V>(name: String) {
     // Basic options to ensure fast caching
     val options: LocalCachedMapOptions<K, V> = LocalCachedMapOptions.name<K, V>(name).apply {
         storeMode(LocalCachedMapOptions.StoreMode.LOCALCACHE_REDIS)
@@ -13,5 +13,5 @@ abstract class CacheEntitiesHandler<K, V>(val name: String) {
         syncStrategy(LocalCachedMapOptions.SyncStrategy.UPDATE)
     }
 
-    abstract val parentMap: RLocalCachedMap<K, V>
+    abstract val parentMap: RLocalCachedMapReactive<K, V>
 }

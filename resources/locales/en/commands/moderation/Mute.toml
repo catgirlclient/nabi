@@ -1,0 +1,35 @@
+[command]
+name = "mute"
+description = "Mutes a user, preventing them from sending messages in your guild."
+userOptionName = "user"
+userOptionDescription = "The user you want to mute."
+durationOptionName = "duration"
+durationOptionDescription = "The duration you want the user to be muted for."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why this user is being muted."
+
+[error]
+permissionIsMissing = """
+    Nabi is currently missing the `MODERATE_MEMBERS` permission. Please check if Nabi has the required permissions
+    to execute the commands, and try again.
+"""
+targetRoleIsEqualOrHigher = """
+    You can't mute this member due to insufficient permissions. Please make sure your permissions is higher than
+    the person you're trying to mute, and try again.
+"""
+targetIsNull = "The user you've supplied seems to not be in the server! Please supply a valid user, and try again."
+targetIsOwner = "You can't mute the owner of the server!"
+targetIsNabi = "HOW DARE YOU! >:("
+targetIsSelf = "You can't mute yourself!"
+durationOutsideRange = """
+    The duration you've supplied is outside of the accepted range (0 seconds through 28 days). Please supply
+    a valid duration within the range, and try again.
+"""
+
+[embed]
+punishmentDescription = "You've been muted in **{guildName}** for **{reason}**"
+resultantTitle = "User Muted"
+resultantDescription = """
+    • **User:** {username} - {userMention} - {userId} \n\
+    • **Reason:** {reason}
+"""

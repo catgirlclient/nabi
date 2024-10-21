@@ -1,8 +1,12 @@
 [command]
 name = "slowmode"
 description = "Ratelimits the given channel, increasing/decreasing the intervals of which messages can be sent."
+durationOptionName = "duration"
+durationOptionDescrtiption = "The amount you want to slow the channel by."
 channelOptionName = "channel"
 channelOptionDescription = "The channel you want to target."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why this channel is being slowed."
 
 [error]
 permissionIsMissing = """
