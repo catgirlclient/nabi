@@ -1,0 +1,12 @@
+[command]
+name = "remove"
+description = "Removes the blacklist status from Nabi, allowing them to use Nabi's services oncemore."
+userOptionName = "user"
+userOptionDescription = "The user you want to unblacklist."
+
+[error]
+targetIsNotBlacklisted = """
+    The user you've specified hasn't been blacklisted! Please provide an actual blacklisted user, and try again.
+"""
+
+[embed]

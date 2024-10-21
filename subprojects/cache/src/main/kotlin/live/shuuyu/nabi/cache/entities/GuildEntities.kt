@@ -4,45 +4,48 @@ import dev.kord.common.entity.DiscordGuild
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.core.cache.data.GuildData
+import dev.kord.core.cache.data.toData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.Role
 import dev.kord.core.entity.channel.Channel
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.sync.Mutex
-import org.redisson.api.RLocalCachedMap
-import org.redisson.api.RedissonClient
+import kotlinx.coroutines.sync.withLock
+import live.shuuyu.nabi.cache.utils.GuildKeys
+import org.redisson.api.RLocalCachedMapReactive
+import org.redisson.api.RedissonReactiveClient
 
 class GuildEntities (
-    val client: RedissonClient,
+    client: RedissonReactiveClient,
     val kord: Kord
 ): CacheEntitiesHandler<Snowflake, GuildData>("nabi:guild") {
-    override val parentMap: RLocalCachedMap<Snowflake, GuildData> = client.getLocalCachedMap(options)
-    val mutex = Mutex()
+    override val parentMap: RLocalCachedMapReactive<Snowflake, GuildData> = client.getLocalCachedMap(options)
+    private val mutex = Mutex()
     var roles = mutableMapOf<Snowflake, Role>()
     var channels = mutableMapOf<Snowflake, Channel>()
     var members = mutableMapOf<Snowflake, Member>()
 
-    operator fun get(guildId: Snowflake): Guild? {
-        val cachedData = parentMap[guildId] ?: return null
+    suspend fun contains(guildId: Snowflake): Boolean = parentMap.containsKey(guildId).awaitSingle()
 
-        return Guild(cachedData, kord)
+    suspend fun get(guildId: Snowflake): Guild? = mutex.withLock(GuildKeys(guildId)) {
+        val cachedData = parentMap[guildId].awaitFirstOrNull() ?: return@withLock null
+
+        return@withLock Guild(cachedData, kord)
     }
 
-    operator fun set(guildId: Snowflake, guild: DiscordGuild): Guild {
-        val data = GuildData.from(guild)
-        parentMap[guild.id] = data
+    suspend fun set(guildId: Snowflake, data: GuildData): Guild = mutex.withLock(GuildKeys(guildId)) {
+        parentMap.put(guildId, data).awaitSingle()
 
-
-        return Guild(data, kord)
+        return@withLock Guild(data, kord)
     }
 
-    suspend fun set(guild: DiscordGuild): Guild {
-        val data = GuildData.from(guild)
+    suspend fun set(guild: DiscordGuild): Guild = set(guild.id, guild.toData())
 
-        parentMap[guild.id] = data
-
-        return Guild(data, kord)
+    suspend fun remove(guildId: Snowflake): GuildData? = mutex.withLock(GuildKeys(guildId)) {
+        return@withLock parentMap.get(guildId).awaitFirstOrNull()
     }
 
-    suspend fun remove(guildId: Snowflake) = parentMap.remove(guildId)
+    suspend fun count() = parentMap.size().awaitSingle()
 }

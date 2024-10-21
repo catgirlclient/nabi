@@ -7,22 +7,20 @@ import com.fasterxml.jackson.dataformat.toml.TomlFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.decodeFromString
+import live.shuuyu.common.Language
 import live.shuuyu.i18n.I18nContext
 import live.shuuyu.i18n.I18nData
 import live.shuuyu.i18n.LanguageData
 import live.shuuyu.i18n.TextData
 import java.io.File
 
-class LanguageManager(
-    private val directory: File,
-    private val defaultLanguageId: String
-) {
+class LanguageManager(private val directory: File, private val defaultLanguageId: Language) {
     companion object {
         val ktoml = Toml()
         val logger = KotlinLogging.logger {  }
 
         fun load(): LanguageManager {
-            val languageManager = LanguageManager(File("/resources/locales"), "en")
+            val languageManager = LanguageManager(File("/resources/locales"), Language.ENGLISH)
             languageManager.createAndLoad()
             return languageManager
         }
@@ -30,9 +28,24 @@ class LanguageManager(
 
     private var i18nContexts = mutableMapOf<String, I18nContext>()
     private var languages = mutableMapOf<String, I18nData>()
+    val defaultI18nContext: I18nContext
+        get() = i18nContexts[getDefaultLanguageId(defaultLanguageId)]!!
+
+    private fun getDefaultLanguageId(languageId: Language): String {
+        return when(languageId) {
+            Language.ENGLISH -> "en"
+            Language.CHINESE_SIMPLIFIED -> "ch-sm"
+            Language.CHINESE_TRADITIONAL -> "ch-tw"
+            Language.KOREAN -> "kr"
+        }
+    }
 
     fun getI18nContext(languageId: String?): I18nContext {
-        return i18nContexts[languageId] ?: i18nContexts[defaultLanguageId]!!
+        return i18nContexts[languageId] ?: i18nContexts[getDefaultLanguageId(defaultLanguageId)]!!
+    }
+
+    fun getI18nContext(language: Language): I18nContext {
+        return getI18nContext(getDefaultLanguageId(language))
     }
 
     fun loadData(languageId: String): I18nData {

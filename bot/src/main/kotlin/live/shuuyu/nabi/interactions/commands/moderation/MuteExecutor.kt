@@ -12,13 +12,14 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.nabi.NabiCore
+import live.shuuyu.nabi.i18n.Mute
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import live.shuuyu.nabi.utils.MessageUtils.createRespondEmbed
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -26,10 +27,12 @@ import kotlin.time.Duration.Companion.days
 class MuteExecutor(
     nabi: NabiCore,
 ): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), ModerationInteractionWrapper {
-    inner class Options: ApplicationCommandOptions() {
-        val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
-        val duration = string(i18n.get("durationOptionName"), i18n.get("durationOptionDescription"))
-        val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription"))
+    inner class Options: NabiApplicationCommandOptions(language) {
+        val user = user(Mute.Command.UserOptionName, Mute.Command.UserOptionDescription)
+        val duration = string(Mute.Command.DurationOptionName, Mute.Command.DurationOptionDescription)
+        val reason = optionalString(Mute.Command.ReasonOptionName, Mute.Command.ReasonOptionDescription) {
+            allowedLength = 0..512
+        }
     }
 
     override val options = Options()

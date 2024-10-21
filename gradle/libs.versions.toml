@@ -25,6 +25,7 @@ slf4j = "2.0.16" # https://github.com/qos-ch/slf4j
 # Default Kotlin Libraries
 kotlin-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlin-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlin-coroutines" }
 
 # Discord libraries/frameworks
 kord-common = { module = "dev.kord:kord-core", version.ref = "kord" }
@@ -86,7 +87,7 @@ kotlin-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 [bundles]
-kotlin = ["kotlin-serialization-core", "kotlin-coroutines-core"]
+kotlin = ["kotlin-serialization-core", "kotlin-coroutines-core", "kotlin-coroutines-reactive"]
 
 discord = [
     "kord-common",

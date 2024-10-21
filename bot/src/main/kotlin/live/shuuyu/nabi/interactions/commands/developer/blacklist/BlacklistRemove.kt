@@ -2,21 +2,20 @@ package live.shuuyu.nabi.interactions.commands.developer.blacklist
 
 import dev.kord.core.entity.User
 import live.shuuyu.common.locale.LanguageManager
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.database.tables.user.BlacklistedUserTable
+import live.shuuyu.nabi.i18n.Blacklist
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 
-class BlacklistRemove(
-    nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Blacklist.toml")) {
-    inner class Options: ApplicationCommandOptions() {
-        val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
+class BlacklistRemove(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/BlacklistRemove.toml")) {
+    inner class Options: NabiApplicationCommandOptions(language) {
+        val user = user(Blacklist.Command.UserOptionName, Blacklist.Command.UserOptionDescription)
     }
 
     override val options = Options()

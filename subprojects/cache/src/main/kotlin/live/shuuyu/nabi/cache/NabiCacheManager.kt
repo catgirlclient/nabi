@@ -2,10 +2,11 @@ package live.shuuyu.nabi.cache
 
 import dev.kord.core.Kord
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.sync.Mutex
 import live.shuuyu.nabi.cache.entities.*
 import org.redisson.Redisson
-import org.redisson.api.RedissonClient
+import org.redisson.api.RedissonReactiveClient
 import org.redisson.codec.SnappyCodecV2
 import org.redisson.config.Config
 
@@ -15,7 +16,7 @@ class NabiCacheManager(val config: NabiCacheConfig) {
         val config = Config()
         val mutex = Mutex()
     }
-    lateinit var client: RedissonClient
+    lateinit var client: RedissonReactiveClient
     // We will initialize kord before the bot starts, no need to do this when the service starts.
     lateinit var kord: Kord
 
@@ -25,7 +26,7 @@ class NabiCacheManager(val config: NabiCacheConfig) {
     val roles = RoleEntities(client, kord)
     val users = UserEntities(client, kord)
 
-    fun initialize(kord: Kord): RedissonClient {
+    fun initialize(kord: Kord): RedissonReactiveClient {
         val cluster = Companion.config.useClusterServers()
         this.kord = kord
 
@@ -40,17 +41,17 @@ class NabiCacheManager(val config: NabiCacheConfig) {
 
         return Redisson.create(Companion.config.also {
             it.codec = SnappyCodecV2()
-        })
+        }).reactive()
     }
 
     // Clear local cache when the instance stops. This should only be executed during the shutdown phase.
     suspend fun stop() {
         logger.info { "Clearing all cache maps..." }
 
-        channels.parentMap.clear()
-        guilds.parentMap.clear()
-        members.parentMap.clear()
-        roles.parentMap.clear()
-        users.parentMap.clear()
+        channels.parentMap.clearLocalCache().awaitSingle()
+        guilds.parentMap.clearLocalCache().awaitSingle()
+        members.parentMap.clearLocalCache().awaitSingle()
+        roles.parentMap.clearLocalCache().awaitSingle()
+        users.parentMap.clearLocalCache().awaitSingle()
     }
 }

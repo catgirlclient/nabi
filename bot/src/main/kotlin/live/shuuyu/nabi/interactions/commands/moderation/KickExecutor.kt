@@ -15,25 +15,26 @@ import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.builder.message.embed
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
 import live.shuuyu.nabi.NabiCore
+import live.shuuyu.nabi.i18n.Kick
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.MessageUtils
 import live.shuuyu.nabi.utils.MessageUtils.createRespondEmbed
 import live.shuuyu.nabi.utils.UserUtils.getUserAvatar
 
-class KickExecutor(
-    nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), ModerationInteractionWrapper {
-    inner class Options: ApplicationCommandOptions() {
-        val user = user("user", "The supplied user to be kicked from the guild.")
-        val reason = optionalString("reason", "The supplied reason for why the member was kicked. This is an optional argument.")
+class KickExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), ModerationInteractionWrapper {
+    inner class Options: NabiApplicationCommandOptions(language) {
+        val user = user(Kick.Command.UserOptionName, Kick.Command.UserOptionDescription)
+        val reason = optionalString(Kick.Command.ReasonOptionName, Kick.Command.ReasonOptionDescription) {
+            allowedLength = 0..512
+        }
     }
 
     override val options = Options()
