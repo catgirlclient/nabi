@@ -128,6 +128,8 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# All files in relation to Nabi
 nabi.conf
 nabi-config.toml
 postgres.env
+./dashboard/dist/*

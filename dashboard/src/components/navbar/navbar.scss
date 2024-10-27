@@ -1,0 +1,10 @@
+.navbar-blur {
+  backdrop-filter: blur(28px);
+
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 1em
+}

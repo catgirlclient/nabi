@@ -22,7 +22,7 @@ import live.shuuyu.nabi.utils.UserUtils.getUserAvatar
 import live.shuuyu.nabi.utils.UserUtils.getUserBanner
 
 
-interface UserInteractionHandler {
+interface  UserInteractionHandler {
     companion object {
         private val i18n = LanguageManager("./locale/commands/UserInfo.toml")
         val yujin = Snowflake(647675269057871885) // owner

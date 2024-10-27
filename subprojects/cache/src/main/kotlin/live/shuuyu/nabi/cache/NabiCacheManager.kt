@@ -3,7 +3,6 @@ package live.shuuyu.nabi.cache
 import dev.kord.core.Kord
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.sync.Mutex
 import live.shuuyu.nabi.cache.entities.*
 import org.redisson.Redisson
 import org.redisson.api.RedissonReactiveClient
@@ -14,8 +13,8 @@ class NabiCacheManager(val config: NabiCacheConfig) {
     companion object {
         val logger = KotlinLogging.logger {  }
         val config = Config()
-        val mutex = Mutex()
     }
+
     lateinit var client: RedissonReactiveClient
     // We will initialize kord before the bot starts, no need to do this when the service starts.
     lateinit var kord: Kord

@@ -16,21 +16,22 @@
     "million": "^3.1.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.25.1"
+    "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
-    "@iconify/iconify": "^3.1.1",
-    "@types/node": "^22.0.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/node": "^22.8.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
     "@types/react-router-dom": "^5.3.3",
-    "@unocss/vite": "^0.61.5",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@unocss/vite": "^0.63.6",
+    "@unocss/preset-web-fonts": "^0.63.6",
+    "@vitejs/plugin-react": "^4.3.3",
+    "iconify": "^1.4.0",
     "prettier": "^3.3.3",
-    "sass": "^1.77.8",
+    "sass": "^1.80.4",
     "typescript": "^5.4.5",
-    "unocss": "^0.61.5",
-    "vite": "^5.3.4",
-    "vitest": "^2.0.3"
+    "unocss": "^0.63.6",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.3"
   }
 }

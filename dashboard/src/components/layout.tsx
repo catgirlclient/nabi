@@ -1,4 +1,6 @@
 import React, {FC} from "react";
+import Navbar from "./navbar/navbar";
+import Footer from "./footer";
 
 interface LayoutProps {
     title: string;
@@ -9,8 +11,6 @@ interface LayoutProps {
 export const Layout: FC<LayoutProps> = ({ title, description, children}) => {
     let theme = localStorage.getItem("theme");
 
-
-
     return (
         <>
             <head>
@@ -20,6 +20,17 @@ export const Layout: FC<LayoutProps> = ({ title, description, children}) => {
                 <meta property="og:description" content={description}></meta>
 
             </head>
+            <body>
+                <header>
+                    <Navbar />
+                </header>
+
+                <main>{children}</main>
+
+                <footer>
+                    <Footer />
+                </footer>
+            </body>
         </>
     )
 }

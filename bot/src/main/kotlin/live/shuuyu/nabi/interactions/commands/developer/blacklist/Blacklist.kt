@@ -18,7 +18,7 @@ import live.shuuyu.nabi.utils.MessageUtils
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.jetbrains.exposed.sql.upsert
 
-class  Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Blacklist.toml")) {
+class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Blacklist.toml")) {
     inner class Options: ApplicationCommandOptions() {
         val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
         val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription")) {

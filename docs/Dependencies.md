@@ -21,3 +21,10 @@ In the future, we may plan to use the following dependencies:
 ## Discord Library/Frameworks
 * [Kord](https://github.com/kordlib/kord)
 * [Discord InteraKTions](https://github.com/catgirlclient/DiscordInteraKTions)
+
+## Website
+* [React](https://github.com/facebook/react)
+* [MillionJS](https://github.com/aidenybai/million)
+* [Vite](https://github.com/vitejs/vite)
+* [Vitest](https://github.com/vitest-dev/vitest)
+* [UnoCSS](https://github.com/unocss/unocss)

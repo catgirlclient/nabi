@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "allowJs": false,
     "composite": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
