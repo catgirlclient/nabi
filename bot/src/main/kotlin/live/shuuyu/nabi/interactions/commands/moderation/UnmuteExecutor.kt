@@ -1,10 +1,11 @@
 package live.shuuyu.nabi.interactions.commands.moderation
 
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.edit
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
-import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
+import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.request.RestRequestException
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
@@ -14,6 +15,7 @@ import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInterac
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.utils.MessageUtils
 
 class UnmuteExecutor(
     nabi: NabiCore
@@ -44,11 +46,27 @@ class UnmuteExecutor(
     private suspend fun unmuteUser(data: UnmuteData) {
         val (target, executor, guild, reason) = data
 
-        val targetAsMember = target.asMemberOrNull(guild.id) ?: target as? Member
-        val executorAsMember = executor.asMemberOrNull(guild.id) ?: target as? Member
+        val targetAsMember = target.asMember(guild.id)
+        val executorAsMember = executor.asMember(guild.id)
+        val modLogConfigId = database.guild.getGuildSettingsConfig(guild.id.value.toLong())?.loggingConfigId
+        val modLogConfig = database.guild.getLoggingSettingsConfig(modLogConfigId)
 
         try {
-            targetAsMember?.edit {
+            val loggingChannelId = modLogConfig?.channelId
+
+            if (loggingChannelId != null && modLogConfig.logUserUnbans) {
+                val channelIdToSnowflake = Snowflake(loggingChannelId)
+
+                rest.channel.createMessage(
+                    channelIdToSnowflake,
+                    sendModerationLoggingMessage(target, executor, reason, ModerationInteractionWrapper.ModerationType.Unmute)
+                )
+            }
+
+            MessageUtils.directMessageUser(target, nabi, createUnmuteDirectMessageEmbed())
+
+            targetAsMember.edit {
+                this.communicationDisabledUntil = null
                 this.reason = reason
             }
         } catch (e: RestRequestException) {
@@ -66,6 +84,12 @@ class UnmuteExecutor(
         }
 
         return check
+    }
+
+    private fun createUnmuteDirectMessageEmbed(
+
+    ): UserMessageCreateBuilder.() -> (Unit) = {
+
     }
 
     private data class UnmuteData(

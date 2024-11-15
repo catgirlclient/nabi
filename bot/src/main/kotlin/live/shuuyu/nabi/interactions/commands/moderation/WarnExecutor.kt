@@ -10,8 +10,10 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
+import live.shuuyu.discordinteraktions.common.builder.message.embed
 import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.database.tables.member.WarnTable
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
@@ -55,7 +57,7 @@ class WarnExecutor(
         if (successInteractionCheck.isEmpty()) {
             context.ephemeralFail {
                 for (fail in failInteractionCheck) {
-                    buildInteractionFailMessage(fail, this)
+                    buildInteractionFailMessage(fail, context.i18nContext, this)
                 }
             }
         }
@@ -169,12 +171,18 @@ class WarnExecutor(
         return check
     }
 
-    private fun buildInteractionFailMessage(check: WarnInteractionCheck, builder: MessageBuilder) {
+    private fun buildInteractionFailMessage(
+        check: WarnInteractionCheck,
+        i18n: I18nContext,
+        builder: MessageBuilder
+    ) {
         val (target, executor, results) = check
 
         builder.apply {
             when (results) {
-                WarnInteractionResult.INSUFFICIENT_PERMISSIONS -> TODO()
+                WarnInteractionResult.INSUFFICIENT_PERMISSIONS -> embed {
+
+                }
                 WarnInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> TODO()
                 WarnInteractionResult.TARGET_IS_NULL -> TODO()
                 WarnInteractionResult.TARGET_IS_SELF -> TODO()

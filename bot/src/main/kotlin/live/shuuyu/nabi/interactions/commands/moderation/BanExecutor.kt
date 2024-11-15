@@ -123,7 +123,7 @@ class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManage
             builder.apply(resultantEmbed)
         } catch (e: KtorRequestException) {
             val errorMessage: MessageBuilder.() -> (Unit) = {
-                content = "An error has occurred."
+                content = "The command couldn't be successfully executed."
             }
 
             builder.apply(errorMessage)
@@ -221,10 +221,9 @@ class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManage
 
         builder.apply {
             when(result) {
-                BanInteractionResult.INSUFFICIENT_PERMISSIONS -> createRespondEmbed (
-                    i18nContext.get(Ban.Error.PermissionIsMissing),
-                    executor
-                )
+                BanInteractionResult.INSUFFICIENT_PERMISSIONS -> embed {
+
+                }
 
                 BanInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> createRespondEmbed(
                     i18n.get("targetRoleEqualOrHigher"),

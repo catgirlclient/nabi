@@ -40,5 +40,6 @@ include(
     ":subprojects:cache",
     ":subprojects:database",
     ":subprojects:entities",
-    ":subprojects:metrics"
+    ":subprojects:metrics",
+    ":subprojects:scylladb"
 )

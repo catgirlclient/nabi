@@ -1,0 +1,10 @@
+[command]
+name = "remove"
+description = "Removes any set slowmode in the given channel."
+channelOptionName = "channel"
+channelOptionDescription = "The channel you want tto remove the slowmode from."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why the slowmode is being removed."
+
+[error]
+slowmodeIsNull = "There doesn't seem to be a slowmode in this channel!"

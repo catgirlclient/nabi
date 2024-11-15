@@ -4,7 +4,6 @@ import dev.kord.common.entity.ChannelType
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.edit
-import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
@@ -13,19 +12,19 @@ import dev.kord.core.entity.channel.TextChannel
 import dev.kord.rest.request.RestRequestException
 import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import kotlin.time.Duration.Companion.seconds
 
 class SlowmodeRemoveExecutor(
     nabi: NabiCore
 ): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Slowmode.toml")), ModerationInteractionWrapper {
-    inner class Options: ApplicationCommandOptions() {
+    inner class Options: NabiApplicationCommandOptions(language) {
         val channel = optionalChannel(i18n.get("channelOptionName"), i18n.get("channelOptionDescription")) {
             channelTypes = listOf(
                 ChannelType.GuildText,
@@ -48,7 +47,7 @@ class SlowmodeRemoveExecutor(
         context.deferEphemeralChannelMessage()
 
         val data = SlowmodeRemoveData(
-            args[options.channel] ?: Channel.from(ChannelData.from(rest.channel.getChannel(context.channelId)), kord),
+            args[options.channel] ?: fetchChannel(nabi, rest.channel.getChannel(context.channelId)),
             context.sender,
             Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
             args[options.reason]

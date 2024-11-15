@@ -1,6 +1,7 @@
 import React, {FC} from "react";
 import Navbar from "./navbar/navbar";
 import Footer from "./footer";
+import '../styles/global.scss'
 
 interface LayoutProps {
     title: string;
@@ -18,18 +19,11 @@ export const Layout: FC<LayoutProps> = ({ title, description, children}) => {
                 <meta property="og:title" content={title}></meta>
                 <meta property="og:type" content="website"></meta>
                 <meta property="og:description" content={description}></meta>
-
             </head>
             <body>
-                <header>
-                    <Navbar />
-                </header>
-
+                <Navbar />
                 <main>{children}</main>
-
-                <footer>
-                    <Footer />
-                </footer>
+                <Footer />
             </body>
         </>
     )

@@ -1,12 +1,8 @@
 export default function Navbar() {
     return (
-        <nav>
-            <div className="flex grid navbar-blur text-white p-5 fixed z-88 flex-row flex-wrap align-middle justify-center">
-                <ul>
-                    <li>
-
-                    </li>
-                </ul>
+        <nav className="bg-white">
+            <div className="max-w-screen-xl flex flex-wrap items-center justify-center mx-auto p-4">
+                <ul className="flex flex-row justify-start gap-4 max-md:mt-4"></ul>
             </div>
         </nav>
     )

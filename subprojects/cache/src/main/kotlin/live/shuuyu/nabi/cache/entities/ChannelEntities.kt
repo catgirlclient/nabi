@@ -14,6 +14,7 @@ import live.shuuyu.nabi.cache.utils.ChannelKeys
 import org.redisson.api.RLocalCachedMapReactive
 import org.redisson.api.RedissonReactiveClient
 
+// Channel Entities won't follow the same conventions as Member and Roles due to dm channels existing.
 class ChannelEntities (
     client: RedissonReactiveClient,
     val kord: Kord
@@ -21,8 +22,12 @@ class ChannelEntities (
     override val parentMap: RLocalCachedMapReactive<Snowflake, ChannelData> = client.getLocalCachedMap(options)
     private val mutex = Mutex()
 
-    suspend fun contains(channelId: Snowflake): Boolean = mutex.withLock(ChannelKeys(channelId)) {
+    suspend fun containsKey(channelId: Snowflake): Boolean = mutex.withLock(ChannelKeys(channelId)) {
         return@withLock parentMap.containsKey(channelId).awaitSingle()
+    }
+
+    suspend fun containsValue(value: ChannelData): Boolean = mutex.withLock(ChannelKeys(value.id)) {
+        return@withLock parentMap.containsValue(value).awaitSingle()
     }
 
     suspend fun get(channelId: Snowflake): Channel? = mutex.withLock(ChannelKeys(channelId)) {
@@ -38,6 +43,15 @@ class ChannelEntities (
         parentMap.put(channelId, data).awaitFirstOrNull()
 
         return@withLock Channel.from(data, kord)
+    }
+
+    suspend fun replace(
+        channelId: Snowflake,
+        newData: ChannelData
+    ): Channel = mutex.withLock(ChannelKeys(channelId)) {
+        parentMap.replace(channelId, newData).awaitFirstOrNull()
+
+        return@withLock Channel.from(newData, kord)
     }
 
     suspend fun set(

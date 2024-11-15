@@ -17,3 +17,13 @@ targetRoleEqualOrHigher = """
 """
 targetIsNotBanned = "This user is not banned from this guild!"
 targetIsNabi = "You couldn't get rid of me in the first place :))))))"
+
+[embed]
+resultantTitle = "User Unbanned"
+resultantDescription = """
+    A user has been successfully unbanned.
+
+    • **Member:** {member} \n\
+    • **Action:** {action} \n\
+    • **Reason:** {reason}
+"""

@@ -49,5 +49,7 @@ class NabiProjectModule: Plugin<Project> {
                 useJUnitPlatform()
             }
         }
+
+
     }
 }

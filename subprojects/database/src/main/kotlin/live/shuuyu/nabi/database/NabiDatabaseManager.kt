@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory
 import com.zaxxer.hikari.util.IsolationLevel
-import kotlinx.coroutines.sync.Mutex
 import live.shuuyu.nabi.database.manager.GuildManager
 import live.shuuyu.nabi.database.manager.MemberManager
 import live.shuuyu.nabi.database.manager.UserManager
@@ -16,7 +15,6 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 
 public class NabiDatabaseManager(public val config: NabiDatabaseConfig) {
     public companion object {
-        private val mutex = Mutex()
         private const val DRIVER_CLASS_NAME = "org.postgresql.Driver"
     }
 

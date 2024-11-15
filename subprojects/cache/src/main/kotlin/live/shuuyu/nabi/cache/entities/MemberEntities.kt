@@ -22,7 +22,10 @@ class MemberEntities (
     override val parentMap: RLocalCachedMapReactive<Snowflake, MutableMap<Snowflake, MemberData>> = client.getLocalCachedMap(options)
     private val mutex = Mutex()
 
-    suspend fun contains(userId: Snowflake, guildId: Snowflake): Boolean = mutex.withLock(MemberKeys(userId, guildId)) {
+    suspend fun contains(
+        userId: Snowflake,
+        guildId: Snowflake
+    ): Boolean = mutex.withLock(MemberKeys(userId, guildId)) {
         val cachedMemberMap = parentMap[guildId].awaitSingle()
 
         try {

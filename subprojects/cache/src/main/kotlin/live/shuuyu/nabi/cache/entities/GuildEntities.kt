@@ -37,14 +37,21 @@ class GuildEntities (
 
     suspend fun set(guildId: Snowflake, data: GuildData): Guild = mutex.withLock(GuildKeys(guildId)) {
         parentMap.put(guildId, data).awaitSingle()
+        val guild = Guild(data, kord)
 
-        return@withLock Guild(data, kord)
+        return@withLock guild
     }
 
     suspend fun set(guild: DiscordGuild): Guild = set(guild.id, guild.toData())
 
+    suspend fun replace(guildId: Snowflake, newData: GuildData): Guild? = mutex.withLock(GuildKeys(guildId)) {
+        val replacedCachedData = parentMap.replace(guildId, newData).awaitFirstOrNull() ?: return@withLock null
+
+        return@withLock Guild(replacedCachedData, kord)
+    }
+
     suspend fun remove(guildId: Snowflake): GuildData? = mutex.withLock(GuildKeys(guildId)) {
-        return@withLock parentMap.get(guildId).awaitFirstOrNull()
+        return@withLock parentMap.remove(guildId).awaitFirstOrNull()
     }
 
     suspend fun count() = parentMap.size().awaitSingle()
