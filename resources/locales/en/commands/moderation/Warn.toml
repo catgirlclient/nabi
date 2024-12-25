@@ -1,0 +1,24 @@
+[command]
+name = "warn"
+description = "Warns the target with the given parameters."
+userOptionName = "user"
+userOptionDescription = "The user you want to warn. The user must be a user within the server in order to be warned."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why this user is being muted."
+
+[error]
+targetRoleEqualOrHigher = """
+    You can't warn  this member due to having equal to or lower permissions compared to the target. Please make sure
+    your permissions are higher than the target, and try again.
+"""
+targetIsNull = "The user you've specified seems to not be in the server!"
+targetIsOwner = "You can't warn the owner of this server!"
+targetIsNabi = "NO >:("
+targetIsSelf = "You can't warn yourself!"
+
+[embed]
+resultantTitle = "User Warned"
+resultantDescription = """
+    • **User:** {username} - {userMention} - ``{userId}`` \n\
+    • **Reason:** {reason}
+"""

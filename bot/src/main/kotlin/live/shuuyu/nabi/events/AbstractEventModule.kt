@@ -8,6 +8,7 @@ abstract class AbstractEventModule(val nabi: NabiCore) {
     val rest = nabi.rest
     val cache = nabi.cache
     val database = nabi.database
+
     val logger = KotlinLogging.logger {}
 
     abstract suspend fun onEvent(context: EventContext): EventResult

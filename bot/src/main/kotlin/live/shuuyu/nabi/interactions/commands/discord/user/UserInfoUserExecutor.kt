@@ -9,14 +9,12 @@ import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiUserCommandExecutor
 
-class UserInfoUserExecutor(
-    nabi: NabiCore
-): NabiUserCommandExecutor(nabi), UserInteractionHandler {
+class UserInfoUserExecutor(nabi: NabiCore): NabiUserCommandExecutor(nabi), UserInteractionHandler {
     override suspend fun execute(context: NabiApplicationCommandContext, targetUser: User, targetMember: Member?) {
         context.sendMessage {
             val guild = Guild(GuildData.from(rest.guild.getGuild((context as NabiGuildApplicationContext).guildId)), kord)
 
-            createUserInfoMessage(targetUser, guild)
+            createUserInfoMessage(context.i18nContext, targetUser, guild)
         }
     }
 }

@@ -3,6 +3,8 @@ name = "purge"
 description = "Removes the amount of messages supplied."
 countOptionName = "count"
 countOptionDescription = "The number of messages you want to delete."
+channelOptionName = "channel"
+channelOptionDescription = "The channel you want to purge."
 userOptionName = "user"
 userOptionDescription = "Targets the specified user's message."
 reasonOptionName = "reason"
@@ -20,3 +22,6 @@ targetRoleIsEqualOrHigher = """
 
 [embed]
 resultantTitle = "Messages Deleted"
+resultantDescription = """
+    *
+"""

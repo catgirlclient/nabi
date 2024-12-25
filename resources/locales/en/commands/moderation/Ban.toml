@@ -29,9 +29,6 @@ targetIsSelf = "You can't ban yourself!"
 punishmentDescription = "You've been banned from **{guildName}** for **{reason}**."
 resultantTitle = "User Banned"
 resultantDescription = """
-    A user has been sucessfully banned.
-
-    • **Member:** {member} \n\
-    • **Action:** {action} \n\
+    • **User:** {username} - {userMention} - ``{userId}`` \n\
     • **Reason:** {reason}
 """

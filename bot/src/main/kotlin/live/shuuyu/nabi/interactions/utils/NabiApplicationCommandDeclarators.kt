@@ -3,44 +3,59 @@ package live.shuuyu.nabi.interactions.utils
 import dev.kord.common.Locale
 import dev.kord.common.entity.Permissions
 import live.shuuyu.discordinteraktions.common.commands.*
-import live.shuuyu.discordinteraktions.common.commands.MessageCommandDeclaration
+import live.shuuyu.i18n.data.I18nStringData
+import live.shuuyu.nabi.utils.i18n.LanguageManager
 
 class NabiSlashCommandDeclaration(
-    override val name: String,
+    val manager: LanguageManager,
+    val localizedName: I18nStringData,
+    override val nameLocalizations: Map<Locale, String>? = null,
+    val localizedDescription: I18nStringData,
+    override val descriptionLocalizations: Map<Locale, String>? = null,
+    override val executor: SlashCommandExecutor? = null,
     override val defaultMemberPermissions: Permissions?,
-    override val description: String,
-    override val descriptionLocalizations: Map<Locale, String>?,
     override val dmPermission: Boolean?,
-    override val executor: SlashCommandExecutor?,
-    override val nameLocalizations: Map<Locale, String>?,
-    override val nsfw: Boolean?,
+    override val subcommands: List<SlashCommandDeclaration>,
     override val subcommandGroups: List<SlashCommandGroupDeclaration>,
-    override val subcommands: List<SlashCommandDeclaration>
-): SlashCommandDeclaration()
+    override val nsfw: Boolean?
+): SlashCommandDeclaration() {
+    override val name: String = manager.defaultI18nContext.get(localizedName)
+    override val description: String = manager.defaultI18nContext.get(localizedDescription)
+}
 
 class NabiSlashCommandGroupDeclaration(
-    override val name: String,
-    override val description: String,
-    override val descriptionLocalizations: Map<Locale, String>?,
+    val manager: LanguageManager,
+    val localizedName: I18nStringData,
     override val nameLocalizations: Map<Locale, String>?,
-    override val nsfw: Boolean?,
-    override val subcommands: List<SlashCommandDeclaration>
-): SlashCommandGroupDeclaration()
+    val localizedDescription: I18nStringData,
+    override val descriptionLocalizations: Map<Locale, String>?,
+    override val subcommands: List<SlashCommandDeclaration>,
+    override val nsfw: Boolean?
+): SlashCommandGroupDeclaration() {
+    override val name: String = manager.defaultI18nContext.get(localizedName)
+    override val description: String = manager.defaultI18nContext.get(localizedDescription)
+}
 
 class NabiUserCommandDeclaration(
-    override val name: String,
-    override val defaultMemberPermissions: Permissions?,
-    override val dmPermission: Boolean?,
+    val manager: LanguageManager,
+    val localizedName: I18nStringData,
+    override val nameLocalizations: Map<Locale, String>?,
     override val executor: UserCommandExecutor,
-    override val nameLocalizations: Map<Locale, String>?,
-    override val nsfw: Boolean?
-): UserCommandDeclaration()
-
-class MessageCommandDeclaration(
-    override val name: String,
     override val defaultMemberPermissions: Permissions?,
     override val dmPermission: Boolean?,
-    override val executor: MessageCommandExecutor,
-    override val nameLocalizations: Map<Locale, String>?,
     override val nsfw: Boolean?
-): MessageCommandDeclaration()
+): UserCommandDeclaration() {
+    override val name: String = manager.defaultI18nContext.get(localizedName)
+}
+
+class NabiMessageCommandDeclaration(
+    val manager: LanguageManager,
+    val localizedName: I18nStringData,
+    override val nameLocalizations: Map<Locale, String>? = null,
+    override val executor: MessageCommandExecutor,
+    override val defaultMemberPermissions: Permissions?,
+    override val dmPermission: Boolean?,
+    override val nsfw: Boolean?
+): MessageCommandDeclaration() {
+    override val name: String = manager.defaultI18nContext.get(localizedName)
+}

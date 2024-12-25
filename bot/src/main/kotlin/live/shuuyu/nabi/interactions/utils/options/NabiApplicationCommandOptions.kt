@@ -5,7 +5,7 @@ import live.shuuyu.discordinteraktions.common.commands.options.register
 import live.shuuyu.i18n.data.I18nStringData
 import live.shuuyu.nabi.utils.i18n.LanguageManager
 
-abstract class NabiApplicationCommandOptions(val manager: LanguageManager): ApplicationCommandOptions() {
+abstract class NabiApplicationCommandOptions(private val manager: LanguageManager): ApplicationCommandOptions() {
     fun string(
         name: I18nStringData,
         description: I18nStringData,

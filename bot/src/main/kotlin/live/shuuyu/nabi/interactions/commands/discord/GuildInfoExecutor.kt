@@ -8,36 +8,33 @@ import dev.kord.rest.Image
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.embed
-import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
-import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
 import live.shuuyu.nabi.NabiCore
+import live.shuuyu.nabi.i18n.GuildInfo
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.GuildUtils.getGuildIcon
 
-class GuildInfo(
-    nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/GuildInfo.toml")), SlashCommandDeclarationWrapper {
+class GuildInfoExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
     override suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments) {
+        val i18n = context.i18nContext
         val guild = Guild(GuildData.from(rest.guild.getGuild((context as NabiGuildApplicationContext).guildId)), kord)
 
         context.sendMessage {
             embed {
                 title = guild.name
                 field {
-                    name = i18n.get("guildInformationEmbedTitle")
-                    value = i18n.get("guildInformationEmbedDescription", mapOf(
-                        "0" to guild.id,
-                        "1" to guild.owner.mention,
-                        "2" to guild.id.timestamp.toMessageFormat(DiscordTimestampStyle.LongDate),
-                        "3" to guild.members.count(),
-                        "4" to guild.roles.toList().size
+                    name = i18n.get(GuildInfo.Embed.GuildInfoFieldTitle)
+                    value = i18n.get(GuildInfo.Embed.GuildInfoFieldDescription(
+                        guild.id,
+                        guild.owner.mention,
+                        guild.id.timestamp.toMessageFormat(DiscordTimestampStyle.LongDate),
+                        guild.members.count(),
+                        guild.roles.toList().size
                     ))
                 }
                 thumbnailUrl = guild.getGuildIcon(Image.Size.Size512)
@@ -45,11 +42,5 @@ class GuildInfo(
                 timestamp = Clock.System.now()
             }
         }
-    }
-
-    override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
-        dmPermission = false
-
-        executor = this@GuildInfo
     }
 }

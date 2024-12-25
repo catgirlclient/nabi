@@ -4,12 +4,9 @@ import dev.kord.common.annotation.KordExperimental
 import dev.kord.common.annotation.KordUnsafe
 import dev.kord.rest.route.Route
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.actionRow
 import live.shuuyu.discordinteraktions.common.builder.message.embed
-import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
-import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.i18n.NabiInfo
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
@@ -18,9 +15,7 @@ import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.formatBytes
 import java.lang.management.ManagementFactory
 
-class NabiInfo(
-    nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/NabiInfo.toml")), SlashCommandDeclarationWrapper {
+class NabiInfoExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
     @OptIn(KordUnsafe::class, KordExperimental::class)
     override suspend fun execute(context: NabiApplicationCommandContext, args: SlashCommandArguments) {
         val gatewayInfo = nabi.rest.unsafe(Route.GatewayBotGet) {}
@@ -71,9 +66,5 @@ class NabiInfo(
                 }
             }
         }
-    }
-
-    override fun declaration() = slashCommand("info", "Sends useless information about Nabi.") {
-        executor = this@NabiInfo
     }
 }

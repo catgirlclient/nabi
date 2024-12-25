@@ -8,29 +8,27 @@ import dev.kord.core.entity.User
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.builder.message.embed
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.database.tables.member.WarnTable
+import live.shuuyu.nabi.i18n.Warn
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import live.shuuyu.nabi.utils.MessageUtils
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 
-class WarnExecutor(
-    nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Warn.toml")), ModerationInteractionWrapper {
-    inner class Options : ApplicationCommandOptions() {
-        val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
-        val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription")) {
+class WarnExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi), ModerationInteractionWrapper {
+    inner class Options : NabiApplicationCommandOptions(language) {
+        val user = user(Warn.Command.UserOptionName, Warn.Command.UserOptionDescription)
+        val reason = optionalString(Warn.Command.ReasonOptionName, Warn.Command.ReasonOptionDescription) {
             maxLength = 512
         }
     }
@@ -47,7 +45,7 @@ class WarnExecutor(
             context.sender,
             args[options.user],
             Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
-            args[options.reason]
+            args[options.reason] ?: "No reason provided."
         )
 
         val interactionCheck = validate(data)
@@ -67,6 +65,12 @@ class WarnExecutor(
 
     private suspend fun warn(data: WarnData) {
         val (target, executor, guild, reason) = data
+
+        val resultantEmbed: MessageBuilder.() -> (Unit) = {
+            embed {
+
+            }
+        }
 
         val modLogConfigId = database.guild.getGuildSettingsConfig(guild.id.value.toLong())?.loggingConfigId
         val modLogConfig = database.guild.getLoggingSettingsConfig(modLogConfigId)
@@ -195,7 +199,7 @@ class WarnExecutor(
         val target: User,
         val executor: User,
         val guild: Guild,
-        val reason: String?
+        val reason: String
     )
 
     private data class WarnInteractionCheck(

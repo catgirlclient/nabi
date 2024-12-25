@@ -14,7 +14,6 @@ import dev.kord.rest.request.KtorRequestException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.builder.message.embed
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
@@ -30,13 +29,12 @@ import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.GuildUtils.getGuildIcon
 import live.shuuyu.nabi.utils.MessageUtils
-import live.shuuyu.nabi.utils.MessageUtils.createRespondEmbed
 import live.shuuyu.nabi.utils.UserUtils.getUserAvatar
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
-class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Ban.toml")), ModerationInteractionWrapper {
+class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi), ModerationInteractionWrapper {
     inner class Options: NabiApplicationCommandOptions(language) {
         val user = user(Ban.Command.UserOptionName, Ban.Command.UserOptionDescription)
         val reason = optionalString(Ban.Command.ReasonOptionName, Ban.Command.ReasonOptionDescription) {
@@ -59,7 +57,7 @@ class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManage
             args[options.user],
             context.sender,
             Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
-            args[options.reason],
+            args[options.reason] ?: "No reason provided.",
             deleteMessageDuration
         )
 
@@ -87,9 +85,10 @@ class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManage
             embed {
                 description = i18nContext.get(
                     Ban.Embed.ResultantDescription(
-                        target.mention,
                         target.username,
-                        reason ?: "No"
+                        target.mention,
+                        target.id,
+                        reason
                     )
                 )
                 thumbnailUrl = target.getUserAvatar(Image.Size.Size512)
@@ -113,7 +112,7 @@ class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManage
                 )
             }
 
-            MessageUtils.directMessageUser(target, nabi, createDirectMessageEmbed(i18nContext, guild, reason ?: "No reason provided."))
+            MessageUtils.directMessageUser(target, nabi, createDirectMessageEmbed(i18nContext, guild, reason))
 
             guild.ban(target.id) {
                 this.reason = reason
@@ -212,45 +211,31 @@ class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManage
         return check
     }
 
-    private fun buildInteractionFailMessages(
+    private suspend fun buildInteractionFailMessages(
         i18nContext: I18nContext,
         check: BanInteractionCheck,
         builder: MessageBuilder
     ) {
-        val (target, executor, result) = check
+        val (_, _, result) = check
 
         builder.apply {
             when(result) {
-                BanInteractionResult.INSUFFICIENT_PERMISSIONS -> embed {
-
-                }
-
-                BanInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> createRespondEmbed(
-                    i18n.get("targetRoleEqualOrHigher"),
-                    executor
-                )
-
-                BanInteractionResult.DELETE_MESSAGE_DURATION_OUTSIDE_OF_RANGE -> createRespondEmbed(
-                    i18n.get("deleteMessageDurationOutsideRange"),
-                    executor
-                )
-
-                BanInteractionResult.TARGET_IS_OWNER -> createRespondEmbed(
-                    i18n.get("targetIsOwner"),
-                    executor
-                )
-
-                BanInteractionResult.TARGET_IS_SELF -> createRespondEmbed(
-                    i18n.get("targetIsSelf"),
-                    executor
-                )
-
-                BanInteractionResult.SUCCESS -> TODO()
+                BanInteractionResult.INSUFFICIENT_PERMISSIONS -> styled(i18nContext.get(Ban.Error.PermissionIsMissing))
+                BanInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> styled(i18nContext.get(Ban.Error.TargetRoleEqualOrHigher))
+                BanInteractionResult.DELETE_MESSAGE_DURATION_OUTSIDE_OF_RANGE -> styled(i18nContext.get(Ban.Error.DeleteMessageDuration))
+                BanInteractionResult.TARGET_IS_OWNER -> styled(i18nContext.get(Ban.Error.TargetIsOwner))
+                BanInteractionResult.TARGET_IS_NABI -> styled(i18nContext.get(Ban.Error.TargetIsNabi))
+                BanInteractionResult.TARGET_IS_SELF -> styled(i18nContext.get(Ban.Error.TargetIsSelf))
+                BanInteractionResult.SUCCESS -> error("This should always result in a no-operation!")
             }
         }
     }
 
-    private fun createDirectMessageEmbed(i18nContext: I18nContext, guild: Guild, reason: String): UserMessageCreateBuilder.() -> (Unit) = {
+    private fun createDirectMessageEmbed(
+        i18nContext: I18nContext,
+        guild: Guild,
+        reason: String
+    ): UserMessageCreateBuilder.() -> (Unit) = {
         embed {
             description = i18nContext.get(Ban.Embed.PunishmentDescription(guild.name, reason))
             thumbnailUrl = guild.getGuildIcon(Image.Size.Size512)
@@ -263,7 +248,7 @@ class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManage
         val target: User,
         val executor: User,
         val guild: Guild,
-        val reason: String?,
+        val reason: String,
         val deleteMessageDuration: Duration
     )
 
@@ -278,6 +263,7 @@ class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManage
         TARGET_PERMISSION_IS_EQUAL_OR_HIGHER,
         DELETE_MESSAGE_DURATION_OUTSIDE_OF_RANGE,
         TARGET_IS_OWNER,
+        TARGET_IS_NABI,
         TARGET_IS_SELF,
         SUCCESS
     }

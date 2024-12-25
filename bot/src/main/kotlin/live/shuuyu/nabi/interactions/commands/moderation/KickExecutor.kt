@@ -12,11 +12,11 @@ import dev.kord.rest.request.RestRequestException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.builder.message.embed
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.i18n.Kick
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
@@ -26,10 +26,9 @@ import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
 import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.MessageUtils
-import live.shuuyu.nabi.utils.MessageUtils.createRespondEmbed
 import live.shuuyu.nabi.utils.UserUtils.getUserAvatar
 
-class KickExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), ModerationInteractionWrapper {
+class KickExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi), ModerationInteractionWrapper {
     inner class Options: NabiApplicationCommandOptions(language) {
         val user = user(Kick.Command.UserOptionName, Kick.Command.UserOptionDescription)
         val reason = optionalString(Kick.Command.ReasonOptionName, Kick.Command.ReasonOptionDescription) {
@@ -47,7 +46,7 @@ class KickExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManag
             args[options.user],
             context.sender,
             Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
-            args[options.reason]
+            args[options.reason] ?: "No reason provided."
         )
 
         val interactionCheck = validate(data)
@@ -57,26 +56,25 @@ class KickExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManag
         if (successfulInteractionCheck.isEmpty()) {
             context.ephemeralFail {
                 for (fail in failInteractionCheck) {
-                    buildInteractionFailMessage(fail, this)
+                    buildInteractionFailMessage(context.i18nContext, fail, this)
                 }
             }
         }
 
         context.sendMessage {
-            kickUser(data, this)
+            kickUser(context.i18nContext, data, this)
         }
     }
 
-    private suspend fun kickUser(data: KickData, builder: MessageBuilder) {
+    private suspend fun kickUser(i18nContext: I18nContext, data: KickData, builder: MessageBuilder) {
         val (target, executor, guild, reason) = data
 
         val resultantEmbed: MessageBuilder.() -> (Unit) = {
             embed {
-                description = i18n.get("resultantEmbedDescription", mapOf(
-                    "0" to target.mention,
-                    "1" to target.globalName,
-                    "2" to reason
-                ))
+                title = i18nContext.get(Kick.Embed.ResultantTitle)
+                description = i18nContext.get(
+                    Kick.Embed.ResultantDescription(target.username, target.mention, target.id, reason)
+                )
                 thumbnailUrl = target.getUserAvatar(Image.Size.Size512)
                 color = ColorUtils.DEFAULT
                 timestamp = Clock.System.now()
@@ -98,13 +96,17 @@ class KickExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManag
                 )
             }
 
-            MessageUtils.directMessageUser(target, nabi, createKickMessage())
+            MessageUtils.directMessageUser(target, nabi, createDirectMessage())
 
             guild.kick(target.id, reason)
 
             builder.apply(resultantEmbed)
         } catch (e: RestRequestException) {
-            TODO("replace this with an actual error embed.")
+            val errorMessage: MessageBuilder.() -> (Unit) = {
+                content = "The command couldn't be successfully executed."
+            }
+
+            builder.apply(errorMessage)
         }
     }
 
@@ -182,25 +184,26 @@ class KickExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManag
         return check
     }
 
-    private fun buildInteractionFailMessage(check: KickInteractionCheck, builder: MessageBuilder) {
-        val (target, executor, results) = check
+    private suspend fun buildInteractionFailMessage(
+        i18nContext: I18nContext,
+        check: KickInteractionCheck,
+        builder: MessageBuilder
+    ) {
+        val (_, _, results) = check
 
         builder.apply {
             when(results) {
-                KickInteractionResult.INSUFFICIENT_PERMISSIONS -> createRespondEmbed(
-                    i18n.get("insufficientPermissions"),
-                    executor
-                )
-                KickInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> TODO()
-                KickInteractionResult.TARGET_IS_OWNER -> TODO()
-                KickInteractionResult.TARGET_IS_NULL -> TODO()
-                KickInteractionResult.TARGET_IS_SELF -> TODO()
-                KickInteractionResult.SUCCESS -> TODO()
+                KickInteractionResult.INSUFFICIENT_PERMISSIONS -> styled(i18nContext.get(Kick.Error.PermissionIsMissing))
+                KickInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> styled(i18nContext.get(Kick.Error.TargetRoleIsEqualOrHigher))
+                KickInteractionResult.TARGET_IS_OWNER -> styled(i18nContext.get(Kick.Error.TargetIsOwner))
+                KickInteractionResult.TARGET_IS_NULL -> styled(i18nContext.get(Kick.Error.TargetIsNull))
+                KickInteractionResult.TARGET_IS_SELF -> styled(i18nContext.get(Kick.Error.TargetIsSelf))
+                KickInteractionResult.SUCCESS -> error("This should always result in a no-operation!")
             }
         }
     }
 
-    private suspend fun createKickMessage(
+    private suspend fun createDirectMessage(
 
     ): UserMessageCreateBuilder.() -> (Unit) = {
 
@@ -210,7 +213,7 @@ class KickExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManag
         val target: User,
         val executor: User,
         val guild: Guild,
-        val reason: String?
+        val reason: String
     )
 
     private data class KickInteractionCheck(

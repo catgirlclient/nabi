@@ -11,10 +11,12 @@ import dev.kord.core.entity.effectiveName
 import dev.kord.rest.Image
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.builder.message.actionRow
 import live.shuuyu.discordinteraktions.common.builder.message.embed
+import live.shuuyu.i18n.I18nContext
+import live.shuuyu.nabi.i18n.SecretKey
+import live.shuuyu.nabi.i18n.UserInfo
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.MemberUtils.getMemberAvatar
 import live.shuuyu.nabi.utils.MemberUtils.getMemberBanner
@@ -22,54 +24,43 @@ import live.shuuyu.nabi.utils.UserUtils.getUserAvatar
 import live.shuuyu.nabi.utils.UserUtils.getUserBanner
 
 
-interface  UserInteractionHandler {
+interface UserInteractionHandler {
     companion object {
-        private val i18n = LanguageManager("./locale/commands/UserInfo.toml")
         val yujin = Snowflake(647675269057871885) // owner
         val lily = Snowflake(150427554166210560) // owner
         val nicky = Snowflake(347884694408265729) // owner
         val jaminul = Snowflake(234089402777731072) // some random
         val meph = Snowflake(426497602716958731) // another random
+        val azoo = Snowflake(239800573459824641)
     }
 
-    fun createUserInfoMessage(
-        user: User,
-        guild: Guild
-    ): suspend MessageBuilder.() -> (Unit) = {
+    fun createUserInfoMessage(i18nContext: I18nContext, user: User, guild: Guild): suspend MessageBuilder.() -> (Unit) = {
         val userAsMember = user.asMemberOrNull(guild.id) ?: user as? Member
-        val easterEgg = easterEggs(user)
 
         embed {
             title = user.effectiveName
             description = user.publicFlags?.values?.joinToString(separator = " ") { getUserFlags(it) ?: "" }
 
-            if (easterEgg != null) {
-                field {
-                    name = i18n.get("embedEasterEggName")
-                    value = easterEgg
-                }
-            }
-
             field {
-                name = "» User Information"
-                value = i18n.get("embedUserField", mapOf(
-                    "0" to user.mention,
-                    "1" to user.id,
-                    "2" to user.id.timestamp.toMessageFormat(DiscordTimestampStyle.LongDate)
+                name = i18nContext.get(UserInfo.Embed.UserFieldTitle)
+                value = i18nContext.get(UserInfo.Embed.UserFieldDescription(
+                    user.mention,
+                    user.id,
+                    user.id.timestamp.toMessageFormat(DiscordTimestampStyle.LongDate)
                 ))
             }
 
             if (userAsMember != null) {
                 field {
-                    name = "» Member Information"
-                    value = i18n.get("embedMemberField", mapOf(
-                        "0" to (userAsMember.nickname ?: user.effectiveName),
-                        "1" to userAsMember.joinedAt?.toMessageFormat(DiscordTimestampStyle.LongDate)
+                    name = i18nContext.get(UserInfo.Embed.MemberFieldTitle)
+                    value = i18nContext.get(UserInfo.Embed.MemberFieldDescription(
+                        userAsMember.nickname ?: user.effectiveName,
+                        userAsMember.joinedAt?.toMessageFormat(DiscordTimestampStyle.LongDate)!!
                     ))
                 }
 
                 field {
-                    name = "» Roles (${userAsMember.roles.toList().size})"
+                    name = i18nContext.get(UserInfo.Embed.RoleFieldTitle(userAsMember.roles.toList().size))
                     value = userAsMember.roles.toList().sortedByDescending {
                         it.rawPosition
                     }.joinToString(separator = " - ") { it.mention }
@@ -101,13 +92,14 @@ interface  UserInteractionHandler {
         }
     }
 
-    private fun easterEggs(user: User): String? {
+    private fun eastereggMessages(i18nContext: I18nContext, user: User): String? {
         return when (user.id) {
-            yujin -> i18n.get("secretKeyYujin")
-            lily -> i18n.get("secretKeyLily")
-            nicky -> i18n.get("secretKeyNicky")
-            jaminul -> i18n.get("secretKeyJaminul")
-            meph -> i18n.get("secretKeyMeph")
+            yujin -> i18nContext.get(SecretKey.Keys.Yujin)
+            lily -> i18nContext.get(SecretKey.Keys.Lily)
+            nicky -> i18nContext.get(SecretKey.Keys.Nick)
+            jaminul -> i18nContext.get(SecretKey.Keys.Jaminul)
+            meph -> i18nContext.get(SecretKey.Keys.Meph)
+            azoo -> i18nContext.get(SecretKey.Keys.Azoo)
             else -> return null
         }
     }

@@ -4,24 +4,26 @@ import dev.kord.core.entity.User
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
+import live.shuuyu.discordinteraktions.common.builder.message.embed
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.database.tables.user.BlacklistedUserTable
+import live.shuuyu.nabi.i18n.Blacklist
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.MessageUtils
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.jetbrains.exposed.sql.upsert
 
-class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Blacklist.toml")) {
-    inner class Options: ApplicationCommandOptions() {
-        val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
-        val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription")) {
+class BlacklistExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
+    inner class Options: NabiApplicationCommandOptions(language) {
+        val user = user(Blacklist.Command.UserOptionName, Blacklist.Command.UserOptionDescription)
+        val reason = optionalString(Blacklist.Command.ReasonOptionName, Blacklist.Command.ReasonOptionDescription) {
             maxLength = 512
         }
     }
@@ -49,10 +51,10 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
             }
         }
 
-        blacklist(data)
+        blacklist(context.i18nContext, data)
     }
 
-    private suspend fun blacklist(data: BlacklistData) {
+    private suspend fun blacklist(i18nContext: I18nContext, data: BlacklistData) {
         val executor = data.executor
         val target = data.target
         val reason = data.reason
@@ -67,7 +69,7 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
                 }
             }.await()
 
-            MessageUtils.directMessageUser(target, nabi, createBlacklistDirectMessage())
+            MessageUtils.directMessageUser(target, nabi, createBlacklistDirectMessage(i18nContext))
         } catch (e: Exception) {
 
         }
@@ -127,17 +129,17 @@ class Blacklist(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager(
 
         builder.apply {
             when(result) {
-                BlacklistInteractionResults.EXECUTOR_IS_NOT_DEVELOPER -> i18n.get("executorIsNotDeveloper")
-                BlacklistInteractionResults.TARGET_IS_DEVELOPER -> i18n.get("targetIsDeveloper")
-                BlacklistInteractionResults.TARGET_IS_SELF -> i18n.get("targetIsSelf")
+                BlacklistInteractionResults.EXECUTOR_IS_NOT_DEVELOPER -> embed {  }
+                BlacklistInteractionResults.TARGET_IS_DEVELOPER -> embed {  }
+                BlacklistInteractionResults.TARGET_IS_SELF -> embed {  }
                 BlacklistInteractionResults.SUCCESS -> ""
             }
         }
     }
 
-    private fun createBlacklistDirectMessage(): UserMessageCreateBuilder.() -> (Unit) = {
+    private fun createBlacklistDirectMessage(i18nContext: I18nContext): UserMessageCreateBuilder.() -> (Unit) = {
         embed {
-            description = i18n.get("directMessageDescription")
+            description = i18nContext.get(Blacklist.Command.Description)
             color = ColorUtils.ERROR
             timestamp = Clock.System.now()
         }

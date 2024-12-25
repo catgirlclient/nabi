@@ -1,0 +1,8 @@
+[command]
+name = "count"
+description = "Displays the amount of warns the user currently possesses."
+userOptionName = "user"
+userOptionDescription = "The user you want to look up."
+
+[embed]
+resultantTitle = ""

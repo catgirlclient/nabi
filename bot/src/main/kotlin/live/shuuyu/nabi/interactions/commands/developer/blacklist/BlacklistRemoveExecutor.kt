@@ -1,7 +1,6 @@
 package live.shuuyu.nabi.interactions.commands.developer.blacklist
 
 import dev.kord.core.entity.User
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.database.tables.user.BlacklistedUserTable
@@ -13,7 +12,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 
-class BlacklistRemove(nabi: NabiCore): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/BlacklistRemove.toml")) {
+class BlacklistRemoveExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
     inner class Options: NabiApplicationCommandOptions(language) {
         val user = user(Blacklist.Command.UserOptionName, Blacklist.Command.UserOptionDescription)
     }

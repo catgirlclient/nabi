@@ -17,5 +17,4 @@ public object GuildSettingsTable: LongIdTable() {
     public val leaveSettings: Column<EntityID<Long>?> = optReference("leave_settings", LeaveChannelSettingsTable, onDelete = ReferenceOption.CASCADE)
     public val showPunishmentMessage: Column<Boolean> = bool("show_punishment_message").default(true)
     public val directMessageUser: Column<Boolean> = bool("direct_message_user").default(true)
-
 }

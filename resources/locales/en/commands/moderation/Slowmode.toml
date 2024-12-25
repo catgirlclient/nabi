@@ -22,9 +22,7 @@ invalidChannelFormat = "You can't slow the messages in this type of channel!"
 [embed]
 successTitle = "Channel Ratelimited"
 successDescription = """
-    The channel has been successfully ratelimited. \n\
-
-    • **Channel:** {channelMention} ``{channelId}`` \n\
+    • **Channel:** {channelName} - {channelMention} - ``{channelId}`` \n\
     • **Ratelimit Duration:** {duration} \n\
     • **Reason:** {reason}
 """

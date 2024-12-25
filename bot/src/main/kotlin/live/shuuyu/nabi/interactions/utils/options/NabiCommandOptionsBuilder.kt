@@ -15,9 +15,9 @@ abstract class NabiStringCommandOptionBuilderBase<T>(
     override val required: Boolean
 ): StringCommandOptionBuilderBase<T>() {
     override val name: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
     override val description: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
 
     override fun build(): StringCommandOption = NabiStringCommandOption(
         manager,
@@ -52,9 +52,9 @@ abstract class NabiIntegerCommandOptionBuilderBase<T>(
     override val required: Boolean
 ): IntegerCommandOptionBuilderBase<T>() {
     override val name: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
     override val description: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
 
     override fun build(): IntegerCommandOption = NabiIntegerCommandOption(
         manager,
@@ -89,9 +89,9 @@ abstract class NabiNumberCommandOptionBuilderBase<T>(
     override val required: Boolean
 ): NumberCommandOptionBuilderBase<T>() {
     override val name: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
     override val description: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
 
     override fun build(): NumberCommandOption = NabiNumberCommandOption(
         manager,
@@ -126,9 +126,9 @@ abstract class NabiBooleanCommandOptionBuilderBase<T>(
     override val required: Boolean
 ): BooleanCommandOptionBuilderBase<T>() {
     override val name: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
     override val description: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
 
     override fun build(): BooleanCommandOption = NabiBooleanCommandOption(
         manager,
@@ -159,9 +159,9 @@ abstract class NabiUserCommandOptionBuilderBase<T>(
     override val required: Boolean
 ): UserCommandOptionBuilderBase<T>() {
     override val name: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
     override val description: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
 
     override fun build(): UserCommandOption = NabiUserCommandOption (
         manager,
@@ -225,9 +225,9 @@ abstract class NabiChannelCommandOptionBuilderBase<T>(
     override val required: Boolean
 ): ChannelCommandOptionBuilderBase<T>() {
     override val name: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
     override val description: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
 
     override fun build(): ChannelCommandOption = NabiChannelCommandOption(
         manager,
@@ -259,9 +259,9 @@ abstract class NabiMentionableCommandOptionBuilderBase<T>(
     override val required: Boolean
 ): MentionableCommandOptionBuilderBase<T>() {
     override val name: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
     override val description: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
 
     override fun build(): MentionableCommandOption = NabiMentionableCommandOption(
         manager,
@@ -292,9 +292,9 @@ abstract class NabiAttachmentCommandOptionBuilderBase<T>(
     override val required: Boolean
 ): AttachmentCommandOptionBuilderBase<T>() {
     override val name: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
     override val description: String
-        get() = TODO("Not yet implemented")
+        get() = error("This will result in a no-op! Please use the localized version of this.")
 
     override fun build(): AttachmentCommandOption = NabiAttachmentCommandOption(
         manager,

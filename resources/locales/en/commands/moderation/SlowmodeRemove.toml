@@ -8,3 +8,10 @@ reasonOptionDescription = "The reason why the slowmode is being removed."
 
 [error]
 slowmodeIsNull = "There doesn't seem to be a slowmode in this channel!"
+
+[embed]
+resultantTitle = "Slowmode Removed"
+resultantDescription = """
+    • **Channel:** {channelName} - {channelMention} - ``{channelId}`` \n\
+    • **Reason:** {reason}
+"""

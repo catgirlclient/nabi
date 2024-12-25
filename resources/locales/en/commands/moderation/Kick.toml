@@ -24,6 +24,6 @@ targetIsSelf = "You can't kick yourself!"
 punishmentDescription = "You've been kicked from **{guildName}** for **{reason}**."
 resultantTitle = "User Kicked"
 resultantDescription = """
-    • **User:** {username} - {userMention} - {userId} \n\
+    • **User:** {username} - {userMention} - ``{userId}`` \n\
     • **Reason:** {reason}
 """
