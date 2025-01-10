@@ -1,0 +1,21 @@
+[package]
+name = "nabi-api"
+version.workspace = true
+rust-version.workspace = true
+description.workspace = true
+edition.workspace = true
+resolver = "2"
+
+[dependencies]
+anyhow = "1.0.95"
+axum = "0.8.1"
+dotenvy = "0.15.7"
+log = "0.4.22"
+env_logger = "0.11.6"
+scylla = "0.15.1"
+thiserror = "2.0.9"
+tokio = { version = "1.42.0", features = ["full"] }
+tower = { version = "0.5.2", features = ["full"] }
+tower-http = "0.6.2"
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"

@@ -1,0 +1,8 @@
+[workspace]
+members = ["api"]
+
+[workspace.package]
+version = "0.0.1"
+description = "A versatile bot in the likes of ease and execution."
+rust-version = "1.83.0"
+edition = "2021"

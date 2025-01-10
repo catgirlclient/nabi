@@ -32,7 +32,7 @@ plugins {
 rootProject.name = "nabi"
 
 include(
-    ":api",
+    // ":api",
     ":bot",
     ":bot:gateway",
     ":common",

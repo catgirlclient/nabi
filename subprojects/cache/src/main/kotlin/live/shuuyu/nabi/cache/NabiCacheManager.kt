@@ -6,7 +6,7 @@ import kotlinx.coroutines.reactive.awaitSingle
 import live.shuuyu.nabi.cache.entities.*
 import org.redisson.Redisson
 import org.redisson.api.RedissonReactiveClient
-import org.redisson.codec.SnappyCodecV2
+import org.redisson.codec.ZStdCodec
 import org.redisson.config.Config
 
 class NabiCacheManager(val config: NabiCacheConfig) {
@@ -39,7 +39,7 @@ class NabiCacheManager(val config: NabiCacheConfig) {
         cluster.isKeepAlive = true
 
         return Redisson.create(Companion.config.also {
-            it.codec = SnappyCodecV2()
+            it.codec = ZStdCodec()
         }).reactive()
     }
 
