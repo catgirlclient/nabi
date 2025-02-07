@@ -6,6 +6,7 @@ hikari = "5.1.0" # https://github.com/brettwooldridge/HikariCP
 icu4j = "75.1" # https://github.com/unicode-org/icu
 interaktions = "0.1.2" # https://github.com/catgirlclient/DiscordInteraKTions
 jackson = "2.18.0" # https://github.com/FasterXML/jackson-databind
+jib = "3.4.4" # https://github.com/GoogleContainerTools/jib/blob/master/jib-gradle-plugin
 junit = "5.11.2" # https://github.com/junit-team/junit5
 kotlin = "2.0.21" # https://github.com/JetBrains/kotlin
 ktor = "2.3.12" # https://github.com/ktorio/ktor
@@ -138,3 +139,7 @@ caching = ["caffeine-core", "redisson"]
 logger = ["slf4j-api", "slf4j-simple"]
 test = ["container", "container-junit", "junit-jupiter"]
 buildLogic = ["kotlin-plugin", "kotlin-serialization-plugin"]
+
+[plugins]
+jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

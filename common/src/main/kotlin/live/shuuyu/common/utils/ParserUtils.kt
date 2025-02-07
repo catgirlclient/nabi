@@ -1,7 +1,7 @@
 package live.shuuyu.common.utils
 
 import com.akuleshov7.ktoml.Toml
-import kotlinx.serialization.decodeFromString
+import com.akuleshov7.ktoml.source.decodeFromStream
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -20,7 +20,7 @@ public object ParserUtils {
         if (!file.exists())
             return null
 
-        return toml.decodeFromString<T>(file.readText(Charsets.UTF_8))
+        return toml.decodeFromStream<T>(file.inputStream())
     }
 
     public inline fun <reified T> readOrWriteConfig(file: File): T = readConfig<T>(file) ?: run {

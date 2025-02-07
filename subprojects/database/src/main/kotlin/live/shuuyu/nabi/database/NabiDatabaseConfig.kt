@@ -7,5 +7,4 @@ public data class NabiDatabaseConfig (
     val jdbcUrl: String,
     val jdbcUsername: String,
     val jdbcPassword: String,
-    val port: String? = "9042",
 )

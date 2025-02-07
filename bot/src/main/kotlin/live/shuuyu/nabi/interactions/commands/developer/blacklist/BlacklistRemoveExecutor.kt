@@ -51,8 +51,6 @@ class BlacklistRemoveExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
                     BlacklistRemoveResult.EXECUTOR_IS_NOT_DEVELOPER
                 )
             )
-
-
         }
 
         return check
