@@ -5,7 +5,8 @@ import live.shuuyu.plugins.i18n.utils.ParserType
 plugins {
     id("live.shuuyu.plugins.module")
     id("live.shuuyu.plugins.i18n")
-    id("com.gradleup.shadow") version libs.versions.shadow
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.jib)
 }
 
 description = "Core packages that allow Nabi to function."
@@ -25,6 +26,7 @@ dependencies {
     implementation(project(":subprojects:cache"))
     implementation(project(":subprojects:database"))
     implementation(project(":subprojects:metrics"))
+    implementation(project(":subprojects:scylladb"))
     implementation(project(":common"))
 
     implementation(libs.bundles.kotlin)
@@ -60,5 +62,11 @@ tasks {
 
     test {
         useJUnitPlatform()
+    }
+}
+
+jib {
+    container {
+        mainClass = "live.shuuyu.nabi.NabiLauncher"
     }
 }

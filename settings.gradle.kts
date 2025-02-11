@@ -32,7 +32,7 @@ plugins {
 rootProject.name = "nabi"
 
 include(
-    ":api",
+    // ":api",
     ":bot",
     ":bot:gateway",
     ":common",
@@ -40,5 +40,6 @@ include(
     ":subprojects:cache",
     ":subprojects:database",
     ":subprojects:entities",
-    ":subprojects:metrics"
+    ":subprojects:metrics",
+    ":subprojects:scylladb"
 )

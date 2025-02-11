@@ -9,7 +9,7 @@ repositories {
 }
 
 tasks.wrapper {
-    gradleVersion = "8.10.2"
+    gradleVersion = "8.12.1"
     distributionType = Wrapper.DistributionType.ALL
 }
 

@@ -4,20 +4,22 @@ container = "1.20.2" # https://central.sonatype.com/artifact/org.testcontainers/
 exposed = "0.55.0" # https://github.com/JetBrains/Exposed
 hikari = "5.1.0" # https://github.com/brettwooldridge/HikariCP
 icu4j = "75.1" # https://github.com/unicode-org/icu
-interaktions = "0.1.1" # https://github.com/catgirlclient/DiscordInteraKTions
+interaktions = "0.1.2" # https://github.com/catgirlclient/DiscordInteraKTions
 jackson = "2.18.0" # https://github.com/FasterXML/jackson-databind
+jib = "3.4.4" # https://github.com/GoogleContainerTools/jib/blob/master/jib-gradle-plugin
 junit = "5.11.2" # https://github.com/junit-team/junit5
-kotlin = "2.0.20" # https://github.com/JetBrains/kotlin
+kotlin = "2.0.21" # https://github.com/JetBrains/kotlin
 ktor = "2.3.12" # https://github.com/ktorio/ktor
 kaml = "0.61.0" # https://github.com/charleskorn/kaml
-kord = "0.15.0-SNAPSHOT" # https://github.com/kordlib/kord
+kord = "0.16.0-SNAPSHOT" # https://github.com/kordlib/kord
 kotlin-coroutines = "1.9.0" # https://github.com/Kotlin/kotlinx.coroutines
 kotlin-serialization = "1.7.3" # https://github.com/Kotlin/kotlinx.serialization
 kotlin-poet = "1.18.1" # https://github.com/square/kotlinpoet
 ktoml = "0.5.2" # https://github.com/orchestr7/ktoml
 postgresql = "42.7.4" # https://github.com/pgjdbc/pgjdbc
 prometheus = "1.3.1" # https://github.com/prometheus/client_java
-redisson = "3.37.0" # https://github.com/redisson/redisson
+redisson = "3.41.0" # https://github.com/redisson/redisson
+scylladb-driver = "4.18.0.1" # https://github.com/scylladb/java-driver
 shadow = "8.3.3"
 slf4j = "2.0.16" # https://github.com/qos-ch/slf4j
 
@@ -25,6 +27,7 @@ slf4j = "2.0.16" # https://github.com/qos-ch/slf4j
 # Default Kotlin Libraries
 kotlin-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlin-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlin-coroutines" }
 
 # Discord libraries/frameworks
 kord-common = { module = "dev.kord:kord-core", version.ref = "kord" }
@@ -41,6 +44,10 @@ exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "e
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
+
+scylladb-driver-core = { module = "com.scylladb:java-driver-core", version.ref = "scylladb-driver" }
+scylladb-driver-query-builder = { module = "com.scylladb:java-driver-query-builder", version.ref = "scylladb-driver" }
+scylladb-driver-mapper-runtime = { module = "com.scylladb:java-driver-mapper-runtime", version.ref = "scylladb-driver" }
 
 # Caching
 caffeine-core = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
@@ -86,7 +93,7 @@ kotlin-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 [bundles]
-kotlin = ["kotlin-serialization-core", "kotlin-coroutines-core"]
+kotlin = ["kotlin-serialization-core", "kotlin-coroutines-core", "kotlin-coroutines-reactive"]
 
 discord = [
     "kord-common",
@@ -104,6 +111,12 @@ database = [
     "exposed-dao",
     "exposed-jdbc",
     "exposed-kotlin-datetime"
+]
+
+scylladb = [
+    "scylladb-driver-core",
+    "scylladb-driver-query-builder",
+    "scylladb-driver-mapper-runtime"
 ]
 
 i18n = ["icu4j", "kaml", "kotlin-poet", "ktoml-core", "ktoml-file"]
@@ -126,3 +139,7 @@ caching = ["caffeine-core", "redisson"]
 logger = ["slf4j-api", "slf4j-simple"]
 test = ["container", "container-junit", "junit-jupiter"]
 buildLogic = ["kotlin-plugin", "kotlin-serialization-plugin"]
+
+[plugins]
+jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

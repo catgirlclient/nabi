@@ -1,0 +1,25 @@
+[command]
+name = "unmute"
+description = "Removes the timeout status from the given user."
+userOptionName = "user"
+userOptionDescription = "The user you want to remove the timeout from."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why the user is being unmuted."
+
+[error]
+permissionIsMissing = """
+    Nabi is currently missing the `MODERATE_MEMBERS` permission. Please check if Nabi has the required permissions
+    to execute the commands, and try again.
+"""
+targetRoleEqualOrHigher = """
+    You can't unmute this member due to having equal to or lower permissions compared to the target. Please make sure
+    your permissions are higher than the target, and try again.
+"""
+targetIsNotTimedOut = "This user isn't timed out!"
+
+[embed]
+resultantTitle = "User Unmuted"
+resultantDescription = """
+    • **User:** {username} - {userMention} - ``{userId}`` \n\
+    • **Reason:** {reason}
+"""

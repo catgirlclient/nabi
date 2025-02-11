@@ -1,17 +1,15 @@
 package live.shuuyu.nabi.interactions.commands.discord.user
 
-import live.shuuyu.common.locale.LanguageManager
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.nabi.NabiCore
+import live.shuuyu.nabi.i18n.UserAvatar
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 
-class UserAvatarSlashExecutor(
-    nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/UserAvatar.toml")), UserInteractionHandler {
-    inner class Options: ApplicationCommandOptions() {
-        val user = optionalUser(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
+class UserAvatarSlashExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi), UserInteractionHandler {
+    inner class Options: NabiApplicationCommandOptions(language) {
+        val user = optionalUser(UserAvatar.Command.Name, UserAvatar.Command.Description)
     }
 
     override val options = Options()

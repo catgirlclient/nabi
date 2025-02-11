@@ -11,9 +11,19 @@ permissionIsMissing = """
     Nabi is currently missing the `KICK_MEMBERS` permission. Please check if Nabi has the required permissions
     to execute the commands, and try again.
 """
+targetRoleIsEqualOrHigher = """
+    You can't kick this member due to insufficient permissions. Please make sure your permissions is higher than
+    the person you're trying to kick, and try again.
+"""
 targetIsNull = "The user you've specified seems to not be in the server!"
 targetIsOwner = "You can't kick the owner of this server!"
 targetIsNabi = "CEASE >:("
 targetIsSelf = "You can't kick yourself!"
 
 [embed]
+punishmentDescription = "You've been kicked from **{guildName}** for **{reason}**."
+resultantTitle = "User Kicked"
+resultantDescription = """
+    • **User:** {username} - {userMention} - ``{userId}`` \n\
+    • **Reason:** {reason}
+"""

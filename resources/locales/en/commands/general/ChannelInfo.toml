@@ -1,0 +1,14 @@
+[command]
+name = "channel"
+description = "Provides information on the sequestered channel."
+channelOptionName = "channel"
+channelOptionDescription = "The channel you want to look up. Defaults to your current channel if a channel is not specified."
+
+[error]
+channelNotFound = "There doesn't seem to be a channel with the id: **{channelId}**."
+
+[embed]
+channelInfoDescription = """
+    • **Channel ID:** {channelId} \n\
+    • **Creation Date:** {date} \n\
+"""

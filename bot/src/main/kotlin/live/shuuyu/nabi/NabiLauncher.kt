@@ -31,8 +31,7 @@ object NabiLauncher {
             NabiDatabaseConfig(
                 result.database.jdbcUrl,
                 result.database.jdbcUsername,
-                result.database.jdbcPassword,
-                result.database.port
+                result.database.jdbcPassword
             ),
             NabiCacheConfig(
                 result.cache.addresses,

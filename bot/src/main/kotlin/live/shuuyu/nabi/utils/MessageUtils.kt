@@ -22,7 +22,7 @@ object MessageUtils {
         builder: MultipartMessageCreateRequest
     ) {
         val rest = nabi.rest
-        val dmChannelId = nabi.cache.channels[user.getDmChannel().id]?.id  ?: nabi.rest.user.createDM(DMCreateRequest(user.id)).id
+        val dmChannelId = nabi.cache.channels.get(user.getDmChannel().id)?.id  ?: nabi.rest.user.createDM(DMCreateRequest(user.id)).id
         try {
             rest.channel.createMessage(dmChannelId, builder)
         } catch (e: RestRequestException) {

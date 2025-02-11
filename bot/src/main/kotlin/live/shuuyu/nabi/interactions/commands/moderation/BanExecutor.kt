@@ -14,36 +14,33 @@ import dev.kord.rest.request.KtorRequestException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.builder.message.embed
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
+import live.shuuyu.nabi.i18n.Ban
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.GuildUtils.getGuildIcon
 import live.shuuyu.nabi.utils.MessageUtils
-import live.shuuyu.nabi.utils.MessageUtils.createRespondEmbed
 import live.shuuyu.nabi.utils.UserUtils.getUserAvatar
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
-class BanExecutor(
-    nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Ban.toml")), ModerationInteractionWrapper {
-    inner class Options: ApplicationCommandOptions() {
-        val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
-        val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription"))
-        val deleteMessageDuration = optionalString(
-            i18n.get("deleteMessageDurationOptionName"),
-            i18n.get("deleteMessageDurationOptionDescription")
-        )
+class BanExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi), ModerationInteractionWrapper {
+    inner class Options: NabiApplicationCommandOptions(language) {
+        val user = user(Ban.Command.UserOptionName, Ban.Command.UserOptionDescription)
+        val reason = optionalString(Ban.Command.ReasonOptionName, Ban.Command.ReasonOptionDescription) {
+            allowedLength = 0..512
+        }
+        val deleteMessageDuration = optionalString(Ban.Command.DurationOptionName, Ban.Command.DurationOptionDescription)
     }
 
     override val options = Options()
@@ -60,7 +57,7 @@ class BanExecutor(
             args[options.user],
             context.sender,
             Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
-            args[options.reason],
+            args[options.reason] ?: "No reason provided.",
             deleteMessageDuration
         )
 
@@ -71,26 +68,29 @@ class BanExecutor(
         if (successInteractionCheck.isEmpty()) {
             context.ephemeralFail {
                 for (fail in failInteractionCheck) {
-                    buildInteractionFailMessages(fail, this)
+                    buildInteractionFailMessages(context.i18nContext, fail, this)
                 }
             }
         }
 
         context.sendMessage {
-            banUser(data, this)
+            banUser(context.i18nContext, data, this)
         }
     }
 
-    private suspend fun banUser(data: BanData, builder: MessageBuilder) {
+    private suspend fun banUser(i18nContext: I18nContext, data: BanData, builder: MessageBuilder) {
         val (target, executor, guild, reason, deleteMessageDuration) = data
 
         val resultantEmbed: MessageBuilder.() -> (Unit) = {
             embed {
-                description = i18n.get("resultantEmbedDescription", mapOf(
-                    "0" to target.mention,
-                    "1" to target.globalName,
-                    "2" to reason
-                ))
+                description = i18nContext.get(
+                    Ban.Embed.ResultantDescription(
+                        target.username,
+                        target.mention,
+                        target.id,
+                        reason
+                    )
+                )
                 thumbnailUrl = target.getUserAvatar(Image.Size.Size512)
                 color = ColorUtils.DEFAULT
                 timestamp = Clock.System.now()
@@ -112,7 +112,7 @@ class BanExecutor(
                 )
             }
 
-            MessageUtils.directMessageUser(target, nabi, createDirectMessageEmbed(guild, reason))
+            MessageUtils.directMessageUser(target, nabi, createDirectMessageEmbed(i18nContext, guild, reason))
 
             guild.ban(target.id) {
                 this.reason = reason
@@ -122,7 +122,7 @@ class BanExecutor(
             builder.apply(resultantEmbed)
         } catch (e: KtorRequestException) {
             val errorMessage: MessageBuilder.() -> (Unit) = {
-                content = "An error has occurred."
+                content = "The command couldn't be successfully executed."
             }
 
             builder.apply(errorMessage)
@@ -211,45 +211,33 @@ class BanExecutor(
         return check
     }
 
-    private fun buildInteractionFailMessages(check: BanInteractionCheck, builder: MessageBuilder) {
-        val (target, executor, result) = check
+    private suspend fun buildInteractionFailMessages(
+        i18nContext: I18nContext,
+        check: BanInteractionCheck,
+        builder: MessageBuilder
+    ) {
+        val (_, _, result) = check
 
         builder.apply {
             when(result) {
-                BanInteractionResult.INSUFFICIENT_PERMISSIONS -> createRespondEmbed (
-                    i18n.get("insufficientPermissions"),
-                    executor
-                )
-
-                BanInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> createRespondEmbed(
-                    i18n.get("targetRoleEqualOrHigher"),
-                    executor
-                )
-
-                BanInteractionResult.DELETE_MESSAGE_DURATION_OUTSIDE_OF_RANGE -> createRespondEmbed(
-                    i18n.get("deleteMessageDurationOutsideRange"),
-                    executor
-                )
-
-                BanInteractionResult.TARGET_IS_OWNER -> createRespondEmbed(
-                    i18n.get("targetIsOwner"),
-                    executor
-                )
-
-                BanInteractionResult.TARGET_IS_SELF -> createRespondEmbed(
-                    i18n.get("targetIsSelf"),
-                    executor
-                )
-
-                BanInteractionResult.SUCCESS -> TODO()
+                BanInteractionResult.INSUFFICIENT_PERMISSIONS -> styled(i18nContext.get(Ban.Error.PermissionIsMissing))
+                BanInteractionResult.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> styled(i18nContext.get(Ban.Error.TargetRoleEqualOrHigher))
+                BanInteractionResult.DELETE_MESSAGE_DURATION_OUTSIDE_OF_RANGE -> styled(i18nContext.get(Ban.Error.DeleteMessageDuration))
+                BanInteractionResult.TARGET_IS_OWNER -> styled(i18nContext.get(Ban.Error.TargetIsOwner))
+                BanInteractionResult.TARGET_IS_NABI -> styled(i18nContext.get(Ban.Error.TargetIsNabi))
+                BanInteractionResult.TARGET_IS_SELF -> styled(i18nContext.get(Ban.Error.TargetIsSelf))
+                BanInteractionResult.SUCCESS -> error("This should always result in a no-operation!")
             }
         }
     }
 
-    private fun createDirectMessageEmbed(guild: Guild, reason: String?): UserMessageCreateBuilder.() -> (Unit) = {
+    private fun createDirectMessageEmbed(
+        i18nContext: I18nContext,
+        guild: Guild,
+        reason: String
+    ): UserMessageCreateBuilder.() -> (Unit) = {
         embed {
-            title = i18n.get("punishmentEmbedTitle")
-            description = i18n.get("punishmentEmbedDescription", mapOf("0" to guild.name, "1" to reason))
+            description = i18nContext.get(Ban.Embed.PunishmentDescription(guild.name, reason))
             thumbnailUrl = guild.getGuildIcon(Image.Size.Size512)
             color = ColorUtils.BAN_COLOR
             timestamp = Clock.System.now()
@@ -260,7 +248,7 @@ class BanExecutor(
         val target: User,
         val executor: User,
         val guild: Guild,
-        val reason: String?,
+        val reason: String,
         val deleteMessageDuration: Duration
     )
 
@@ -275,6 +263,7 @@ class BanExecutor(
         TARGET_PERMISSION_IS_EQUAL_OR_HIGHER,
         DELETE_MESSAGE_DURATION_OUTSIDE_OF_RANGE,
         TARGET_IS_OWNER,
+        TARGET_IS_NABI,
         TARGET_IS_SELF,
         SUCCESS
     }

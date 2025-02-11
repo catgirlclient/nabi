@@ -15,7 +15,8 @@ export function Disclosures() {
             question: <>Can I self-host Nabi for my own server?</>,
             answer: (
                 <>
-                    
+                    Yes! However, keep in mind you'll receive next to no support from the developers
+                    of Nabi if her code decides to break at any point in her lifetime.
                 </>
             )
         }

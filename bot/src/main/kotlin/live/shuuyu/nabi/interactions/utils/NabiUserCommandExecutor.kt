@@ -6,15 +6,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import live.shuuyu.common.locale.LanguageManager
+import live.shuuyu.common.Language
 import live.shuuyu.discordinteraktions.common.commands.ApplicationCommandContext
 import live.shuuyu.discordinteraktions.common.commands.UserCommandExecutor
 import live.shuuyu.nabi.NabiCore
 
-abstract class NabiUserCommandExecutor(
-    val nabi: NabiCore,
-    val i18n: LanguageManager
-): UserCommandExecutor(), NabiCommandHandler {
+abstract class NabiUserCommandExecutor(val nabi: NabiCore): UserCommandExecutor(), NabiCommandHandler {
     val kord = nabi.kord
     val rest = nabi.rest
     val database = nabi.database
@@ -35,7 +32,7 @@ abstract class NabiUserCommandExecutor(
         targetUser: User,
         targetMember: Member?
     ) {
-        val i18nContext = nabi.language.getI18nContext(null)
+        val i18nContext = nabi.language.getI18nContext(Language.ENGLISH)
         val ctx = handleCommandContext(nabi, context, i18nContext)
 
         try {

@@ -4,37 +4,34 @@ import dev.kord.common.entity.ChannelType
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.edit
-import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.Channel
 import dev.kord.core.entity.channel.TextChannel
-import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
-import dev.kord.rest.builder.message.embed
 import dev.kord.rest.request.RestRequestException
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
+import live.shuuyu.discordinteraktions.common.builder.message.embed
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
+import live.shuuyu.nabi.i18n.Slowmode
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import live.shuuyu.nabi.utils.ColorUtils
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
-class SlowmodeExecutor(
-    nabi: NabiCore
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Slowmode.toml")), ModerationInteractionWrapper {
-    inner class Options: ApplicationCommandOptions() {
+class SlowmodeExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi), ModerationInteractionWrapper {
+    inner class Options: NabiApplicationCommandOptions(language) {
         // oPtIoNaL aRgS cAn'T bE oN tOp (said discord)
-        val duration = string(i18n.get("durationOptionName"), i18n.get("durationOptionDescription"))
-        val channel = optionalChannel(i18n.get("channelOptionName"), i18n.get("channelOptionDescription")) {
+        val duration = string(Slowmode.Command.DurationOptionName, Slowmode.Command.DurationOptionDescrtiption)
+        val channel = optionalChannel(Slowmode.Command.ChannelOptionName, Slowmode.Command.ChannelOptionDescription) {
             channelTypes = listOf(
                 ChannelType.GuildText,
                 ChannelType.PrivateThread,
@@ -42,7 +39,7 @@ class SlowmodeExecutor(
                 ChannelType.GuildForum
             )
         }
-        val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription"))
+        val reason = optionalString(Slowmode.Command.ReasonOptionName, Slowmode.Command.ReasonOptionDescription)
     }
 
     override val options = Options()
@@ -54,11 +51,11 @@ class SlowmodeExecutor(
         context.deferEphemeralChannelMessage()
 
         val data = SlowmodeData(
-            args[options.channel] ?: Channel.from(ChannelData.from(rest.channel.getChannel(context.guildId)), kord),
+            args[options.channel] ?: fetchChannel(nabi, rest.channel.getChannel(context.channelId)),
             context.sender,
             Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
             Duration.parse(args[options.duration]),
-            args[options.reason]
+            args[options.reason] ?: "No reason provided."
         )
 
         val interactionCheck = validate(data)
@@ -68,16 +65,29 @@ class SlowmodeExecutor(
         if (successInteractionCheck.isEmpty()) {
             context.ephemeralFail {
                 for (fail in failInteractionCheck) {
-                    buildInteractionFailMessage(fail, this)
+                    buildInteractionFailMessage(context.i18nContext, fail, this)
                 }
             }
         }
 
-        slowmode(data)
+        context.sendMessage {
+            slowmode(context.i18nContext, data, this)
+        }
     }
 
-    private suspend fun slowmode(data: SlowmodeData) {
+    private suspend fun slowmode(i18nContext: I18nContext, data: SlowmodeData, builder: MessageBuilder) {
         val (channel, executor, guild, duration, reason) = data
+
+        val resultantEmbed: MessageBuilder.() -> (Unit) = {
+            embed {
+                title = i18nContext.get(Slowmode.Embed.SuccessTitle)
+                description = i18nContext.get(
+                    Slowmode.Embed.SuccessDescription(channel.data.name, channel.mention, channel.id, duration, reason)
+                )
+                color = ColorUtils.DEFAULT
+                timestamp = Clock.System.now()
+            }
+        }
 
         val channelAsTextChannel = channel as TextChannel
 
@@ -100,8 +110,6 @@ class SlowmodeExecutor(
                 this.rateLimitPerUser = duration
                 this.reason = reason
             }
-
-            rest.channel.createMessage(channel.id, createSlowmodeConfirmationEmbed(channel, duration))
         } catch (e: RestRequestException) {
 
         }
@@ -143,28 +151,20 @@ class SlowmodeExecutor(
         return check
     }
 
-    private fun buildInteractionFailMessage(check: SlowmodeInteractionCheck, builder: MessageBuilder) {
+    private suspend fun buildInteractionFailMessage(
+        i18nContext: I18nContext,
+        check: SlowmodeInteractionCheck,
+        builder: MessageBuilder
+    ) {
         val (channel, executor, results) = check
 
         builder.apply {
             when (results) {
-                SlowmodeInteractionResult.INSUFFICIENT_PERMISSIONS -> TODO()
-                SlowmodeInteractionResult.DURATION_OUTSIDE_OF_RANGE -> TODO()
-                SlowmodeInteractionResult.INVALID_CHANNEL -> TODO()
-                SlowmodeInteractionResult.SUCCESS -> TODO()
+                SlowmodeInteractionResult.INSUFFICIENT_PERMISSIONS -> styled(i18nContext.get(Slowmode.Error.PermissionIsMissing))
+                SlowmodeInteractionResult.DURATION_OUTSIDE_OF_RANGE -> styled(i18nContext.get(Slowmode.Error.DurationOutsideRange))
+                SlowmodeInteractionResult.INVALID_CHANNEL -> styled(i18nContext.get(Slowmode.Error.InvalidChannelFormat))
+                SlowmodeInteractionResult.SUCCESS -> error("Nothing should return!")
             }
-        }
-    }
-
-    private fun createSlowmodeConfirmationEmbed(
-        channel: Channel,
-        duration: Duration
-    ): UserMessageCreateBuilder.() -> (Unit) = {
-        embed {
-            title = i18n.get("confirmationEmbedTitle")
-            description = i18n.get("confirmationEmbedDescription", mapOf("0" to "${duration.absoluteValue}"))
-            color = ColorUtils.SUCCESS
-            timestamp = Clock.System.now()
         }
     }
 
@@ -173,7 +173,7 @@ class SlowmodeExecutor(
         val executor: User,
         val guild: Guild,
         val duration: Duration,
-        val reason: String?
+        val reason: String
     )
 
     private data class SlowmodeInteractionCheck(

@@ -1,0 +1,27 @@
+[command]
+name = "purge"
+description = "Removes the amount of messages supplied."
+countOptionName = "count"
+countOptionDescription = "The number of messages you want to delete."
+channelOptionName = "channel"
+channelOptionDescription = "The channel you want to purge."
+userOptionName = "user"
+userOptionDescription = "Targets the specified user's message."
+reasonOptionName = "reason"
+reasonOptionDescription = "The reason why the messages are being deleted."
+
+[error]
+permissionMissing = """
+    Nabi is currently missing the `MANAGE_MESSAGES` permission. Please check if Nabi has the required permissions
+    to execute the commands, and try again.
+"""
+targetRoleIsEqualOrHigher = """
+    You can't mute this member due to insufficient permissions. Please make sure your permissions is higher than
+    the person you're trying to mute, and try again.
+"""
+
+[embed]
+resultantTitle = "Messages Deleted"
+resultantDescription = """
+    *
+"""

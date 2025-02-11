@@ -10,26 +10,28 @@ import dev.kord.rest.request.RestRequestException
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
-import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
-import live.shuuyu.discordinteraktions.common.commands.options.ApplicationCommandOptions
+import live.shuuyu.discordinteraktions.common.builder.message.embed
 import live.shuuyu.discordinteraktions.common.commands.options.SlashCommandArguments
+import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
+import live.shuuyu.nabi.i18n.Ban
+import live.shuuyu.nabi.i18n.Mute
 import live.shuuyu.nabi.interactions.commands.moderation.utils.ModerationInteractionWrapper
 import live.shuuyu.nabi.interactions.utils.NabiApplicationCommandContext
 import live.shuuyu.nabi.interactions.utils.NabiGuildApplicationContext
 import live.shuuyu.nabi.interactions.utils.NabiSlashCommandExecutor
-import live.shuuyu.nabi.utils.MessageUtils.createRespondEmbed
+import live.shuuyu.nabi.interactions.utils.options.NabiApplicationCommandOptions
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-class MuteExecutor(
-    nabi: NabiCore,
-): NabiSlashCommandExecutor(nabi, LanguageManager("./locale/commands/Kick.toml")), ModerationInteractionWrapper {
-    inner class Options: ApplicationCommandOptions() {
-        val user = user(i18n.get("userOptionName"), i18n.get("userOptionDescription"))
-        val duration = string(i18n.get("durationOptionName"), i18n.get("durationOptionDescription"))
-        val reason = optionalString(i18n.get("reasonOptionName"), i18n.get("reasonOptionDescription"))
+class MuteExecutor(nabi: NabiCore, ): NabiSlashCommandExecutor(nabi), ModerationInteractionWrapper {
+    inner class Options: NabiApplicationCommandOptions(language) {
+        val user = user(Mute.Command.UserOptionName, Mute.Command.UserOptionDescription)
+        val duration = string(Mute.Command.DurationOptionName, Mute.Command.DurationOptionDescription)
+        val reason = optionalString(Mute.Command.ReasonOptionName, Mute.Command.ReasonOptionDescription) {
+            allowedLength = 0..512
+        }
     }
 
     override val options = Options()
@@ -45,7 +47,7 @@ class MuteExecutor(
             context.sender,
             Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
             Duration.parse(args[options.duration]),
-            args[options.reason]
+            args[options.reason] ?: "No reason provided"
         )
 
         val check = validate(data)
@@ -55,16 +57,27 @@ class MuteExecutor(
         if (successCheck.isEmpty()) {
             context.ephemeralFail {
                 for (fail in failCheck) {
-                     buildInteractionFailMessage(fail, this)
+                     buildInteractionFailMessage(context.i18nContext, fail, this)
                 }
             }
         }
 
-        mute(data)
+        context.sendMessage {
+            muteUser(context.i18nContext, data, this)
+        }
     }
 
-    private suspend fun mute(data: MuteData) {
+    private suspend fun muteUser(i18nContext: I18nContext, data: MuteData, builder: MessageBuilder) {
         val (target, executor, guild, duration, reason) = data
+
+        val resultantEmbed: MessageBuilder.() -> (Unit) = {
+            embed {
+                title = i18nContext.get(Ban.Embed.ResultantTitle)
+                description = i18nContext.get(
+                    Ban.Embed.ResultantDescription(target.username, target.mention, target.id, reason)
+                )
+            }
+        }
 
         val targetAsMember = target.asMember(guild.id)
         val executorAsMember = executor.asMember(guild.id)
@@ -88,8 +101,14 @@ class MuteExecutor(
                 this.communicationDisabledUntil = Clock.System.now().plus(duration)
                 this.reason = reason
             }
-        } catch (e: RestRequestException) {
 
+            builder.apply(resultantEmbed)
+        } catch (e: RestRequestException) {
+            val errorMessage: MessageBuilder.() -> (Unit) = {
+                content = "The command couldn't be successfully executed."
+            }
+
+            builder.apply(errorMessage)
         }
     }
 
@@ -175,42 +194,18 @@ class MuteExecutor(
         return check
     }
 
-    private fun buildInteractionFailMessage(check: MuteInteractionCheck, builder: MessageBuilder) {
-        val (target, executor, results) = check
+    private suspend fun buildInteractionFailMessage(i18nContext: I18nContext, check: MuteInteractionCheck, builder: MessageBuilder) {
+        val (_, _, results) = check
 
         builder.apply {
             when(results) {
-                MuteInteractionResults.INSUFFICIENT_PERMISSIONS -> createRespondEmbed(
-                    i18n.get("insufficientPermission"),
-                    executor
-                )
-
-                MuteInteractionResults.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> createRespondEmbed(
-                    i18n.get("targetRoleEqualOrHigher"),
-                    executor
-                )
-
-                // TODO: Remove this since we're going to assign them the legacy version of mute if it's above 28 days.
-                MuteInteractionResults.DURATION_OUTSIDE_OF_RANGE -> createRespondEmbed(
-                    i18n.get("durationOutsideOfRange"),
-                    executor
-                )
-
-                MuteInteractionResults.TARGET_IS_OWNER -> createRespondEmbed(
-                    i18n.get("targetIsOwner"),
-                    executor
-                )
-
-                MuteInteractionResults.TARGET_IS_NULL -> createRespondEmbed(
-                    i18n.get("targetIsNull"),
-                    executor
-                )
-                MuteInteractionResults.TARGET_IS_SELF -> createRespondEmbed(
-                    i18n.get("targetIsSelf"),
-                    executor
-                )
-
-                MuteInteractionResults.SUCCESS -> TODO()
+                MuteInteractionResults.INSUFFICIENT_PERMISSIONS -> styled(i18nContext.get(Mute.Error.PermissionIsMissing))
+                MuteInteractionResults.TARGET_PERMISSION_IS_EQUAL_OR_HIGHER -> styled(i18nContext.get(Mute.Error.TargetRoleIsEqualOrHigher))
+                MuteInteractionResults.DURATION_OUTSIDE_OF_RANGE -> styled(i18nContext.get(Mute.Error.DurationOutsideRange))
+                MuteInteractionResults.TARGET_IS_OWNER -> styled(i18nContext.get(Mute.Error.TargetIsOwner ))
+                MuteInteractionResults.TARGET_IS_NULL -> styled(i18nContext.get(Mute.Error.TargetIsNull))
+                MuteInteractionResults.TARGET_IS_SELF -> styled(i18nContext.get(Mute.Error.TargetIsSelf))
+                MuteInteractionResults.SUCCESS -> error("This should always result in a no-operation!")
             }
         }
     }
@@ -220,7 +215,7 @@ class MuteExecutor(
         val executor: User,
         val guild: Guild,
         val duration: Duration,
-        val reason: String?,
+        val reason: String,
     )
 
     private data class MuteInteractionCheck(

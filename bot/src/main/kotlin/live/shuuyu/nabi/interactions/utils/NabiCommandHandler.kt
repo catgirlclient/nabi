@@ -12,7 +12,7 @@ import live.shuuyu.discordinteraktions.common.commands.GuildApplicationCommandCo
 import live.shuuyu.i18n.I18nContext
 import live.shuuyu.nabi.NabiCore
 
-interface NabiCommandHandler {
+interface  NabiCommandHandler {
     companion object: CoroutineScope {
         private val logger = KotlinLogging.logger {  }
         override val coroutineContext = Dispatchers.Default + SupervisorJob() + CoroutineName("Nabi's Command Handler")

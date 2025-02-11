@@ -1,23 +1,19 @@
 package live.shuuyu.nabi.interactions.commands.discord.declarators
 
-import live.shuuyu.common.locale.LanguageManager
-import live.shuuyu.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
-import live.shuuyu.discordinteraktions.common.commands.slashCommand
 import live.shuuyu.nabi.NabiCore
+import live.shuuyu.nabi.i18n.UserAvatar
+import live.shuuyu.nabi.i18n.UserInfo
 import live.shuuyu.nabi.interactions.commands.discord.user.UserAvatarSlashExecutor
 import live.shuuyu.nabi.interactions.commands.discord.user.UserInfoSlashExecutor
+import live.shuuyu.nabi.interactions.utils.NabiSlashCommandDeclarationWrapper
 
-class UserSlashDeclarator(val nabi: NabiCore): SlashCommandDeclarationWrapper {
-    companion object {
-        val i18n = LanguageManager("./locale/commands/UserInfo.toml")
-    }
-
-    override fun declaration() = slashCommand(i18n.get("name"), i18n.get("description")) {
+class UserSlashDeclarator(nabi: NabiCore): NabiSlashCommandDeclarationWrapper(nabi) {
+    override fun declaration() = slashCommand(UserInfo.Command.Name, UserInfo.Command.Description) {
         dmPermission = true
 
         executor = UserInfoSlashExecutor(nabi)
 
-        subcommand(i18n.get("avatarName"), i18n.get("avatarDescription")) {
+        subcommand(UserAvatar.Command.Name, UserAvatar.Command.Description) {
             dmPermission = true
 
             executor = UserAvatarSlashExecutor(nabi)

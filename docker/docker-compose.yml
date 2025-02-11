@@ -1,0 +1,37 @@
+services:
+  # TODO: Eventually phase out postgres for scylladb
+  nabi-postgresql:
+    image: postgres
+    pull_policy: 'always'
+    container_name: "nabidb-postgresql"
+    restart: always
+    ports:
+      - "5432"
+    env_file:
+      - ../postgres.env
+
+  nabi-garnet:
+    image: 'ghcr.io/microsoft/garnet'
+    pull_policy: 'always'
+    container_name: "nabi-garnet"
+    restart: always
+    ulimits:
+      memlock: -1
+    ports:
+      - "6380:6379"
+
+  nabi-scylladb:
+    image: scylladb/scylla
+    pull_policy: 'always'
+    container_name: 'nabi-scylladb'
+    restart: always
+    ports:
+      - "2345"
+
+  nabi-prometheus:
+    image: prom/prometheus
+    pull_policy: 'always'
+    container_name: 'nabi-prometheus'
+    restart: always
+    ports:
+      - '3030'

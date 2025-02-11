@@ -1,0 +1,3 @@
+[command]
+name = "avatar"
+description = "Displays the avatar associated with the user."
