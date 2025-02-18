@@ -44,7 +44,7 @@ class BlacklistRemoveExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
         val executor = data.executor
 
         when {
-            executor.id !in nabi.config.discord.ownerIds -> check.add(
+            executor.id.value.toLong() !in nabi.config.discord.ownerIds -> check.add(
                 BlacklistRemoveInteractionCheck(
                     target,
                     executor,

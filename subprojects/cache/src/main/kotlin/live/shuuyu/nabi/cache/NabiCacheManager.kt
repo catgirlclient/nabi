@@ -5,43 +5,43 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.reactive.awaitSingle
 import live.shuuyu.nabi.cache.entities.*
 import org.redisson.Redisson
-import org.redisson.api.RedissonReactiveClient
 import org.redisson.codec.ZStdCodec
 import org.redisson.config.Config
 
 class NabiCacheManager(val config: NabiCacheConfig) {
     companion object {
         val logger = KotlinLogging.logger {  }
-        val config = Config()
+        val redissonConfig = Config()
     }
 
-    lateinit var client: RedissonReactiveClient
-    // We will initialize kord before the bot starts, no need to do this when the service starts.
     lateinit var kord: Kord
+
+    fun initialize(config: NabiCacheConfig, kord: Kord): Config {
+        this.kord = kord
+
+        return redissonConfig.apply {
+            codec = ZStdCodec()
+
+            useClusterServers().apply {
+                for (address in config.addresses) {
+                    addNodeAddress(address)
+                }
+                username = config.username
+                password = config.password
+                retryAttempts = 10
+                isKeepAlive = true
+                clientName = "Nabi-Cache"
+            }
+        }
+    }
+
+    private val client = Redisson.create(redissonConfig).reactive()
 
     val channels = ChannelEntities(client, kord)
     val guilds = GuildEntities(client, kord)
     val members = MemberEntities(client, kord)
     val roles = RoleEntities(client, kord)
     val users = UserEntities(client, kord)
-
-    fun initialize(kord: Kord): RedissonReactiveClient {
-        val cluster = Companion.config.useClusterServers()
-        this.kord = kord
-
-        for (address in config.addresses) {
-            cluster.addNodeAddress(address)
-        }
-
-        cluster.username = config.username
-        cluster.password = config.password
-        cluster.retryAttempts = 10
-        cluster.isKeepAlive = true
-
-        return Redisson.create(Companion.config.also {
-            it.codec = ZStdCodec()
-        }).reactive()
-    }
 
     // Clear local cache when the instance stops. This should only be executed during the shutdown phase.
     suspend fun stop() {

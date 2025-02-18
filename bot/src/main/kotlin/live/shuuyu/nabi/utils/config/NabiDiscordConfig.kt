@@ -1,6 +1,5 @@
 package live.shuuyu.nabi.utils.config
 
-import dev.kord.common.entity.Snowflake
 import kotlinx.serialization.Serializable
 
 /**
@@ -16,11 +15,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NabiDiscordConfig(
     val token: String,
-    val applicationId: Snowflake,
-    val defaultGuildId: Snowflake,
+    val applicationId: Long,
+    val defaultGuildId: Long,
     val shards: Int,
     val defaultPrefix: String,
-    val ownerIds: List<Snowflake>,
+    val ownerIds: List<Long>,
     val publicKey: String,
     val port: Int,
 )

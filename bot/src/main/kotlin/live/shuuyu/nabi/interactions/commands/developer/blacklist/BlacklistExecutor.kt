@@ -82,7 +82,7 @@ class BlacklistExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
         val executor = data.executor
 
         when {
-            executor.id !in nabi.config.discord.ownerIds -> {
+            executor.id.value.toLong() !in nabi.config.discord.ownerIds -> {
                 check.add(
                     BlacklistInteractionCheck (
                         target,
@@ -92,7 +92,7 @@ class BlacklistExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi) {
                 )
             }
 
-            target.id in nabi.config.discord.ownerIds -> {
+            target.id.value.toLong() in nabi.config.discord.ownerIds -> {
                 check.add(
                     BlacklistInteractionCheck (
                         target,

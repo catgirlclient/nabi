@@ -3,6 +3,7 @@ package live.shuuyu.nabi
 import dev.kord.common.annotation.KordExperimental
 import dev.kord.common.annotation.KordUnsafe
 import dev.kord.common.entity.PresenceStatus
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.gateway.Intent
 import dev.kord.gateway.Intents
@@ -41,6 +42,9 @@ class NabiCore(
         val logger = KotlinLogging.logger("Nabi")
     }
 
+    private val applicationId = Snowflake(config.discord.applicationId)
+    private val defaultGuildId = Snowflake(config.discord.defaultGuildId)
+
     @OptIn(KordExperimental::class)
     val kord = Kord.restOnly(config.discord.token) {
         requestHandler {
@@ -55,7 +59,7 @@ class NabiCore(
         override val coroutineContext = Dispatchers.IO + SupervisorJob()
     }
 
-    val interaktions = DiscordInteraKTions(config.discord.token, config.discord.applicationId)
+    val interaktions = DiscordInteraKTions(config.discord.token, applicationId)
     private val manager = InteractionsManager(this)
 
     private val modules = listOf(
@@ -81,7 +85,7 @@ class NabiCore(
         logger.info { "Running pre-initialization tasks, this may take a while..." }
 
         require(slashCommandCount > 100) {
-            "Registered slash command count is more than 100! Exiting the process....  "
+            "Registered slash command count is more than 100! Exiting the process...."
         }
     }
 
@@ -92,8 +96,8 @@ class NabiCore(
         database.initialize()
         database.createMissingTablesAndColums()
         manager.registerGlobalApplicationCommands()
-        manager.registerGuildApplicationCommands(config.discord.defaultGuildId)
-        cache.initialize(kord)
+        manager.registerGuildApplicationCommands(defaultGuildId)
+        cache.initialize(config.cache, kord)
         metrics.start()
 
         logger.info { "Initializing all Gateway instances of Nabi..." }
