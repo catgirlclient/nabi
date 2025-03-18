@@ -1,5 +1,5 @@
 plugins {
-    id("live.shuuyu.plugins.module")
+    id("live.shuuyu.plugins.convention.module")
 }
 
 description = "Common packages and modules shared across the project."

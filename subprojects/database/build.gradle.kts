@@ -1,5 +1,5 @@
 plugins {
-    id("live.shuuyu.plugins.module")
+    id("live.shuuyu.plugins.convention.module")
 }
 
 description = "The database in which Nabi's data is stored in."

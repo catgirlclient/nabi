@@ -38,6 +38,5 @@ include(
     ":dashboard",
     ":subprojects:cache",
     ":subprojects:database",
-    ":subprojects:entities",
     ":subprojects:metrics"
 )

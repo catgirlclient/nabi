@@ -3,7 +3,7 @@ import live.shuuyu.plugins.i18n.tasks.GenerateI18nFileTask
 import live.shuuyu.plugins.i18n.utils.ParserType
 
 plugins {
-    id("live.shuuyu.plugins.module")
+    id("live.shuuyu.plugins.convention.module")
     id("live.shuuyu.plugins.i18n")
     alias(libs.plugins.shadow)
     alias(libs.plugins.jib)

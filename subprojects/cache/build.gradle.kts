@@ -1,5 +1,5 @@
 plugins {
-    id("live.shuuyu.plugins.module")
+    id("live.shuuyu.plugins.convention.module")
 }
 
 description = "Caches all sequestered information in Nabi to improve performance!"
