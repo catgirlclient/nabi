@@ -4,6 +4,7 @@ import dev.kord.common.entity.ChannelType
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.edit
+import dev.kord.core.cache.data.ChannelData
 import dev.kord.core.cache.data.GuildData
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
@@ -51,7 +52,7 @@ class SlowmodeExecutor(nabi: NabiCore): NabiSlashCommandExecutor(nabi), Moderati
         context.deferEphemeralChannelMessage()
 
         val data = SlowmodeData(
-            args[options.channel] ?: fetchChannel(nabi, rest.channel.getChannel(context.channelId)),
+            args[options.channel] ?: Channel.from(ChannelData.from(rest.channel.getChannel(context.channelId)), kord),
             context.sender,
             Guild(GuildData.from(rest.guild.getGuild(context.guildId)), kord),
             Duration.parse(args[options.duration]),

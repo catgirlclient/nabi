@@ -1,13 +1,8 @@
 package live.shuuyu.nabi.interactions.commands.moderation.utils
 
-import dev.kord.common.entity.DiscordChannel
-import dev.kord.common.entity.Snowflake
-import dev.kord.core.cache.data.ChannelData
-import dev.kord.core.cache.data.UserData
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.Channel
 import dev.kord.core.entity.effectiveName
-import dev.kord.core.exception.EntityNotFoundException
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
@@ -16,42 +11,12 @@ import live.shuuyu.common.locale.LanguageManager
 import live.shuuyu.discordinteraktions.common.builder.message.MessageBuilder
 import live.shuuyu.discordinteraktions.common.builder.message.embed
 import live.shuuyu.discordinteraktions.common.utils.thumbnailUrl
-import live.shuuyu.nabi.NabiCore
 import live.shuuyu.nabi.utils.ColorUtils
 import live.shuuyu.nabi.utils.UserUtils.getUserAvatar
 
 interface ModerationInteractionWrapper {
     private companion object {
         val i18n = LanguageManager("./locale/utils/ModerationInteractionWrapper.toml")
-    }
-
-    suspend fun fetchGuild(nabi: NabiCore, guildId: Snowflake) {
-        val cachedGuild = nabi.cache.guilds.get(guildId)
-
-
-    }
-
-    suspend fun fetchUser(nabi: NabiCore, userId: Snowflake): User {
-        val cachedUser = nabi.cache.users.get(userId)
-
-        try {
-            return cachedUser!!.fetchUser()
-        } catch (e: EntityNotFoundException) {
-            val userFromRest = nabi.rest.user.getUser(userId)
-            nabi.cache.users.set(userFromRest)
-            return User(UserData.from(userFromRest), nabi.kord)
-        }
-    }
-
-    suspend fun fetchChannel(nabi: NabiCore, channel: DiscordChannel): Channel {
-        val cache = nabi.cache
-
-        try {
-            return cache.channels.get(channel.id)!!.fetchChannel()
-        } catch (e: EntityNotFoundException) {
-            cache.channels.set(channel)
-            return Channel.from(ChannelData.from(channel), nabi.kord)
-        }
     }
 
     suspend fun styled(description: String): MessageBuilder.() -> (Unit) = {

@@ -22,16 +22,13 @@ object MessageUtils {
         builder: MultipartMessageCreateRequest
     ) {
         val rest = nabi.rest
-        val dmChannelId = nabi.cache.channels.get(user.getDmChannel().id)?.id  ?: nabi.rest.user.createDM(DMCreateRequest(user.id)).id
+        val dmChannelId = nabi.rest.user.createDM(DMCreateRequest(user.id)).id
         try {
             rest.channel.createMessage(dmChannelId, builder)
         } catch (e: RestRequestException) {
             logger.debug(e) {
                 "Failed to send direct message to the user, most likely because the user has their direct messages closed"
             }
-
-            // It most likely is someone who doesn't exist, let's just delete it from the cache.
-            nabi.cache.channels.remove(dmChannelId)
         }
     }
 

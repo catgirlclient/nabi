@@ -4,7 +4,6 @@ Nabi would not be possible without the following dependencies!
 ## Caching
 * [Caffeine](https://github.com/kordlib/cache/tree/main/caffeine)
 * [Redisson](https://github.com/redisson/redisson)
-* [DragonflyDB](https://github.com/dragonflydb/dragonfly)
 
 ## Compression
 * [Zstd](https://github.com/facebook/zstd)

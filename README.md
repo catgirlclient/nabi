@@ -3,6 +3,11 @@
     Because butterflies were meant to fly~
 </p>
 
+# Rewriting
+Unfortunately, at the time of writing this, Kord has unfortunately seen little to no updates within the past few months.
+Due to this, I've grown incredibly frustrated with the usage of the library, which is partially reason why I'm considering
+using Twilight (Which means rewriting entirely to use Rust) or JDA (Which will just require a bit of refactoring).
+
 ## Purpose
 Nabi was made with the purpose of being completely free and accessable for servers. Most bots require you to pay money 
 in order to use their more advanced features. However, most servers cannot afford these features in other bots, so 

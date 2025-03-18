@@ -97,7 +97,6 @@ class NabiCore(
         database.createMissingTablesAndColums()
         manager.registerGlobalApplicationCommands()
         manager.registerGuildApplicationCommands(defaultGuildId)
-        cache.initialize(config.cache, kord)
         metrics.start()
 
         logger.info { "Initializing all Gateway instances of Nabi..." }
